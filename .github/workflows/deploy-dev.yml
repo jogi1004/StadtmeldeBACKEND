@@ -1,0 +1,46 @@
+name: Deploy Dev
+
+on:
+  workflow_run:
+    workflows: ["Build Dev"]
+    types:
+      - completed
+
+env:
+  PROJECT_ID: vaulted-art-327315 
+  GAR_LOCATION: europe-west3
+  REGION: us-central1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout develop branch
+        uses: actions/checkout@v2
+        with:
+          ref: develop
+
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v2.0.1'
+        with:
+          project_id: '${{env.PROJECT_ID}}'
+          token_format: 'access_token'
+          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+          service_account: '${{ secrets.SA_EMAIL }}'
+        
+      - name: Get latest commit SHA
+        run: echo "DEVELOP_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+      - name: Deploy to Cloud Run - UserManagement
+        id: deploy-usermanagement-dev
+        uses: google-github-actions/deploy-cloudrun@v2.0.0
+        with:
+          service: usermanagementservice-dev
+          region: ${{ env.REGION }}
+          image: "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/stadtmeldeappregistry/usermanagement-image-dev:${{ env.DEVELOP_SHA }}"
