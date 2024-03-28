@@ -21,13 +21,13 @@ jobs:
 
     steps:
       - name: Checkout develop branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4.1.1
         with:
           ref: develop
 
       - name: Google Auth
         id: auth
-        uses: 'google-github-actions/auth@v2.0.1'
+        uses: 'google-github-actions/auth@v2.1.2'
         with:
           project_id: '${{env.PROJECT_ID}}'
           token_format: 'access_token'
@@ -39,7 +39,7 @@ jobs:
           
       - name: Deploy to Cloud Run
         id: deploy-backend-dev
-        uses: google-github-actions/deploy-cloudrun@v2.0.0
+        uses: google-github-actions/deploy-cloudrun@v2.2.0
         with:
           service: backendservice-dev
           region: ${{ env.REGION }}
