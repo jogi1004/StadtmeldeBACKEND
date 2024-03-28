@@ -1,4 +1,4 @@
-/* package com.stadtmeldeapp.service;
+package com.stadtmeldeapp.service;
 
 import com.stadtmeldeapp.Entity.RoleEntity;
 import com.stadtmeldeapp.Repository.RoleRepository;
@@ -22,4 +22,3 @@ public class RoleService {
         return null;
     }
 }
- */

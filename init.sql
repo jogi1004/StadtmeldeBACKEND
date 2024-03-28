@@ -1,3 +1,33 @@
+-- Create Reporting Locations table
+CREATE TABLE reportinglocations (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+-- Create Status table
+CREATE TABLE status (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+-- Create Main Categories table
+CREATE TABLE maincategories (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL
+);
+
+-- Create Sub Categories table
+CREATE TABLE subcategories (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL
+);
+
+-- Create Role table
+CREATE TABLE roles (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
 -- Create User table
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
@@ -8,6 +38,14 @@ CREATE TABLE users (
     notifications_enabled BOOLEAN,
     reporting_location_id INTEGER
 );
+
+-- Create User Roles table
+CREATE TABLE user_roles (
+    user_id INTEGER,
+    role_id INTEGER,
+    PRIMARY KEY (user_id, role_id)
+);
+
 
 -- Create Messages table
 CREATE TABLE reports (
@@ -22,27 +60,8 @@ CREATE TABLE reports (
     additional_picture BYTEA
 );
 
--- Create Main Categories table
-CREATE TABLE maincategories (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL
-);
+-- Insert roles
+INSERT INTO roles (name) VALUES ('USER'), ('ADMIN');
 
--- Create Sub Categories table
-CREATE TABLE subcategories (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    main_category_id INTEGER
-);
-
--- Create Reporting Locations table
-CREATE TABLE reportinglocations (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
-);
-
--- Create Status table
-CREATE TABLE status (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
-)
+-- Insert reporting location
+INSERT INTO reportinglocations (name) VALUES ('Zweibrücken');
