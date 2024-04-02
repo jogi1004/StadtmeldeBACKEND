@@ -31,8 +31,8 @@ CREATE TABLE maincategories (
 -- Create Sub Categories table
 CREATE TABLE subcategories (
     id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    main_category_id INTEGER
+    main_category_id INTEGER,
+    title VARCHAR(255) NOT NULL
 );
 
 -- Create Reporting Locations table
@@ -46,3 +46,60 @@ CREATE TABLE status (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL
 )
+
+-- add maincategories
+INSERT INTO maincategories (title)
+VALUES ('Straßenschäden'),
+       ('Gebäudeschäden'),
+       ('Öffentliche Einrichtungen'),
+       ('Grünanlagen'),
+       ('Abfall und Umweltverschmutzung'),
+       ('Verkehrsschilder und Markierungen'),
+       ('Öffentlicher Nahverkehr'),
+       ('Versorgungsleitungen');
+
+-- add subcategories
+INSERT INTO subcategories (main_category_id, title)
+VALUES (1, 'Schlaglöcher'),
+       (1, 'Risse im Asphalt'),
+       (1, 'Beschädigte Bordsteine'),
+       (1, 'Sonstiges'),
+       (2, 'Zerbrochene Fenster'),
+       (2, 'Beschädigte Fassaden'),
+       (2, 'Eingestürzte Dächer'),
+       (2, 'Sonstiges'),
+       (3, 'Defekte Straßenlampen'),
+       (3, 'Kaputte Parkbänke'),
+       (3, 'Beschädigte Spielplätze'),
+       (3, 'Sonstiges'),
+       (4, 'Umgestürzte Bäume'),
+       (4, 'Beschädigte Zäune'),
+       (4, 'Verwüstete Blumenbeete'),
+       (4, 'Sonstiges'),
+       (5, 'Müllablagerungen'),
+       (5, 'Graffiti'),
+       (5, 'Verschmutzte Gewässer'),
+       (5, 'Sonstiges'),
+       (6, 'Fehlende Verkehrsschilder'),
+       (6, 'Unleserliche Markierungen'),
+       (6, 'Beschädigte Leitpfosten'),
+       (6, 'Sonstiges'),
+       (7, 'Defekte Bushaltestellen'),
+       (7, 'Störungen im Bahnverkehr'),
+       (7, 'Verspätete Busse'),
+       (7, 'Sonstiges'),
+       (8, 'Wasserrohrbrüche'),
+       (8, 'Stromausfälle'),
+       (8, 'Gaslecks'),
+       (8, 'Sonstiges');
+
+-- add status
+INSERT INTO status (name)
+VALUES ('Neu'),
+       ('In Bearbeitung'),
+       ('Abgeschlossen'),
+       ('Abgelehnt');
+
+-- add reportinglocations
+INSERT INTO reportinglocations (name)
+VALUES ('Zweibrücken');
