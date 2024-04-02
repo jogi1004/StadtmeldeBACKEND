@@ -7,12 +7,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "users")
+@NoArgsConstructor
 public class UserEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,8 +52,6 @@ public class UserEntity {
      private Set<RoleEntity> roles;
      */
 
-    
-    public UserEntity() {}
 
     public UserEntity(String username, String password, String email, byte[] profilePicture, boolean notificationsEnabled, int reportingLocationId) {
         this.username = username;
