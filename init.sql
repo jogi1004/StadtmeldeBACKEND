@@ -31,7 +31,7 @@ CREATE TABLE maincategories (
 -- Create Sub Categories table
 CREATE TABLE subcategories (
     id SERIAL PRIMARY KEY,
-    main_category_id INTEGER,
+    maincategory_id INTEGER,
     title VARCHAR(255) NOT NULL
 );
 
@@ -59,7 +59,7 @@ VALUES ('Straßenschäden'),
        ('Versorgungsleitungen');
 
 -- add subcategories
-INSERT INTO subcategories (main_category_id, title)
+INSERT INTO subcategories (maincategory_id, title)
 VALUES (1, 'Schlaglöcher'),
        (1, 'Risse im Asphalt'),
        (1, 'Beschädigte Bordsteine'),
