@@ -57,7 +57,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Cross-Site-Request-Forgery
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/auth/*")
+                        .requestMatchers("/auth/*", "/swagger-ui/*", "/v3/api-docs/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
