@@ -1,5 +1,7 @@
 package com.stadtmeldeapp.Controller;
 
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,12 +10,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.stadtmeldeapp.DTO.UserInfoDTO;
+import com.stadtmeldeapp.Entity.UserEntity;
 import com.stadtmeldeapp.service.UserDetailsServiceImpl;
 import com.stadtmeldeapp.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 @RestController
 @RequestMapping("/user")
@@ -50,5 +58,19 @@ public class PrivateUserController {
 
         logger.info("Return user info for " + headerUsername);
         return ResponseEntity.ok(userInfoDTO);
+    }
+
+    @PutMapping("/addProfilePicture")
+    public UserEntity addProfilePicture(@RequestParam("file") MultipartFile file, @RequestParam("username") String username) {
+        logger.info("PROFILEPICTURE");
+        UserEntity userEntity = userService.getUserEntityByUsername(username);
+        
+        try {
+            userEntity.setProfilePicture(file.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return userService.updateUser(userEntity);
     }
 }
