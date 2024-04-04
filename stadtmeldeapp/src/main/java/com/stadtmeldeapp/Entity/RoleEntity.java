@@ -1,42 +1,26 @@
-/* package com.stadtmeldeapp.Entity;
-
-import java.util.Set;
+package com.stadtmeldeapp.Entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
 @Entity
 @Table(name = "roles")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class RoleEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToMany(mappedBy = "roles")
-    private Set<UserEntity> users;
-
     @Column(nullable = false)
     private String name;
-
-
-    public RoleEntity() {
-    }
-
-    public RoleEntity(Integer id, Set<UserEntity> users, String name) {
-        this.id = id;
-        this.users = users;
-        this.name = name;
-    }
 }
- */
