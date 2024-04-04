@@ -13,10 +13,5 @@
     "name": "jwt.secret",
     "type": "java.lang.String",
     "description": "A description for 'jwt.secret'"
-  },
-  {
-    "name": "management.endpoints.web.exposure.include",
-    "type": "java.lang.String",
-    "description": "A description for 'management.endpoints.web.exposure.include'"
   }
 ]}
