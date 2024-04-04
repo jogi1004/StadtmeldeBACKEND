@@ -61,6 +61,26 @@ public class UserService {
         return null;
     }
 
+    public UserEntity getUserEntityByUsername(String username) {
+        Optional<UserEntity> newUser = repository.findByUsername(username);
+        if (newUser.isPresent()) {
+            UserEntity user = newUser.get();
+            return user;
+        }
+        return null;
+    }
+
+    @Transactional
+    public UserEntity updateUser(UserEntity userEntity){
+        UserEntity updatedUser = repository.findByUsername(userEntity.getUsername()).orElse(null);
+        
+        if(updatedUser != null){
+            updatedUser.setProfilePicture(userEntity.getProfilePicture());
+            return repository.save(updatedUser);
+        }
+        return null;
+    }
+
     public boolean validate(String token, UserDetails userDetails) {
         token = jwtService.removeBearerFromToken(token);
         return jwtService.validateToken(token, userDetails);
