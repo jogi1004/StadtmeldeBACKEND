@@ -1,4 +1,4 @@
-/* package com.stadtmeldeapp.Repository;
+package com.stadtmeldeapp.Repository;
 
 import java.util.Optional;
 
@@ -8,4 +8,4 @@ import com.stadtmeldeapp.Entity.RoleEntity;
 
 public interface RoleRepository extends JpaRepository<RoleEntity, Integer> {
 Optional<RoleEntity> findByName(String name);
-} */
+}
