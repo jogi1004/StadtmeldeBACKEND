@@ -52,7 +52,7 @@ public class CategoryService {
         subCategoryRepository.deleteById(id);
     }
 
-    public List<SubcategoryEntity> getSubCategoriesByMainCategoryId(int mainCategoryId) {
+    /*public List<SubcategoryEntity> getSubCategoriesByMainCategoryId(int mainCategoryId) {
         return subCategoryRepository.findByMaincategoryId(mainCategoryId);
-    }
+    }*/
 }

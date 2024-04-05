@@ -10,7 +10,6 @@ public record UserInfoDTO(
     String email,
     byte[] profilePicture,
     boolean notificationsEnabled,
-    int reportingLocationId,
     Set<RoleEntity> roles
 ) {
 }

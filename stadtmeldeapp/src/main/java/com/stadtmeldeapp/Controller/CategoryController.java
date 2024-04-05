@@ -62,9 +62,9 @@ public class CategoryController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/sub/main/{mainCategoryId}")
+    /*@GetMapping("/sub/main/{mainCategoryId}")
     public ResponseEntity<List<SubcategoryEntity>> getSubCategoriesByMainCategoryId(@PathVariable("mainCategoryId") int mainCategoryId) {
         List<SubcategoryEntity> subCategories = categoryService.getSubCategoriesByMainCategoryId(mainCategoryId);
         return new ResponseEntity<>(subCategories, HttpStatus.OK);
-    }
+    }*/
 }

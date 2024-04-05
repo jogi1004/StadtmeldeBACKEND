@@ -5,19 +5,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
 @Entity
-@Table(name = "status")
+@Table(name = "reportinglocations")
+@Data
 @NoArgsConstructor
-public class StatusEntity {
+public class ReportingLocationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,9 +21,4 @@ public class StatusEntity {
 
     @Column(nullable = false, unique = true)
     private String name;
-
-    @OneToOne
-    @JoinColumn(name = "reporting_location_id", nullable = false)
-    private ReportingLocationEntity reportingLocationEntity;
-
 }

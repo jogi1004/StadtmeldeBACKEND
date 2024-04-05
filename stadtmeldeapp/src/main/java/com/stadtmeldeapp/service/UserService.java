@@ -55,7 +55,7 @@ public class UserService {
         if (newUser.isPresent()) {
             UserEntity user = newUser.get();
             UserInfoDTO userInfoDTO = new UserInfoDTO(user.getId(), username, user.getEmail(), user.getProfilePicture(),
-                    user.isNotificationsEnabled(), user.getReportingLocationId(), user.getRoles());
+                    user.isNotificationsEnabled(), user.getRoles());
             return userInfoDTO;
         }
         return null;
