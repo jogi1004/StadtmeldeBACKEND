@@ -28,7 +28,7 @@ public class CategoryService {
 
     public MaincategoryEntity getMainCategoryById(int id) {
         return mainCategoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("MainCategory not found with id " + id));
+                .orElse(null);
     }
 
     public MaincategoryEntity saveMainCategory(@NonNull MaincategoryEntity mainCategory) {
@@ -41,7 +41,7 @@ public class CategoryService {
 
     public SubcategoryEntity getSubCategoryById(int id) {
         return subCategoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("SubCategory not found with id " + id));
+                .orElse(null);
     }
 
     public SubcategoryEntity saveSubCategory(@NonNull SubcategoryEntity subCategory) {
