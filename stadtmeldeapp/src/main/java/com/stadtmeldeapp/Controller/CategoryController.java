@@ -28,7 +28,10 @@ public class CategoryController {
     @GetMapping("/main/{id}")
     public ResponseEntity<MaincategoryEntity> getMainCategoryById(@PathVariable("id") int id) {
         MaincategoryEntity mainCategory = categoryService.getMainCategoryById(id);
-        return new ResponseEntity<>(mainCategory, HttpStatus.OK);
+        if(mainCategory != null){
+            return new ResponseEntity<>(mainCategory, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping("/main")
@@ -40,14 +43,22 @@ public class CategoryController {
 
     @DeleteMapping("/main/{id}")
     public ResponseEntity<Void> deleteMainCategory(@PathVariable("id") int id) {
-        categoryService.deleteMainCategory(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        MaincategoryEntity maincategoryEntity = categoryService.getMainCategoryById(id);
+
+        if(maincategoryEntity != null){
+            categoryService.deleteMainCategory(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/sub/{id}")
     public ResponseEntity<SubcategoryEntity> getSubCategoryById(@PathVariable("id") int id) {
         SubcategoryEntity subCategory = categoryService.getSubCategoryById(id);
-        return new ResponseEntity<>(subCategory, HttpStatus.OK);
+        if(subCategory != null){
+            return new ResponseEntity<>(subCategory, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping("/sub")
@@ -58,8 +69,14 @@ public class CategoryController {
 
     @DeleteMapping("/sub/{id}")
     public ResponseEntity<Void> deleteSubCategory(@PathVariable("id") int id) {
-        categoryService.deleteSubCategory(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        SubcategoryEntity subcategoryEntity = categoryService.getSubCategoryById(id);
+
+        if(subcategoryEntity != null) {
+            categoryService.deleteSubCategory(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        
     }
 
     @GetMapping("/sub/main/{mainCategoryId}")
