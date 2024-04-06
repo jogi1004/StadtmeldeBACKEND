@@ -22,7 +22,6 @@ import com.stadtmeldeapp.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.PutMapping;
 
-
 @RestController
 @RequestMapping("/user")
 public class PrivateUserController {
@@ -41,7 +40,7 @@ public class PrivateUserController {
         String headerUsername = request.getHeader("Username");
 
         UserInfoDTO userInfoDTO = userService.getUserInfoByUsername(headerUsername);
-       
+
         if (userInfoDTO == null) {
             logger.info("User " + headerUsername + " not found.");
             // Wenn Nutzer im Header nicht exisitiert
@@ -61,16 +60,34 @@ public class PrivateUserController {
     }
 
     @PutMapping("/addProfilePicture")
-    public UserEntity addProfilePicture(@RequestParam("file") MultipartFile file, @RequestParam("username") String username) {
+    public ResponseEntity<UserEntity> addProfilePicture(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+
         logger.info("PROFILEPICTURE");
-        UserEntity userEntity = userService.getUserEntityByUsername(username);
-        
+
+        String headerUsername = request.getHeader("Username");
+
+        UserEntity userEntity = userService.getUserEntityByUsername(headerUsername);
+
+        if (userEntity == null) {
+            logger.info("User " + headerUsername + " not found.");
+            // Wenn Nutzer im Header nicht exisitiert
+            return ResponseEntity.notFound().build();
+        }
+
+        UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(headerUsername);
+        if (!userService.validate(request.getHeader("Authorization"), userDetails)) {
+            logger.info(headerUsername + " does not match JWT");
+            // Wenn JWT in Kombination mit Nutzer nicht gültig ist
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         try {
             userEntity.setProfilePicture(file.getBytes());
+            userService.updateUser(userEntity);
+            return ResponseEntity.ok().build();
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
+        return ResponseEntity.internalServerError().build();
         }
-        return userService.updateUser(userEntity);
     }
 }

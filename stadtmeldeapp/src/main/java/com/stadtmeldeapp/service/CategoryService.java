@@ -55,4 +55,8 @@ public class CategoryService {
     public List<SubcategoryEntity> getSubCategoriesByMainCategoryId(int mainCategoryId) {
         return subCategoryRepository.findByMaincategoryEntity_Id(mainCategoryId);
     }
+
+    public List<MaincategoryEntity> getMaincategoriesByLocationName(String reportingLocationName) {
+        return mainCategoryRepository.findByReportingLocationEntity_Name(reportingLocationName);
+    }
 }
