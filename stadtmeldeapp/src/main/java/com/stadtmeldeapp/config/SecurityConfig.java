@@ -56,9 +56,14 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Cross-Site-Request-Forgery
+                .cors(cors -> cors.disable())
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/auth/*", "/swagger-ui/*", "/v3/api-docs/**")
-                        .permitAll()
+                        .requestMatchers("/auth/*", "/swagger-ui/*", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/css/**").permitAll()
+                        .requestMatchers("/js/**").permitAll()
+                        .requestMatchers("/images/**").permitAll()
+                        .requestMatchers("/static/**").permitAll()
+                        .requestMatchers("/", "/home").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
