@@ -1,5 +1,6 @@
 package com.stadtmeldeapp.service;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.stadtmeldeapp.DTO.RegisterDTO;
 import com.stadtmeldeapp.DTO.UserInfoDTO;
+import com.stadtmeldeapp.Entity.RoleEntity;
 import com.stadtmeldeapp.Entity.UserEntity;
 import com.stadtmeldeapp.Repository.UserRepository;
 
@@ -21,14 +23,14 @@ public class UserService {
 
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
-    // private final RoleService roleService;
+    private final RoleService roleService;
     private final JwtService jwtService;
 
-    public UserService(UserRepository repository, PasswordEncoder passwordEncoder, /* RoleService roleService, */
+    public UserService(UserRepository repository, PasswordEncoder passwordEncoder, RoleService roleService,
             JwtService jwtService) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
-        // this.roleService = roleService;
+        this.roleService = roleService;
         this.jwtService = jwtService;
     }
 
@@ -40,10 +42,10 @@ public class UserService {
         }
 
         String hashedPassword = passwordEncoder.encode(request.password());
-        // RoleEntity role = roleService.findRoleByName("ROLE_USER");
+        RoleEntity role = roleService.findRoleByName("USER");
 
-        UserEntity user = new UserEntity(request.username(), hashedPassword, request.email(), null, false, -1); // die letzten drei Werte sind noch nicht bekannt
-        // Collections.singleton(role));
+        UserEntity user = new UserEntity(request.username(), hashedPassword, request.email(),
+                Collections.singleton(role));
 
         return repository.save(user);
     }
@@ -53,8 +55,28 @@ public class UserService {
         if (newUser.isPresent()) {
             UserEntity user = newUser.get();
             UserInfoDTO userInfoDTO = new UserInfoDTO(user.getId(), username, user.getEmail(), user.getProfilePicture(),
-                    user.isNotificationsEnabled(), user.getReportingLocationId());
+                    user.isNotificationsEnabled(), user.getRoles());
             return userInfoDTO;
+        }
+        return null;
+    }
+
+    public UserEntity getUserEntityByUsername(String username) {
+        Optional<UserEntity> newUser = repository.findByUsername(username);
+        if (newUser.isPresent()) {
+            UserEntity user = newUser.get();
+            return user;
+        }
+        return null;
+    }
+
+    @Transactional
+    public UserEntity updateUser(UserEntity userEntity){
+        UserEntity updatedUser = repository.findByUsername(userEntity.getUsername()).orElse(null);
+        
+        if(updatedUser != null){
+            updatedUser.setProfilePicture(userEntity.getProfilePicture());
+            return repository.save(updatedUser);
         }
         return null;
     }
