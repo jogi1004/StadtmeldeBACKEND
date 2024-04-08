@@ -20,6 +20,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link active" aria-current="page" href="#!" onclick="showSection('home')">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#!" onclick="showSection('login')">Login</a></li>
                     <li class="nav-item"><a class="nav-link" href="#!" onclick="showSection('ueber-uns')">Über uns</a></li>
                     <li class="nav-item"><a class="nav-link" href="#!" onclick="showSection('kontakte')">Kontakt</a></li>
                     <li class="nav-item"><a class="nav-link" href="#!" onclick="showSection('dienstleistungen')">Dienstleistungen</a></li>
@@ -77,17 +78,68 @@
             </div>
         </div>
 
-        <!-- Kontakte Abschnitt -->
-        <div id="kontakte" class="container px-4 px-lg-5 min-vh-85" style="display: none;">
-            <h2 class="text-center mt-5">Kontaktiere uns</h2>
+        <!-- Login Abschnitt -->
+        <div id="login" class="container px-4 px-lg-5 min-vh-85" style="display: none;">
+            <h2 class="text-center mt-5">Login</h2>
             <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <p class="lead">Fühlen Sie sich frei, uns für Anfragen oder Unterstützung zu kontaktieren.</p>
-                    <p>Sie können uns per E-Mail unter <a href="mailto:kontakt@citycare.com">kontakt@citycare.com</a> oder telefonisch unter +123456789 erreichen.</p>
+                <div class="col-lg-6">
+                    <form id="loginForm" th:action="@{/auth/login}" method="post">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </form>
                 </div>
             </div>
         </div>
+        <script>
+            document.getElementById("loginForm").addEventListener("submit", function(event) {
+                event.preventDefault(); // Prevent form submission
 
+                // Get the username and password values
+                var username = document.getElementById("username").value;
+                var password = document.getElementById("password").value;
+
+                // Create a new XMLHttpRequest object
+                var xhr = new XMLHttpRequest();
+
+                // Set the request URL and method
+                xhr.open("POST", "https://backendservice-dev-5rt6jcn4da-uc.a.run.app/swagger-ui/index.html#/auth/login", true);
+
+                // Set the request headers
+                xhr.setRequestHeader("Content-Type", "application/json");
+
+                // Set the request body
+                var requestBody = JSON.stringify({
+                    "username": username,
+                    "password": password
+                });
+
+                // Handle the response
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        // Login successful
+                        // Set the Thymeleaf reference "UserLoggedIn" to true
+                        /* BEGIN: ed8c6549bwf9 */
+                        /* UserLoggedIn = true; */
+                        /* END: ed8c6549bwf9 */
+                        console.log("Login successful");
+                    } else {
+                        // Login failed
+                        console.log("Login failed");
+                    }
+                };
+
+                // Send the request
+                xhr.send(requestBody);
+            });
+        </script>
+        
         <!-- Über uns Abschnitt -->
         <div id="ueber-uns" class="container px-4 px-lg-5 min-vh-85" style="display: none;">
             <h2 class="text-center mt-5">Über uns</h2>
