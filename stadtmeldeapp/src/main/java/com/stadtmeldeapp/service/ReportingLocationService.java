@@ -1,7 +1,5 @@
 package com.stadtmeldeapp.service;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 
 import com.stadtmeldeapp.Entity.ReportingLocationEntity;
@@ -18,15 +16,15 @@ public class ReportingLocationService {
         this.reportingLocationRepository = reportingLocationRepository;
     }
 
-    public Optional<ReportingLocationEntity> getReportingLocationByName(String name){
-        return reportingLocationRepository.findReportingLocationByName(name);
+    public ReportingLocationEntity getReportingLocationByName(String name){
+        return reportingLocationRepository.findReportingLocationByName(name).orElse(null);
     }
 
-    public Optional<ReportingLocationEntity> getReportingLocationById(int id){
-        return reportingLocationRepository.findById(id);
+    public ReportingLocationEntity getReportingLocationById(int id){
+        return reportingLocationRepository.findById(id).orElse(null);
     }
 
-    public ReportingLocationEntity createRportingLocation(ReportingLocationEntity reportingLocation){
+    public ReportingLocationEntity createReportingLocation(ReportingLocationEntity reportingLocation){
         return reportingLocationRepository.save(reportingLocation);
     }
 }
