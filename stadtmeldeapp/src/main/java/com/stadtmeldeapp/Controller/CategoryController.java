@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
+import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.MaincategoryDTO;
 import com.stadtmeldeapp.DTO.SubcategoryDTO;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
@@ -25,6 +26,7 @@ public class CategoryController {
     @Autowired
     private ReportingLocationService reportingLocationService;
 
+    @Deprecated
     @GetMapping("/main") // kommt weg
     public ResponseEntity<List<MaincategoryEntity>> getAllMainCategories() {
         List<MaincategoryEntity> mainCategories = categoryService.getAllMainCategories();
@@ -32,7 +34,7 @@ public class CategoryController {
     }
 
     @GetMapping("/main/{id}")
-    public ResponseEntity<MaincategoryEntity> getMainCategoryById(@PathVariable("id") int id) {
+    public ResponseEntity<MaincategoryEntity> getMainCategoryById(@PathVariable("id") int id) throws NotFoundException {
         MaincategoryEntity mainCategory = categoryService.getMainCategoryById(id);
         if (mainCategory != null) {
             return new ResponseEntity<>(mainCategory, HttpStatus.OK);
@@ -42,7 +44,7 @@ public class CategoryController {
 
     @PostMapping("/main")
     public ResponseEntity<MaincategoryEntity> createOrUpdateMainCategory(
-            @RequestBody @NonNull MaincategoryDTO mainCategoryDTO) {
+            @RequestBody @NonNull MaincategoryDTO mainCategoryDTO) throws NotFoundException {
         ReportingLocationEntity reportingLocationEntity = reportingLocationService.getReportingLocationById(mainCategoryDTO.getreportingLocationID());
         MaincategoryEntity maincategoryEntity = new MaincategoryEntity();
         maincategoryEntity.setTitle(mainCategoryDTO.getTitle());
@@ -52,7 +54,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/main/{id}")
-    public ResponseEntity<Void> deleteMainCategory(@PathVariable("id") int id) {
+    public ResponseEntity<Void> deleteMainCategory(@PathVariable("id") int id) throws NotFoundException {
         MaincategoryEntity maincategoryEntity = categoryService.getMainCategoryById(id);
 
         if (maincategoryEntity != null) {
@@ -63,7 +65,7 @@ public class CategoryController {
     }
 
     @GetMapping("/sub/{id}")
-    public ResponseEntity<SubcategoryEntity> getSubCategoryById(@PathVariable("id") int id) {
+    public ResponseEntity<SubcategoryEntity> getSubCategoryById(@PathVariable("id") int id) throws NotFoundException {
         SubcategoryEntity subCategory = categoryService.getSubCategoryById(id);
         if (subCategory != null) {
             return new ResponseEntity<>(subCategory, HttpStatus.OK);
@@ -73,7 +75,7 @@ public class CategoryController {
 
     @PostMapping("/sub")
     public ResponseEntity<SubcategoryEntity> createOrUpdateSubCategory(
-            @RequestBody @NonNull SubcategoryDTO subcategoryDTO) {
+            @RequestBody @NonNull SubcategoryDTO subcategoryDTO) throws NotFoundException {
         MaincategoryEntity maincategoryEntity = categoryService.getMainCategoryById(subcategoryDTO.getMainCategoryID());
         SubcategoryEntity subcategoryEntity = new SubcategoryEntity();
         subcategoryEntity.setTitle(subcategoryDTO.getTitle());
@@ -83,7 +85,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/sub/{id}")
-    public ResponseEntity<Void> deleteSubCategory(@PathVariable("id") int id) {
+    public ResponseEntity<Void> deleteSubCategory(@PathVariable("id") int id) throws NotFoundException {
         SubcategoryEntity subcategoryEntity = categoryService.getSubCategoryById(id);
 
         if (subcategoryEntity != null) {

@@ -6,6 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
+import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.ReportDTO;
 import com.stadtmeldeapp.Entity.ReportEntity;
 import com.stadtmeldeapp.service.ReportService;
@@ -22,16 +25,11 @@ public class ReportController {
     private ReportService reportService;
 
     @PostMapping
-    public ResponseEntity<ReportEntity> createReport(@RequestBody ReportDTO reportDto) {
+    public ResponseEntity<ReportEntity> createReport(@RequestBody ReportDTO reportDto) throws NotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-
-        try {
-            ReportEntity createdReport = reportService.createReport(reportDto, username);
-            return new ResponseEntity<>(createdReport, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ReportEntity createdReport = reportService.createReport(reportDto, username);
+        return new ResponseEntity<>(createdReport, HttpStatus.CREATED);
     }
 
     // nur für Admins verfügbar machen
@@ -42,7 +40,7 @@ public class ReportController {
     }
 
     @GetMapping("/mine")
-    public ResponseEntity<List<ReportEntity>> getMyReports(HttpServletRequest request) {
+    public ResponseEntity<List<ReportEntity>> getMyReports(HttpServletRequest request) throws NotFoundException {
         List<ReportEntity> reports = reportService.getReportsByUserId(request);
         return new ResponseEntity<>(reports, HttpStatus.OK);
     }
@@ -53,27 +51,28 @@ public class ReportController {
         return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 
-    /* @PutMapping("/{reportId}")
-    public ResponseEntity<ReportEntity> updateReport(@PathVariable int reportId, @RequestBody ReportDTO reportDto, HttpServletRequest request) {
-        String jwt = request.getHeader("Authorization");
-        jwt= jwtService.removeBearerFromToken(jwt);
-        String username = jwtService.extractUsername(jwt);
-        UserEntity user = userService.getUserEntityByUsername(username);
-        try {
-            ReportEntity updatedReport = reportService.updateReport(reportId, reportDto, user);
-            return new ResponseEntity<>(updatedReport, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    } */
+    /*
+     * @PutMapping("/{reportId}")
+     * public ResponseEntity<ReportEntity> updateReport(@PathVariable int
+     * reportId, @RequestBody ReportDTO reportDto, HttpServletRequest request) {
+     * String jwt = request.getHeader("Authorization");
+     * jwt= jwtService.removeBearerFromToken(jwt);
+     * String username = jwtService.extractUsername(jwt);
+     * UserEntity user = userService.getUserEntityByUsername(username);
+     * try {
+     * ReportEntity updatedReport = reportService.updateReport(reportId, reportDto,
+     * user);
+     * return new ResponseEntity<>(updatedReport, HttpStatus.OK);
+     * } catch (Exception e) {
+     * return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+     * }
+     * }
+     */
 
     @DeleteMapping("/{reportId}")
-    public ResponseEntity<Void> deleteReport(@PathVariable int reportId, HttpServletRequest request) {
-        try {
-            reportService.deleteReport(reportId, request);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<Void> deleteReport(@PathVariable int reportId, HttpServletRequest request)
+            throws NotFoundException, NotAllowedException {
+        reportService.deleteReport(reportId, request);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
