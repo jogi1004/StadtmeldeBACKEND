@@ -8,13 +8,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "maincategories")
+@Data
 public class MaincategoryEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

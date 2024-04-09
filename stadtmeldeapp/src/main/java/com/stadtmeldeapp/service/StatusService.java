@@ -45,4 +45,9 @@ public class StatusService {
     public void deleteStatus(int id) {
         statusRepository.deleteById(id);
     }
+
+    public List<StatusEntity> getStatusByReportingLocationId(int reportingLocationId) {
+        return statusRepository.findByReportingLocationEntityId(reportingLocationId);
+    }
+
 }

@@ -38,7 +38,6 @@ public class CategoryController {
     public ResponseEntity<MaincategoryEntity> createOrUpdateMainCategory(
             @RequestBody @NonNull MaincategoryEntity mainCategory) {
         MaincategoryEntity savedMainCategory = categoryService.saveMainCategory(mainCategory);
-        System.out.println(savedMainCategory);
         return new ResponseEntity<>(savedMainCategory, HttpStatus.CREATED);
     }
 
