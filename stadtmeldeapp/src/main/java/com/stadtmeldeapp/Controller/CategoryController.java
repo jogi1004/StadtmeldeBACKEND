@@ -6,9 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
+import com.stadtmeldeapp.DTO.MaincategoryDTO;
+import com.stadtmeldeapp.DTO.SubcategoryDTO;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
+import com.stadtmeldeapp.Entity.ReportingLocationEntity;
 import com.stadtmeldeapp.Entity.SubcategoryEntity;
 import com.stadtmeldeapp.service.CategoryService;
+import com.stadtmeldeapp.service.ReportingLocationService;
 
 import java.util.List;
 
@@ -18,6 +22,8 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private ReportingLocationService reportingLocationService;
 
     @GetMapping("/main") // kommt weg
     public ResponseEntity<List<MaincategoryEntity>> getAllMainCategories() {
@@ -36,8 +42,12 @@ public class CategoryController {
 
     @PostMapping("/main")
     public ResponseEntity<MaincategoryEntity> createOrUpdateMainCategory(
-            @RequestBody @NonNull MaincategoryEntity mainCategory) {
-        MaincategoryEntity savedMainCategory = categoryService.saveMainCategory(mainCategory);
+            @RequestBody @NonNull MaincategoryDTO mainCategoryDTO) {
+        ReportingLocationEntity reportingLocationEntity = reportingLocationService.getReportingLocationById(mainCategoryDTO.getreportingLocationID());
+        MaincategoryEntity maincategoryEntity = new MaincategoryEntity();
+        maincategoryEntity.setTitle(mainCategoryDTO.getTitle());
+        maincategoryEntity.setReportingLocationEntity(reportingLocationEntity);
+        MaincategoryEntity savedMainCategory = categoryService.saveMainCategory(maincategoryEntity);
         return new ResponseEntity<>(savedMainCategory, HttpStatus.CREATED);
     }
 
@@ -63,8 +73,12 @@ public class CategoryController {
 
     @PostMapping("/sub")
     public ResponseEntity<SubcategoryEntity> createOrUpdateSubCategory(
-            @RequestBody @NonNull SubcategoryEntity subCategory) {
-        SubcategoryEntity savedSubCategory = categoryService.saveSubCategory(subCategory);
+            @RequestBody @NonNull SubcategoryDTO subcategoryDTO) {
+        MaincategoryEntity maincategoryEntity = categoryService.getMainCategoryById(subcategoryDTO.getMainCategoryID());
+        SubcategoryEntity subcategoryEntity = new SubcategoryEntity();
+        subcategoryEntity.setTitle(subcategoryDTO.getTitle());
+        subcategoryEntity.setMaincategoryEntity(maincategoryEntity);
+        SubcategoryEntity savedSubCategory = categoryService.saveSubCategory(subcategoryEntity);
         return new ResponseEntity<>(savedSubCategory, HttpStatus.CREATED);
     }
 
@@ -87,6 +101,7 @@ public class CategoryController {
         return new ResponseEntity<>(subCategories, HttpStatus.OK);
     }
 
+    @SuppressWarnings("null")
     @GetMapping("/main/location/{locationName}")
     public ResponseEntity<List<MaincategoryEntity>> getCategoriesByLocationName(
             @PathVariable("locationName") String locationName) {
