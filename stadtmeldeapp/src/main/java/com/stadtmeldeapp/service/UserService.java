@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
+import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.RegisterDTO;
 import com.stadtmeldeapp.DTO.UserInfoDTO;
 import com.stadtmeldeapp.Entity.RoleEntity;
@@ -35,10 +37,10 @@ public class UserService {
         this.jwtService = jwtService;
     }
 
-    public UserEntity register(@Valid @RequestBody RegisterDTO request) {
+    public UserEntity register(@Valid @RequestBody RegisterDTO request) throws NotFoundException, NotAllowedException {
         Optional<UserEntity> existingUser = repository.findByUsername(request.username());
         if (existingUser.isPresent()) {
-            return null;
+            throw new NotAllowedException("Nutzername existiert bereits");
         }
 
         String hashedPassword = passwordEncoder.encode(request.password());
@@ -50,35 +52,26 @@ public class UserService {
         return repository.save(user);
     }
 
-    public UserInfoDTO getUserInfoByUsername(String username) {
-        Optional<UserEntity> newUser = repository.findByUsername(username);
-        if (newUser.isPresent()) {
-            UserEntity user = newUser.get();
-            UserInfoDTO userInfoDTO = new UserInfoDTO(user.getId(), username, user.getEmail(), user.getProfilePicture(),
-                    user.isNotificationsEnabled(), user.getRoles());
-            return userInfoDTO;
-        }
-        return null;
+    public UserInfoDTO getUserInfoByUsername(String username) throws NotFoundException {
+        UserEntity user = repository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
+        UserInfoDTO userInfoDTO = new UserInfoDTO(user.getId(), username, user.getEmail(), user.getProfilePicture(),
+                user.isNotificationsEnabled(), user.getRoles());
+        return userInfoDTO;
     }
 
-    public UserEntity getUserEntityByUsername(String username) {
-        Optional<UserEntity> newUser = repository.findByUsername(username);
-        if (newUser.isPresent()) {
-            UserEntity user = newUser.get();
-            return user;
-        }
-        return null;
+    public UserEntity getUserEntityByUsername(String username) throws NotFoundException {
+        UserEntity user = repository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
+        return user;
     }
 
     @Transactional
-    public UserEntity updateUser(UserEntity userEntity){
-        UserEntity updatedUser = repository.findByUsername(userEntity.getUsername()).orElse(null);
-        
-        if(updatedUser != null){
+    public UserEntity updateUser(UserEntity userEntity) throws NotFoundException {
+        UserEntity updatedUser = repository.findByUsername(userEntity.getUsername())
+                .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
             updatedUser.setProfilePicture(userEntity.getProfilePicture());
             return repository.save(updatedUser);
-        }
-        return null;
     }
 
     public boolean validate(String token, UserDetails userDetails) {
@@ -86,7 +79,7 @@ public class UserService {
         return jwtService.validateToken(token, userDetails);
     }
 
-    public UserEntity getUserFromRequest(HttpServletRequest request) {
+    public UserEntity getUserFromRequest(HttpServletRequest request) throws NotFoundException {
         String jwt = request.getHeader("Authorization");
         jwt = jwtService.removeBearerFromToken(jwt);
         String username = jwtService.extractUsername(jwt);

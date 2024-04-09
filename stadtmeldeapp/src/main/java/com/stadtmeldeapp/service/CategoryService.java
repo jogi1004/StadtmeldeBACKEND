@@ -5,6 +5,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
 import com.stadtmeldeapp.Entity.SubcategoryEntity;
 import com.stadtmeldeapp.Repository.MaincategoryRepository;
@@ -26,9 +27,9 @@ public class CategoryService {
         return mainCategoryRepository.findAll();
     }
 
-    public MaincategoryEntity getMainCategoryById(int id) {
+    public MaincategoryEntity getMainCategoryById(int id) throws NotFoundException {
         return mainCategoryRepository.findById(id)
-                .orElse(null);
+                .orElseThrow(() -> new NotFoundException("Hauptkategorie nicht gefunden"));
     }
 
     public MaincategoryEntity saveMainCategory(@NonNull MaincategoryEntity mainCategory) {
@@ -39,9 +40,9 @@ public class CategoryService {
         mainCategoryRepository.deleteById(id);
     }
 
-    public SubcategoryEntity getSubCategoryById(int id) {
+    public SubcategoryEntity getSubCategoryById(int id) throws NotFoundException {
         return subCategoryRepository.findById(id)
-                .orElse(null);
+                .orElseThrow(() -> new NotFoundException("Unterkategorie nicht gefunden"));
     }
 
     public SubcategoryEntity saveSubCategory(@NonNull SubcategoryEntity subCategory) {

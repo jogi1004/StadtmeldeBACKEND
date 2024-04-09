@@ -2,6 +2,7 @@ package com.stadtmeldeapp.service;
 
 import org.springframework.stereotype.Service;
 
+import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.Entity.ReportingLocationEntity;
 import com.stadtmeldeapp.Repository.ReportingLocationRepository;
 
@@ -16,12 +17,12 @@ public class ReportingLocationService {
         this.reportingLocationRepository = reportingLocationRepository;
     }
 
-    public ReportingLocationEntity getReportingLocationByName(String name){
-        return reportingLocationRepository.findReportingLocationByName(name).orElse(null);
+    public ReportingLocationEntity getReportingLocationByName(String name) throws NotFoundException{
+        return reportingLocationRepository.findReportingLocationByName(name).orElseThrow(() -> new NotFoundException("Meldeort nicht gefunden"));
     }
 
-    public ReportingLocationEntity getReportingLocationById(int id){
-        return reportingLocationRepository.findById(id).orElse(null);
+    public ReportingLocationEntity getReportingLocationById(int id) throws NotFoundException{
+        return reportingLocationRepository.findById(id).orElseThrow(() -> new NotFoundException("Meldeort nicht gefunden"));
     }
 
     public ReportingLocationEntity createReportingLocation(ReportingLocationEntity reportingLocation){
