@@ -9,20 +9,21 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.stadtmeldeapp.DTO.LoginDataDTO;
-import com.stadtmeldeapp.DTO.LoginResponseDTO;
 import com.stadtmeldeapp.service.JwtService;
 import com.stadtmeldeapp.service.UserDetailsServiceImpl;
-import com.stadtmeldeapp.service.UserService;
+
+import jakarta.servlet.http.HttpSession;
+
+import org.springframework.web.bind.annotation.GetMapping;
+
 
 @Controller
 public class WebsiteController {
     
     Logger logger = LoggerFactory.getLogger(getClass());
-
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private UserDetailsServiceImpl userDetailsServiceImpl;
@@ -32,14 +33,30 @@ public class WebsiteController {
 
     @Autowired
     private JwtService jwtService;
+
+    @GetMapping("/")
+    public String index(HttpSession session, Model model) {
+        model.addAttribute("token", session.getAttribute("token"));
+        return "index"; // This maps to index.html inside src/main/resources/templates
+    }
+
+    @GetMapping("/login")
+    public String showLoginForm(Model model) {
+        model.addAttribute("LoginDataDTO", new LoginDataDTO());
+
+        return "login";
+    }
     
-    @PostMapping(value = "/loginWebsite")
-    public String loginWebsite(@ModelAttribute("LoginDataDTO") LoginDataDTO request, Model model) {
+    @PostMapping("/loginWebsite")
+    public String loginWebsite(@ModelAttribute("LoginDataDTO") LoginDataDTO request, RedirectAttributes redirectAttributes, HttpSession session) {
       logger.info("LOGIN");
       authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
       logger.info("User " + request.getUsername() + " authenticated.");
       String token = jwtService.generateToken(userDetailsServiceImpl.loadUserByUsername(request.getUsername()));
-      model.addAttribute("User", request.getUsername());
+      redirectAttributes.addFlashAttribute("User", request.getUsername());
+      session.setAttribute("token", token);
+      session.setAttribute("test", "test");
       return "redirect:/";
     }
+    
 }

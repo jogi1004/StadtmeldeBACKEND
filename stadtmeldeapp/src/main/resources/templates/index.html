@@ -42,14 +42,11 @@
                     <h1 class="font-weight-light">CityCare - Deine Stadtmeldeapp</h1>
                     <p>Willkommen
                         <span th:if="${User != null}">
-                            <span th:text="${User.getUsername}"></span>
+                            <span th:text="${User + ','}"></span>
                         </span>
-                        <span th:unless="${User != null}">Gast</span>
+                        <span th:unless="${User != null}">Gast,</span>
                         CityCare ist deine Plattform, um Schäden, Vandalismus und andere Probleme in deiner Stadt zu melden und deren Bearbeitung durch die Stadtverwaltung zu verfolgen. Mit unserer benutzerfreundlichen App kannst du schnell und einfach Probleme wie defekte Straßenlaternen, Schlaglöcher oder Graffiti melden und ihre Bearbeitung durch die Stadtverwaltung verfolgen.</p>
                     <a class="btn btn-primary" href="#!">Mach mit!</a>
-                </div>
-                <div th:if="${#authentication}">
-                    <p th:text="${#authentication.principal}"></p>
                 </div>
             </div>
             <!-- Call to Action-->
