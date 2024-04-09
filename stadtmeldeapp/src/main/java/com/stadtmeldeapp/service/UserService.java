@@ -15,6 +15,7 @@ import com.stadtmeldeapp.Entity.RoleEntity;
 import com.stadtmeldeapp.Entity.UserEntity;
 import com.stadtmeldeapp.Repository.UserRepository;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @Service
@@ -34,7 +35,6 @@ public class UserService {
         this.jwtService = jwtService;
     }
 
-    @Transactional
     public UserEntity register(@Valid @RequestBody RegisterDTO request) {
         Optional<UserEntity> existingUser = repository.findByUsername(request.username());
         if (existingUser.isPresent()) {
@@ -84,5 +84,13 @@ public class UserService {
     public boolean validate(String token, UserDetails userDetails) {
         token = jwtService.removeBearerFromToken(token);
         return jwtService.validateToken(token, userDetails);
+    }
+
+    public UserEntity getUserFromRequest(HttpServletRequest request) {
+        String jwt = request.getHeader("Authorization");
+        jwt = jwtService.removeBearerFromToken(jwt);
+        String username = jwtService.extractUsername(jwt);
+        UserEntity user = getUserEntityByUsername(username);
+        return user;
     }
 }

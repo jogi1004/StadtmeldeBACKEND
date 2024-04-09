@@ -32,7 +32,6 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private int jwtExpirationInMs;
 
-    // generate token for user
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
@@ -58,7 +57,7 @@ public class JwtService {
 
     private Claims getTokenBody(String token) {
         byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-            SecretKey key = Keys.hmacShaKeyFor(keyBytes);
+        SecretKey key = Keys.hmacShaKeyFor(keyBytes);
         try {
             return Jwts
                     .parser()
@@ -74,14 +73,14 @@ public class JwtService {
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
-      }
+    }
 
-      private boolean isTokenExpired(String token) {
+    private boolean isTokenExpired(String token) {
         Claims claims = getTokenBody(token);
         return claims.getExpiration().before(new Date());
-      }
+    }
 
-      public String removeBearerFromToken(String token) {
+    public String removeBearerFromToken(String token) {
         if (token != null && token.startsWith("Bearer ")) {
             return token.substring(7);
         }
