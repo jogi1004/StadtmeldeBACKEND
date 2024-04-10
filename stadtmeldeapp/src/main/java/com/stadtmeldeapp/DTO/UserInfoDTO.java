@@ -1,6 +1,6 @@
 package com.stadtmeldeapp.DTO;
 
-import java.util.Set;
+import java.util.List;
 
 import com.stadtmeldeapp.Entity.ReportingLocationEntity;
 import com.stadtmeldeapp.Entity.RoleEntity;
@@ -11,6 +11,6 @@ public record UserInfoDTO(
         String email,
         byte[] profilePicture,
         boolean notificationsEnabled,
-        Set<RoleEntity> roles,
+        List<RoleEntity> roles,
         ReportingLocationEntity adminForLocation) {
 }

@@ -2,6 +2,7 @@ package com.stadtmeldeapp.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -57,8 +58,14 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Cross-Site-Request-Forgery
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/auth/*", "/swagger-ui/*", "/v3/api-docs/**")
-                        .permitAll()
+                        .requestMatchers("/auth/*").permitAll()
+                        .requestMatchers("/swagger-ui/*", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/user/*").hasAnyAuthority("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/categories/*").hasAnyAuthority("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/categories/*").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/categories/*").hasAuthority("ADMIN")
+                        .requestMatchers("/status/*").hasAuthority("ADMIN")
+                        .requestMatchers("/reports/*").hasAnyAuthority("USER", "ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

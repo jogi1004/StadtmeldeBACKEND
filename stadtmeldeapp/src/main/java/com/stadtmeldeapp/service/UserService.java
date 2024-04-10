@@ -48,7 +48,7 @@ public class UserService {
         RoleEntity role = roleService.findRoleByName("USER");
 
         UserEntity user = new UserEntity(request.username(), hashedPassword, request.email(),
-                Collections.singleton(role), null);
+                Collections.singletonList(role), null);
 
         return repository.save(user);
     }
