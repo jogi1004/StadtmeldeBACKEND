@@ -1,5 +1,9 @@
 package com.stadtmeldeapp.Entity;
 
+import java.sql.Timestamp;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,14 +34,18 @@ public class ReportEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description")
+    @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "longitude")
+    @Column(name = "longitude", nullable = true)
     private Double longitude;
 
-    @Column(name = "latitude")
+    @Column(name = "latitude", nullable = true)
     private Double latitude;
+    
+    @Column(name = "reporting_timestamp", nullable = false)
+    @CreationTimestamp
+    private Timestamp reportingTimestamp;
 
     @ManyToOne
     @JoinColumn(name = "reporting_location_id", referencedColumnName = "id", nullable = false)
@@ -47,7 +55,7 @@ public class ReportEntity {
     @JoinColumn(name = "status_id", referencedColumnName = "id", nullable = false)
     private StatusEntity status;
 
-    @Column(name = "additional_picture")
+    @Column(name = "additional_picture", nullable = true)
     private String additionalPicture;
 }
 
