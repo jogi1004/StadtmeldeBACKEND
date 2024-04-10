@@ -22,10 +22,11 @@
                     <li class="nav-item"><a class="nav-link active" aria-current="page" href="#!" onclick="showSection('home')">Home</a></li>
                     <li class="nav-item" th:if="${User == null}"><a class="nav-link" href="/login">Login</a></li>
                     <li class="nav-item" th:if="${User}"><a class="nav-link" href="/logout">Logout</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#!" onclick="showSection('ueber-uns')">Über uns</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#!" onclick="showSection('kontakte')">Kontakt</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#!" onclick="showSection('dienstleistungen')">Dienstleistungen</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#!" onclick="showSection('city-info')">Stadtinformationen</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#!" onclick="showSection('aboutus')">Über uns</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#!" onclick="showSection('contact')">Kontakt</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#!" onclick="showSection('services')">Dienstleistungen</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#!" onclick="showSection('cityinfo')">Stadtinformationen</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#!" onclick="showSection('getaetigtemeldungen')">Getätigte Meldungen</a></li>
                 </ul>
             </div>
         </div>
@@ -61,7 +62,7 @@
                             <h2 class="card-title">Über CityCare</h2>
                             <p>CityCare wurde gegründet, um Bürgern eine einfache Möglichkeit zu bieten, Probleme in ihrer Stadt zu melden und deren Bearbeitung durch die Stadtverwaltung zu verfolgen. Unser Ziel ist es, Städte sicherer, sauberer und lebenswerter zu machen, indem wir eine effiziente Kommunikation zwischen Bürgern und Behörden fördern.</p>
                         </div>
-                        <div class="card-footer"><a class="btn btn-primary btn-sm" href="#!" onclick="showSection('ueber-uns')">Mehr erfahren</a></div>
+                        <div class="card-footer"><a class="btn btn-primary btn-sm" href="#!" onclick="showSection('aboutus')">Mehr erfahren</a></div>
                     </div>
                 </div>
                 <div class="col-md-4 mb-5">
@@ -70,7 +71,7 @@
                             <h2 class="card-title">Unsere Dienstleistungen</h2>
                             <p>CityCare bietet eine einfache und effektive Möglichkeit, Probleme in deiner Stadt zu melden und deren Bearbeitung durch die Stadtverwaltung zu verfolgen. Wir unterstützen dich dabei, Schäden, Vandalismus und andere Probleme zu dokumentieren und den Fortschritt ihrer Behebung zu verfolgen.</p>
                         </div>
-                        <div class="card-footer"><a class="btn btn-primary btn-sm" href="#!" onclick="showSection('dienstleistungen')">Mehr erfahren</a></div>
+                        <div class="card-footer"><a class="btn btn-primary btn-sm" href="#!" onclick="showSection('services')">Mehr erfahren</a></div>
                     </div>
                 </div>
                 <div class="col-md-4 mb-5">
@@ -79,94 +80,107 @@
                             <h2 class="card-title">Kontaktiere uns</h2>
                             <p>Hast du Fragen, Feedback oder Anregungen? Wir stehen dir gerne zur Verfügung! Kontaktiere unser Support-Team per E-Mail oder Telefon, und wir werden uns so schnell wie möglich bei dir melden.</p>
                         </div>
-                        <div class="card-footer"><a class="btn btn-primary btn-sm" href="#!" onclick="showSection('kontakte')">Kontaktieren</a></div>
+                        <div class="card-footer"><a class="btn btn-primary btn-sm" href="#!" onclick="showSection('contact')">Kontaktieren</a></div>
                     </div>
                 </div>
             </div>
         </div>
         <!-- City Information Section -->
-        <div id="city-info" class="container px-4 px-lg-5 min-vh-85" style="display: none;">
+        <div id="cityinfo" class="container px-4 px-lg-5 min-vh-85" style="display: none;">
             <h2 class="text-center mt-5">City Information</h2>
             <div class="row justify-content-center">
-                <div class="col-lg-8">
+                <div class="col-lg-8"></div>
                     <!-- City Information Section -->
-                    <h3>Stadt: <span th:text="${cityName}"></span></h3>
-                    <!-- Postal Codes Section -->
-                    <div id="postal-codes" class="container px-4 px-lg-5 min-vh-85" style="display: none;">
-                        <h2 class="text-center mt-5">Postal Codes</h2>
-                        <div class="row justify-content-center">
-                            <div class="col-lg-8">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Postal Code</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr th:each="postalCode : ${postalCodes}">
-                                            <td th:text="${postalCode}"></td>
-                                            <td>
-                                                <button class="btn btn-danger" th:onclick="'removePostalCode(\'' + ${postalCode} + '\')'">Remove</button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <form th:action="@{/addPostalCode}" method="post">
-                                    <div class="input-group mb-3">
-                                        <input type="text" class="form-control" placeholder="Enter postal code" name="postalCode" required>
-                                        <button class="btn btn-primary" type="submit">Add Postal Code</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
+                    <form role="form" method="get" th:action="@{/mainWebsite/{id}(id=1)}" th:object="${MainCategories}">
+                        <button type="submit" class="btn btn-primary">Refresh / Send get Request</button>
+                        <h3>Stadt: Muss Noch</h3>
                     <h4>Main Categories:</h4>
-                    <table>
+                    <table th:if="${MainCategories != null}">
                         <thead>
                             <tr>
-                                <th>Picture</th>
-                                <th>Name</th>
-                                <th>Subcategories</th>
-                                <th>Actions</th>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Reporting Location ID</th>
+                                <th>Reporting Location Name</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="mainCategory, mainCategoryIndex : ${mainCategories}">
-                                <td><img src="path/to/main_category_image.jpg" alt="Main Category Image"></td>
-                                <td contenteditable="true" th:text="${mainCategory.name}"></td>
-                                <td>
-                                    <ul th:if="${mainCategory.open}">
-                                        <li th:each="subcategory, subcategoryIndex : ${mainCategory.subcategories}" contenteditable="true" th:text="${subcategory.name}"></li>
-                                    </ul>
-                                </td>
-                                <td>
-                                    <button class="btn btn-danger" th:onclick="'removeMainCategory(\'' + ${mainCategoryIndex} + '\')'">Remove</button>
-                                    <select>
-                                        <option th:each="subcategory : ${mainCategory.subcategories}" th:text="${subcategory.name}"></option>
-                                    </select>
-                                    <button class="btn btn-primary" th:onclick="'removeSubcategory(\'' + ${mainCategoryIndex} + '\', \'' + ${subcategoryIndex} + '\')'">Remove Subcategory</button>
-                                    <button class="btn btn-success" th:onclick="'addSubcategory(\'' + ${mainCategoryIndex} + '\')'">Add Subcategory</button>
-                                </td>
+                            <tr th:each="mainCategory : ${MainCategories}">
+                                <td th:text="${mainCategory.id}"></td>
+                                <td th:text="${mainCategory.title}"></td>
+                                <td th:text="${mainCategory.reportingLocationEntity.id}"></td>
+                                <td th:text="${mainCategory.reportingLocationEntity.name}"></td>
                             </tr>
+                        </tbody>
+                    </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- Getätigte Meldungen Abschnitt -->
+        <div id="getaetigtemeldungen" class="container px-4 px-lg-5 min-vh-85" style="display: none;">
+            <form role="form" method="get" th:action="@{/mainWebsite/{id}(id=1)}" th:object="${MainCategories}">
+                <button type="submit" class="btn btn-primary">Refresh / Send get Request</button>
+            <h2 class="text-center mt-5">Getätigte Meldungen</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <p class="lead">Hier kannst du deine getätigten Meldungen einsehen und den Bearbeitungsstatus verfolgen.</p>
+                    <!-- Table to display the reported issues -->
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Meldungsnummer</th>
+                                <th>Beschreibung</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Defekte Straßenlaterne</td>
+                                <td>In Bearbeitung</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Schlagloch auf der Hauptstraße</td>
+                                <td>Erledigt</td>
+                            </tr>
+                            <!-- Add more rows for each reported issue -->
                         </tbody>
                     </table>
                 </div>
             </div>
+            </form>
         </div>
-
-        <!-- Dienstleistungen Abschnitt -->
-        <div id="dienstleistungen" class="container px-4 px-lg-5 min-vh-85" style="display: none;">
-            <h2 class="text-center mt-5">Unsere Dienstleistungen</h2>
+        <!-- About Us Section -->
+        <div id="aboutus" class="container px-4 px-lg-5 min-vh-85" style="display: none;">
+            <h2 class="text-center mt-5">Über uns</h2>
             <div class="row justify-content-center">
                 <div class="col-lg-8">
-                    <p class="lead">Entdecken Sie die Vielfalt der von CityCare angebotenen Dienstleistungen, um Ihre Stadt zu verbessern.</p>
-                    <ul>
-                        <li>Melden und Verfolgen von städtischen Problemen</li>
-                        <li>Gemeinschaftsforen und Diskussionen</li>
-                        <li>Kollaborative Projekte und Initiativen</li>
-                        <li>Stadtevents und Möglichkeiten zum ehrenamtlichen Engagement</li>
-                    </ul>
+                    <p class="lead">Erfahre mehr über CityCare und unsere Mission, Städte sicherer und lebenswerter zu machen.</p>
+                    <!-- Add content about your organization -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Section -->
+        <div id="services" class="container px-4 px-lg-5 min-vh-85" style="display: none;">
+            <h2 class="text-center mt-5">Dienstleistungen</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <p class="lead">Entdecke die Dienstleistungen, die CityCare bietet, um Probleme in deiner Stadt zu melden und zu verfolgen.</p>
+                    <!-- Add content about your services -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Section -->
+        <div id="contact" class="container px-4 px-lg-5 min-vh-85" style="display: none;">
+            <h2 class="text-center mt-5">Kontakt</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <p class="lead">Kontaktiere uns bei Fragen, Feedback oder Anregungen. Unser Support-Team steht dir gerne zur Verfügung.</p>
+                    <!-- Add contact information and form -->
                 </div>
             </div>
         </div>
@@ -178,7 +192,7 @@
     <!-- Bootstrap core JS-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Core theme JS-->
-            <script type="text/javascript">
+    <script type="text/javascript">
                 function showSection(sectionId) {
                     // Hide all sections within the content container
                     var contentSections = document.querySelectorAll('#content > div');
@@ -205,6 +219,6 @@
 
                 // Call the checkFooterPosition function on page load
                 checkFooterPosition('home');
-            </script>
+    </script>
 </body>
 </html>
