@@ -47,7 +47,7 @@ public class UserService {
         RoleEntity role = roleService.findRoleByName("USER");
 
         UserEntity user = new UserEntity(request.username(), hashedPassword, request.email(),
-                Collections.singleton(role));
+                Collections.singleton(role), null);
 
         return repository.save(user);
     }
@@ -56,7 +56,7 @@ public class UserService {
         UserEntity user = repository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
         UserInfoDTO userInfoDTO = new UserInfoDTO(user.getId(), username, user.getEmail(), user.getProfilePicture(),
-                user.isNotificationsEnabled(), user.getRoles());
+                user.isNotificationsEnabled(), user.getRoles(), user.getAdminForLocation());
         return userInfoDTO;
     }
 
