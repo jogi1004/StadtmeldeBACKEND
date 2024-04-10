@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.ReportDTO;
+import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
+import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
 import com.stadtmeldeapp.Entity.ReportEntity;
 import com.stadtmeldeapp.Entity.ReportingLocationEntity;
@@ -22,6 +24,7 @@ import com.stadtmeldeapp.Repository.UserRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -71,21 +74,27 @@ public class ReportService {
         return reportRepository.save(report);
     }
 
-    public List<ReportEntity> getReportsByUserId(int userId) {
-        return reportRepository.findAllByUserId(userId);
+    public List<ReportInfoDTO> getReportsByUserId(int userId) {
+        return toInfoDTOList(reportRepository.findAllByUserId(userId));
+        
     }
 
-    public List<ReportEntity> getReportsByUserId(HttpServletRequest request) throws NotFoundException {
+    public List<ReportInfoDTO> getReportsByUserId(HttpServletRequest request) throws NotFoundException {
         int userId = userService.getUserFromRequest(request).getId();
-        return reportRepository.findAllByUserId(userId);
+        return getReportsByUserId(userId);
     }
 
-    public List<ReportEntity> getReportsByReportingLocationId(int reportingLocationId) {
-        return reportRepository.findAllByReportingLocationId(reportingLocationId);
+    public List<ReportInfoDTO> getReportsByReportingLocationId(int reportingLocationId) {
+        return toInfoDTOList(reportRepository.findAllByReportingLocationId(reportingLocationId));
     }
 
-    public List<ReportEntity> getReportsByReportingLocationName(String reportingLocationTitle) {
-        return reportRepository.findAllByReportingLocationName(reportingLocationTitle);
+    public List<ReportInfoDTO> getReportsByReportingLocationName(String reportingLocationTitle) {
+        return toInfoDTOList(reportRepository.findAllByReportingLocationName(reportingLocationTitle));
+    }
+
+    public ReportDetailInfoDTO getReportDetails(int id) throws NotFoundException {
+        ReportEntity report = reportRepository.findById(id).orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
+        return new ReportDetailInfoDTO(!report.getTitle().isBlank()? report.getSubcategory().getTitle() : report.getTitle(), null, report.getReportingTimestamp(), report.getAdditionalPicture(), report.getLongitude(), report.getLatitude(), report.getUser().getUsername(), report.getUser().getProfilePicture());
     }
 
     /*
@@ -121,5 +130,13 @@ public class ReportService {
         }
 
         reportRepository.delete(report);
+    }
+
+    public List<ReportInfoDTO> toInfoDTOList(List<ReportEntity> reports) {
+        List<ReportInfoDTO> retReports = new ArrayList<>();
+        for (ReportEntity r : reports) {
+            retReports.add(new ReportInfoDTO(r.getTitle().isBlank() ? r.getSubcategory().getTitle() : r.getTitle(), null/*icon */, r.getReportingTimestamp(), r.getAdditionalPicture(), r.getLongitude(), r.getLatitude()));
+        }
+        return retReports;
     }
 }

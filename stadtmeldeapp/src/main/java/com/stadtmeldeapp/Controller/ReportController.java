@@ -10,12 +10,16 @@ import org.springframework.web.bind.annotation.*;
 import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.ReportDTO;
+import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
+import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.Entity.ReportEntity;
 import com.stadtmeldeapp.service.ReportService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+
 
 @RestController
 @RequestMapping("/reports")
@@ -32,30 +36,36 @@ public class ReportController {
         return new ResponseEntity<>(createdReport, HttpStatus.CREATED);
     }
 
-    // nur für Admins verfügbar machen
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ReportEntity>> getAllReportsByUserId(@PathVariable int userId) {
-        List<ReportEntity> reports = reportService.getReportsByUserId(userId);
+    public ResponseEntity<List<ReportInfoDTO>> getAllReportsByUserId(@PathVariable int userId) {
+        List<ReportInfoDTO> reports = reportService.getReportsByUserId(userId);
         return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 
     @GetMapping("/mine")
-    public ResponseEntity<List<ReportEntity>> getMyReports(HttpServletRequest request) throws NotFoundException {
-        List<ReportEntity> reports = reportService.getReportsByUserId(request);
+    public ResponseEntity<List<ReportInfoDTO>> getMyReports(HttpServletRequest request) throws NotFoundException {
+        List<ReportInfoDTO> reports = reportService.getReportsByUserId(request);
         return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 
     @GetMapping("/location/id/{locationId}")
-    public ResponseEntity<List<ReportEntity>> getReportsByLocationId(@PathVariable int locationId) {
-        List<ReportEntity> reports = reportService.getReportsByReportingLocationId(locationId);
+    public ResponseEntity<List<ReportInfoDTO>> getReportsByLocationId(@PathVariable int locationId) {
+        List<ReportInfoDTO> reports = reportService.getReportsByReportingLocationId(locationId);
         return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 
     @GetMapping("/location/name/{locationName}")
-    public ResponseEntity<List<ReportEntity>> getReportsByLocationName(@PathVariable String locationName) {
-        List<ReportEntity> reports = reportService.getReportsByReportingLocationName(locationName);
+    public ResponseEntity<List<ReportInfoDTO>> getReportsByLocationName(@PathVariable String locationName) {
+        List<ReportInfoDTO> reports = reportService.getReportsByReportingLocationName(locationName);
         return new ResponseEntity<>(reports, HttpStatus.OK);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ReportDetailInfoDTO> getReportDetails(@PathVariable int id) throws NotFoundException {
+        ReportDetailInfoDTO report = reportService.getReportDetails(id);
+        return new ResponseEntity<>(report, HttpStatus.OK);
+    }
+    
 
     /*
      * @PutMapping("/{reportId}")
