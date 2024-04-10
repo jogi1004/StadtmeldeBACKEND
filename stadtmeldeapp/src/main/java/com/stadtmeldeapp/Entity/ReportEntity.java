@@ -56,6 +56,6 @@ public class ReportEntity {
     private StatusEntity status;
 
     @Column(name = "additional_picture", nullable = true)
-    private String additionalPicture;
+    private byte[] additionalPicture;
 }
 
