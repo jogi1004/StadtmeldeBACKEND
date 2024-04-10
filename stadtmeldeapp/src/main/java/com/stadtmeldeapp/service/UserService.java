@@ -21,7 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class UserService {
 
     private final UserRepository repository;
