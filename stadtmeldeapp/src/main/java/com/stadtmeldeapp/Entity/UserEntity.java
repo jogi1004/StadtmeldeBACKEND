@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import lombok.NoArgsConstructor;
@@ -48,12 +49,18 @@ public class UserEntity {
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Set<RoleEntity> roles = new HashSet<>();
 
-    public UserEntity(String username, String password, String email, Set<RoleEntity> roles) {
+    @ManyToOne
+    @JoinColumn(name = "isAdminForLocationId", referencedColumnName = "id")
+    private ReportingLocationEntity adminForLocation;
+
+    public UserEntity(String username, String password, String email, Set<RoleEntity> roles,
+            ReportingLocationEntity adminForLocation) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.profilePicture = null;
         this.notificationsEnabled = false;
         this.roles = roles;
+        this.adminForLocation = adminForLocation;
     }
 }
