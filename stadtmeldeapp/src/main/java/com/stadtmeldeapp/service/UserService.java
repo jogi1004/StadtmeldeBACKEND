@@ -21,7 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserRepository repository;
@@ -37,6 +37,7 @@ public class UserService {
         this.jwtService = jwtService;
     }
 
+    @Transactional
     public UserEntity register(@Valid @RequestBody RegisterDTO request) throws NotFoundException, NotAllowedException {
         Optional<UserEntity> existingUser = repository.findByUsername(request.username());
         if (existingUser.isPresent()) {
