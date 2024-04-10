@@ -84,6 +84,10 @@ public class ReportService {
         return reportRepository.findAllByReportingLocationId(reportingLocationId);
     }
 
+    public List<ReportEntity> getReportsByReportingLocationName(String reportingLocationTitle) {
+        return reportRepository.findAllByReportingLocationName(reportingLocationTitle);
+    }
+
     /*
      * public ReportEntity updateReport(int reportId, ReportDTO reportDto,
      * UserEntity user) throws Exception {

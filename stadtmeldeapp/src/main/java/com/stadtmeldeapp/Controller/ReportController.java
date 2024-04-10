@@ -45,9 +45,15 @@ public class ReportController {
         return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 
-    @GetMapping("/location/{locationId}")
+    @GetMapping("/location/id/{locationId}")
     public ResponseEntity<List<ReportEntity>> getReportsByLocationId(@PathVariable int locationId) {
         List<ReportEntity> reports = reportService.getReportsByReportingLocationId(locationId);
+        return new ResponseEntity<>(reports, HttpStatus.OK);
+    }
+
+    @GetMapping("/location/name/{locationName}")
+    public ResponseEntity<List<ReportEntity>> getReportsByLocationName(@PathVariable String locationName) {
+        List<ReportEntity> reports = reportService.getReportsByReportingLocationName(locationName);
         return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 
