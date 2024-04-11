@@ -55,7 +55,7 @@ public class ReportEntity {
     @JoinColumn(name = "status_id", referencedColumnName = "id", nullable = false)
     private StatusEntity status;
 
-    @Column(name = "additional_picture", nullable = true)
-    private byte[] additionalPicture;
+    /* @Column(name = "additional_picture", nullable = true)
+    private byte[] additionalPicture; */
 }
 
