@@ -18,7 +18,6 @@ import com.stadtmeldeapp.service.JwtAuthFilter;
 import com.stadtmeldeapp.service.UserDetailsServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties.Admin;
 
 @Configuration
 @EnableWebSecurity

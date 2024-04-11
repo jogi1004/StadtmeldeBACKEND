@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <title>Login</title>
+</head>
+
+<body>
+
+    <div layout:fragment="content">
+        <section class="my-5">
+            <form role="form" method="get" th:action="@{/mainWebsite/{id}(id=1)}" th:object="${MainCategories}">
+                <button type="submit" class="btn btn-primary">Refresh / Send get Request</button>
+                <h2 class="text-center mt-5">Getätigte Meldungen</h2>
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <p class="lead">Hier kannst du deine getätigten Meldungen einsehen und den
+                            Bearbeitungsstatus
+                            verfolgen.</p>
+                        <!-- Table to display the reported issues -->
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Meldungsnummer</th>
+                                    <th>Beschreibung</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Defekte Straßenlaterne</td>
+                                    <td>In Bearbeitung</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Schlagloch auf der Hauptstraße</td>
+                                    <td>Erledigt</td>
+                                </tr>
+                                <!-- Add more rows for each reported issue -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+
+</body>
+
+</html>
