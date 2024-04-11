@@ -94,7 +94,7 @@ public class ReportService {
 
     public ReportDetailInfoDTO getReportDetails(int id) throws NotFoundException {
         ReportEntity report = reportRepository.findById(id).orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
-        return new ReportDetailInfoDTO(!report.getTitle().isBlank()? report.getSubcategory().getTitle() : report.getTitle(), null, report.getReportingTimestamp(), report.getAdditionalPicture(), report.getLongitude(), report.getLatitude(), report.getUser().getUsername(), report.getUser().getProfilePicture());
+        return new ReportDetailInfoDTO((report.getTitle() == null || report.getTitle().isBlank())? report.getSubcategory().getTitle() : report.getTitle(), null, report.getReportingTimestamp(), report.getAdditionalPicture(), report.getLongitude(), report.getLatitude(), report.getUser().getUsername(), report.getUser().getProfilePicture());
     }
 
     /*
@@ -135,7 +135,7 @@ public class ReportService {
     public List<ReportInfoDTO> toInfoDTOList(List<ReportEntity> reports) {
         List<ReportInfoDTO> retReports = new ArrayList<>();
         for (ReportEntity r : reports) {
-            retReports.add(new ReportInfoDTO(r.getTitle().isBlank() ? r.getSubcategory().getTitle() : r.getTitle(), null/*icon */, r.getReportingTimestamp(), r.getAdditionalPicture(), r.getLongitude(), r.getLatitude()));
+            retReports.add(new ReportInfoDTO((r.getTitle() == null || r.getTitle().isBlank()) ? r.getSubcategory().getTitle() : r.getTitle(), null/*icon */, r.getReportingTimestamp(), r.getAdditionalPicture(), r.getLongitude(), r.getLatitude()));
         }
         return retReports;
     }
