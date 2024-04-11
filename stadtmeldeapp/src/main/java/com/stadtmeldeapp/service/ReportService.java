@@ -59,7 +59,11 @@ public class ReportService {
         SubcategoryEntity subcategory = subcategoryRepository
                 .findByTitleAndMaincategoryEntityId(reportDto.subCategoryName(), maincategory.getId())
                 .orElseThrow(() -> new NotFoundException("Unterkategorie nicht gefunden"));
-        StatusEntity status = statusRepository.findByReportingLocationEntityId(reportingLocation.getId()).get(0);
+        List<StatusEntity> status = statusRepository.findByReportingLocationEntityId(reportingLocation.getId());
+        StatusEntity statusX = null;
+        if (!status.isEmpty()) {
+            statusX = status.get(0);
+        }
 
         ReportEntity report = new ReportEntity();
         report.setSubcategory(subcategory);
@@ -69,7 +73,7 @@ public class ReportService {
         report.setLatitude(reportDto.latitude());
         report.setReportingLocation(reportingLocation);
         report.setUser(user);
-        report.setStatus(status);
+        report.setStatus(statusX);
 
         return reportRepository.save(report);
     }
