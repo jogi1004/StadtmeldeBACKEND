@@ -2,6 +2,7 @@ package com.stadtmeldeapp.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -11,8 +12,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 import com.stadtmeldeapp.service.JwtAuthFilter;
 import com.stadtmeldeapp.service.UserDetailsServiceImpl;
@@ -60,21 +59,15 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // Cross-Site-Request-Forgery
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/auth/*", "/swagger-ui/*", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/css/**").permitAll()
-                        .requestMatchers("/js/**").permitAll()
-                        .requestMatchers("/images/**").permitAll()
-                        .requestMatchers("/static/**").permitAll()
-                        .requestMatchers("/", "/home").permitAll()
-                        .anyRequest().permitAll())
-                .httpBasic(withDefaults())
-                .formLogin(form -> form
-                    .loginPage("/login")
-                    .permitAll()
-                    .defaultSuccessUrl("/"))
-                // .formLogin(form -> form
-                //         .defaultSuccessUrl("/"))
-                //         .logout(withDefaults())
+                        .requestMatchers("/auth/*").permitAll()
+                        .requestMatchers("/swagger-ui/*", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/user/*").hasAnyAuthority("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/categories/*").hasAnyAuthority("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/categories/*").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/categories/*").hasAuthority("ADMIN")
+                        .requestMatchers("/status/*").hasAuthority("ADMIN")
+                        .requestMatchers("/reports/*").hasAnyAuthority("USER", "ADMIN")
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
