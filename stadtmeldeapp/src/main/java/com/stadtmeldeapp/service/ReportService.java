@@ -3,6 +3,7 @@ package com.stadtmeldeapp.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
@@ -24,6 +25,7 @@ import com.stadtmeldeapp.Repository.UserRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +49,8 @@ public class ReportService {
     @Autowired
     private UserService userService;
 
-    public ReportEntity createReport(ReportDTO reportDto, String username) throws NotFoundException {
+    public ReportEntity createReport(ReportDTO reportDto, String username, MultipartFile image)
+            throws NotFoundException, IOException {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
         ReportingLocationEntity reportingLocation = reportingLocationRepository
@@ -59,7 +62,12 @@ public class ReportService {
         SubcategoryEntity subcategory = subcategoryRepository
                 .findByTitleAndMaincategoryEntityId(reportDto.subCategoryName(), maincategory.getId())
                 .orElseThrow(() -> new NotFoundException("Unterkategorie nicht gefunden"));
-        StatusEntity status = statusRepository.findByReportingLocationEntityId(reportingLocation.getId()).get(0);
+        List<StatusEntity> status = statusRepository.findByReportingLocationEntityId(reportingLocation.getId());
+
+        StatusEntity statusX = null;
+        if (!status.isEmpty()) {
+            statusX = status.get(0);
+        }
 
         ReportEntity report = new ReportEntity();
         report.setSubcategory(subcategory);
@@ -69,14 +77,15 @@ public class ReportService {
         report.setLatitude(reportDto.latitude());
         report.setReportingLocation(reportingLocation);
         report.setUser(user);
-        report.setStatus(status);
+        report.setStatus(statusX);
+        report.setAdditionalPicture(image.getBytes());
 
         return reportRepository.save(report);
     }
 
     public List<ReportInfoDTO> getReportsByUserId(int userId) {
         return toInfoDTOList(reportRepository.findAllByUserId(userId));
-        
+
     }
 
     public List<ReportInfoDTO> getReportsByUserId(HttpServletRequest request) throws NotFoundException {
@@ -93,8 +102,13 @@ public class ReportService {
     }
 
     public ReportDetailInfoDTO getReportDetails(int id) throws NotFoundException {
-        ReportEntity report = reportRepository.findById(id).orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
-        return new ReportDetailInfoDTO((report.getTitle() == null || report.getTitle().isBlank())? report.getSubcategory().getTitle() : report.getTitle(), null, report.getReportingTimestamp(), null, report.getLongitude(), report.getLatitude(), report.getUser().getUsername(), report.getUser().getProfilePicture());
+        ReportEntity report = reportRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
+        return new ReportDetailInfoDTO(
+                (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
+                        : report.getTitle(),
+                null, report.getReportingTimestamp(), report.getAdditionalPicture(), report.getLongitude(),
+                report.getLatitude(), report.getUser().getUsername(), report.getUser().getProfilePicture());
     }
 
     /*
@@ -135,7 +149,12 @@ public class ReportService {
     public List<ReportInfoDTO> toInfoDTOList(List<ReportEntity> reports) {
         List<ReportInfoDTO> retReports = new ArrayList<>();
         for (ReportEntity r : reports) {
-            retReports.add(new ReportInfoDTO((r.getTitle() == null || r.getTitle().isBlank()) ? r.getSubcategory().getTitle() : r.getTitle(), null/*icon */, r.getReportingTimestamp(), null, r.getLongitude(), r.getLatitude()));
+            retReports
+                    .add(new ReportInfoDTO(
+                            (r.getTitle() == null || r.getTitle().isBlank()) ? r.getSubcategory().getTitle()
+                                    : r.getTitle(),
+                            null/* icon */, r.getReportingTimestamp(), r.getAdditionalPicture(), r.getLongitude(),
+                            r.getLatitude()));
         }
         return retReports;
     }
