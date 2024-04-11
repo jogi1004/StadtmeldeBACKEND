@@ -35,7 +35,7 @@ public class JwtService {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
-        if (roles.contains(new SimpleGrantedAuthority("ROLE_USER"))) {
+        if (roles.contains(new SimpleGrantedAuthority("USER"))) {
             claims.put("isUser", true);
         }
         return doGenerateToken(claims, userDetails.getUsername());
