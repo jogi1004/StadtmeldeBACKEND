@@ -17,9 +17,10 @@ import com.stadtmeldeapp.service.ReportService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.io.IOException;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
-
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/reports")
@@ -29,10 +30,12 @@ public class ReportController {
     private ReportService reportService;
 
     @PostMapping
-    public ResponseEntity<ReportEntity> createReport(@RequestBody ReportDTO reportDto) throws NotFoundException {
+    public ResponseEntity<ReportEntity> createReport(
+            @RequestParam(value = "image", required = false) MultipartFile image,
+            @ModelAttribute ReportDTO reportDTO) throws NotFoundException, IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        ReportEntity createdReport = reportService.createReport(reportDto, username);
+        ReportEntity createdReport = reportService.createReport(reportDTO, username, image);
         return new ResponseEntity<>(createdReport, HttpStatus.CREATED);
     }
 
@@ -65,7 +68,6 @@ public class ReportController {
         ReportDetailInfoDTO report = reportService.getReportDetails(id);
         return new ResponseEntity<>(report, HttpStatus.OK);
     }
-    
 
     /*
      * @PutMapping("/{reportId}")
