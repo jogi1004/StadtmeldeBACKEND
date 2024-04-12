@@ -3,7 +3,6 @@ package com.stadtmeldeapp.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
@@ -49,7 +48,7 @@ public class ReportService {
     @Autowired
     private UserService userService;
 
-    public ReportEntity createReport(ReportDTO reportDto, String username, MultipartFile image)
+    public ReportEntity createReport(ReportDTO reportDto, String username)
             throws NotFoundException, IOException {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
@@ -71,16 +70,16 @@ public class ReportService {
 
         ReportEntity report = new ReportEntity();
         report.setSubcategory(subcategory);
-        report.setTitle(reportDto.title());
+        if (reportDto.title() != null)
+            report.setTitle(reportDto.title());
         report.setDescription(reportDto.description());
         report.setLongitude(reportDto.longitude());
         report.setLatitude(reportDto.latitude());
         report.setReportingLocation(reportingLocation);
         report.setUser(user);
         report.setStatus(statusX);
-        if (image != null) {
-            report.setAdditionalPicture(image.getBytes());
-        }
+        if (reportDto.additionalPicture() != null)
+            report.setAdditionalPicture(reportDto.additionalPicture());
 
         return reportRepository.save(report);
     }
