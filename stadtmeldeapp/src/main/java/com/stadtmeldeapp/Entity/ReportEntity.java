@@ -31,16 +31,16 @@ public class ReportEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private UserEntity user;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title", nullable = true)
     private String title;
 
     @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "longitude", nullable = true)
+    @Column(name = "longitude", nullable = false)
     private Double longitude;
 
-    @Column(name = "latitude", nullable = true)
+    @Column(name = "latitude", nullable = false)
     private Double latitude;
     
     @Column(name = "reporting_timestamp", nullable = false)
