@@ -78,7 +78,9 @@ public class ReportService {
         report.setReportingLocation(reportingLocation);
         report.setUser(user);
         report.setStatus(statusX);
-        report.setAdditionalPicture(image.getBytes());
+        if (image != null) {
+            report.setAdditionalPicture(image.getBytes());
+        }
 
         return reportRepository.save(report);
     }
