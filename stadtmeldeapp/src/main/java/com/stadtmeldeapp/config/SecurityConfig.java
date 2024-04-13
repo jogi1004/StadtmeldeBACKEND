@@ -67,6 +67,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/categories/*").hasAuthority("ADMIN")
                         .requestMatchers("/status/*").hasAuthority("ADMIN")
                         .requestMatchers("/reports/*").hasAnyAuthority("USER", "ADMIN")
+                        .requestMatchers("/css/*").permitAll()
+                        .requestMatchers("/js/*").permitAll()
+                        .requestMatchers("/images/*").permitAll()
+                        .requestMatchers("/static/*").permitAll()
+                        .requestMatchers("/templates/*").permitAll()
+                        .requestMatchers("/*").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

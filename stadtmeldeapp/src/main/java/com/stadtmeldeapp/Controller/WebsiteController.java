@@ -56,12 +56,14 @@ public class WebsiteController {
   @GetMapping("/")
   public String index(HttpSession session, Model model) {
     model.addAttribute("token", session.getAttribute("token"));
-    return "landingPage"; // This maps to index.html inside src/main/resources/templates
+    model.addAttribute("home", true);
+    return "landingPage";
   }
 
   @GetMapping("/cityInfo")
   public String cityInfo(RedirectAttributes redirectAttributes, HttpSession session, Model model) {
     model.addAttribute("token", session.getAttribute("token"));
+    model.addAttribute("cityInfo", true);
     logger.info("GET MAIN CATEGORY BY ID");
     List<MaincategoryEntity> mainCategory = categoryService.getMaincategoriesByLocationName("Zweibrücken");
     List<SubcategoryEntity> subCategory = new ArrayList<SubcategoryEntity>();
@@ -81,30 +83,34 @@ public class WebsiteController {
       return "cityInfo";
     }
     logger.info("Main Category not found.");
-    return "cityInfo"; // This maps to index.html inside src/main/resources/templates
+    return "cityInfo";
   }
 
   @GetMapping("/services")
   public String services(HttpSession session, Model model) {
     model.addAttribute("token", session.getAttribute("token"));
-    return "services"; // This maps to index.html inside src/main/resources/templates
+    model.addAttribute("services", true);
+    return "services";
   }
 
   @GetMapping("/aboutUs")
   public String aboutUs(HttpSession session, Model model) {
     model.addAttribute("token", session.getAttribute("token"));
-    return "aboutUs"; // This maps to index.html inside src/main/resources/templates
+    model.addAttribute("aboutUs", true);
+    return "aboutUs";
   }
 
   @GetMapping("/contact")
   public String contact(HttpSession session, Model model) {
     model.addAttribute("token", session.getAttribute("token"));
-    return "contact"; // This maps to index.html inside src/main/resources/templates
+    model.addAttribute("contact", true);
+    return "contact";
   }
 
   @GetMapping("/reports")
   public String reports(HttpSession session, Model model) {
     model.addAttribute("token", session.getAttribute("token"));
+    model.addAttribute("reports", true);
     logger.info("GET REPORTS");
     List<ReportInfoDTO> reports = reportService.getReportsByReportingLocationId(1);
     if (reports != null) {
@@ -129,19 +135,21 @@ public class WebsiteController {
     else {
       logger.info("Reports not found.");
     }
-    return "reports"; // This maps to index.html inside src/main/resources/templates
+    return "reports";
   }
 
 
   @GetMapping("/login")
   public String showLoginForm(Model model) {
     model.addAttribute("LoginDataDTO", new LoginDataDTO());
+    model.addAttribute("login", true);
     return "login";
   }
 
   @PostMapping("/loginWebsite")
   public String loginWebsite(@ModelAttribute("LoginDataDTO") LoginDataDTO request,
-      RedirectAttributes redirectAttributes, HttpSession session) {
+      RedirectAttributes redirectAttributes, HttpSession session, Model model) {
+    model.addAttribute("home", true);
     logger.info("LOGIN");
     authenticationManager
         .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
