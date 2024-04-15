@@ -12,6 +12,7 @@ import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.ReportDTO;
 import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
+import com.stadtmeldeapp.DTO.ReportUpdateDTO;
 import com.stadtmeldeapp.Entity.ReportEntity;
 import com.stadtmeldeapp.service.ReportService;
 
@@ -67,23 +68,13 @@ public class ReportController {
         return new ResponseEntity<>(report, HttpStatus.OK);
     }
 
-    /*
-     * @PutMapping("/{reportId}")
-     * public ResponseEntity<ReportEntity> updateReport(@PathVariable int
-     * reportId, @RequestBody ReportDTO reportDto, HttpServletRequest request) {
-     * String jwt = request.getHeader("Authorization");
-     * jwt= jwtService.removeBearerFromToken(jwt);
-     * String username = jwtService.extractUsername(jwt);
-     * UserEntity user = userService.getUserEntityByUsername(username);
-     * try {
-     * ReportEntity updatedReport = reportService.updateReport(reportId, reportDto,
-     * user);
-     * return new ResponseEntity<>(updatedReport, HttpStatus.OK);
-     * } catch (Exception e) {
-     * return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-     * }
-     * }
-     */
+    @PutMapping("/{reportId}")
+    public ResponseEntity<ReportEntity> updateReport(@PathVariable int reportId, @RequestBody ReportUpdateDTO reportDto,
+            HttpServletRequest request) throws NotAllowedException, NotFoundException{
+        ReportEntity updatedReport = reportService.updateReport(reportId, reportDto,
+                request);
+        return new ResponseEntity<>(updatedReport, HttpStatus.OK);
+    }
 
     @DeleteMapping("/{reportId}")
     public ResponseEntity<Void> deleteReport(@PathVariable int reportId, HttpServletRequest request)

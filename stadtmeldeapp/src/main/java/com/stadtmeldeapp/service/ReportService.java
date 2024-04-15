@@ -9,6 +9,7 @@ import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.ReportDTO;
 import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
+import com.stadtmeldeapp.DTO.ReportUpdateDTO;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
 import com.stadtmeldeapp.Entity.ReportEntity;
 import com.stadtmeldeapp.Entity.ReportingLocationEntity;
@@ -112,25 +113,23 @@ public class ReportService {
                 report.getLatitude(), report.getUser().getUsername(), report.getUser().getProfilePicture());
     }
 
-    /*
-     * public ReportEntity updateReport(int reportId, ReportDTO reportDto,
-     * UserEntity user) throws Exception {
-     * 
-     * ReportEntity report = reportRepository.findById(reportId)
-     * .orElseThrow();
-     * 
-     * if (!report.getUser().equals(user)) {
-     * throw new Exception("You are not authorized to update this report");
-     * }
-     * 
-     * // Update report details
-     * report.setTitle(reportDto.title());
-     * report.setDescription(reportDto.description());
-     * report.setLongitude(reportDto.longitude());
-     * report.setLatitude(reportDto.latitude());
-     * return reportRepository.save(report);
-     * }
-     */
+    public ReportEntity updateReport(int reportId, ReportUpdateDTO reportDto,
+            HttpServletRequest request) throws NotAllowedException, NotFoundException {
+
+        ReportEntity report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
+
+        if (!report.getUser().equals(userService.getUserFromRequest(request))) {
+            throw new NotAllowedException("Keine Berechtigung!");
+        }
+        if (reportDto.title() != null && !report.getSubcategory().getTitle().equals("Sonstiges")) {
+            throw new NotAllowedException("Meldungen außerhalb der Kategorie 'Sonstiges' haben keinen Titel");
+        }
+        report.setTitle(reportDto.title());
+        report.setDescription(reportDto.description());
+        report.setAdditionalPicture(reportDto.additionalPicture());
+        return reportRepository.save(report);
+    }
 
     public void deleteReport(int reportId, HttpServletRequest request)
             throws NotFoundException, NotAllowedException {
