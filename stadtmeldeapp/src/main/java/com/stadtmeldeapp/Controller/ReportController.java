@@ -33,7 +33,6 @@ public class ReportController {
             @RequestBody ReportDTO reportDTO) throws NotFoundException, IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        System.out.println("Username:" + username);
         ReportEntity createdReport = reportService.createReport(reportDTO, username);
         return new ResponseEntity<>(createdReport, HttpStatus.CREATED);
     }

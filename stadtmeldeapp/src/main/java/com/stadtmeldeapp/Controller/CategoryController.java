@@ -126,7 +126,6 @@ public class CategoryController {
             @RequestBody @NonNull SubcategoryDTO newSubcategory) throws NotFoundException {
         SubcategoryEntity existingSubCategory = categoryService.getSubCategoryById(id);
 
-        System.out.println(newSubcategory.maincategoryId());
         MaincategoryEntity maincategoryEntity = categoryService.getMainCategoryById(newSubcategory.maincategoryId());
         existingSubCategory.setTitle(newSubcategory.title());
         existingSubCategory.setMaincategoryEntity(maincategoryEntity);
