@@ -64,6 +64,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/categories/*").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/categories/*").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/categories/*").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/categories/*").hasAuthority("ADMIN")
                         .requestMatchers("/status/*").hasAuthority("ADMIN")
                         .requestMatchers("/reports/*").hasAnyAuthority("USER", "ADMIN")
                         .anyRequest().authenticated())
