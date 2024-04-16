@@ -18,10 +18,10 @@ jobs:
       id-token: 'write'
 
     steps:
-      - name: Checkout develop branch
+      - name: Checkout main branch
         uses: actions/checkout@v4.1.1
         with:
-          ref: develop
+          ref: main
 
       - name: Google Auth
         id: auth
