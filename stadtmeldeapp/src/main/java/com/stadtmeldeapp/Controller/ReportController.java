@@ -69,11 +69,19 @@ public class ReportController {
     }
 
     @PutMapping("/{reportId}")
-    public ResponseEntity<ReportEntity> updateReport(@PathVariable int reportId, @RequestBody ReportUpdateDTO reportDto,
-            HttpServletRequest request) throws NotAllowedException, NotFoundException{
-        ReportEntity updatedReport = reportService.updateReport(reportId, reportDto,
+    public ResponseEntity<ReportInfoDTO> updateReport(@PathVariable int reportId, @RequestBody ReportUpdateDTO reportDto,
+            HttpServletRequest request) throws NotAllowedException, NotFoundException {
+        ReportInfoDTO updatedReport = reportService.updateReport(reportId, reportDto,
                 request);
+
         return new ResponseEntity<>(updatedReport, HttpStatus.OK);
+    }
+
+    @PutMapping("/admin/{reportId}")
+    public ResponseEntity<ReportInfoDTO> updateReportStatus(@PathVariable int reportId, @RequestBody String newStatus, HttpServletRequest request) throws NotAllowedException, NotFoundException {
+        ReportInfoDTO updatedReport = reportService.updateReportStatus(reportId, newStatus,
+                request);
+        return new ResponseEntity<>(updatedReport, HttpStatus.OK);     
     }
 
     @DeleteMapping("/{reportId}")

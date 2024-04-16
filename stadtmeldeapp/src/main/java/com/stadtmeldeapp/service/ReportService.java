@@ -109,11 +109,12 @@ public class ReportService {
         return new ReportDetailInfoDTO(
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
                         : report.getTitle(),
-                null, report.getReportingTimestamp(), report.getAdditionalPicture(), report.getLongitude(),
+                -1, report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
+                report.getLongitude(),
                 report.getLatitude(), report.getUser().getUsername(), report.getUser().getProfilePicture());
     }
 
-    public ReportEntity updateReport(int reportId, ReportUpdateDTO reportDto,
+    public ReportInfoDTO updateReport(int reportId, ReportUpdateDTO reportDto,
             HttpServletRequest request) throws NotAllowedException, NotFoundException {
 
         ReportEntity report = reportRepository.findById(reportId)
@@ -128,7 +129,24 @@ public class ReportService {
         report.setTitle(reportDto.title());
         report.setDescription(reportDto.description());
         report.setAdditionalPicture(reportDto.additionalPicture());
-        return reportRepository.save(report);
+        return toReportInfoDTO(reportRepository.save(report));
+    }
+
+    public ReportInfoDTO updateReportStatus(int reportId, String newStatus,
+            HttpServletRequest request) throws NotAllowedException, NotFoundException {
+
+        ReportEntity report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
+
+        if (!report.getReportingLocation().equals(userService.getUserFromRequest(request).getAdminForLocation())) {
+            throw new NotAllowedException("Keine Berechtigung!");
+        }
+
+        StatusEntity status = statusRepository
+                .findByReportingLocationEntityIdAndName(report.getReportingLocation().getId(), newStatus)
+                .orElseThrow(() -> new NotFoundException("Status nicht gefunden"));
+        report.setStatus(status);
+        return toReportInfoDTO(report);
     }
 
     public void deleteReport(int reportId, HttpServletRequest request)
@@ -153,9 +171,27 @@ public class ReportService {
                     .add(new ReportInfoDTO(
                             (r.getTitle() == null || r.getTitle().isBlank()) ? r.getSubcategory().getTitle()
                                     : r.getTitle(),
-                            null/* icon */, r.getReportingTimestamp(), r.getAdditionalPicture(), r.getLongitude(),
+                            -1/* icon TODO */, r.getStatus(), r.getReportingTimestamp(), r.getAdditionalPicture(),
+                            r.getLongitude(),
                             r.getLatitude()));
         }
         return retReports;
+    }
+
+    public ReportInfoDTO toReportInfoDTO(ReportEntity report) {
+        return new ReportInfoDTO(
+                (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
+                        : report.getTitle(),
+                -1, report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(), //TODO
+                report.getLongitude(),
+                report.getLatitude());
+    }
+
+    public ReportInfoDTO toReportInfoDTO(ReportDetailInfoDTO report) {
+        return new ReportInfoDTO(
+                report.titleOrsubcategoryName(),
+                report.iconId(), report.status(), report.timestamp(), report.image(),
+                report.longitude(),
+                report.latitude());
     }
 }
