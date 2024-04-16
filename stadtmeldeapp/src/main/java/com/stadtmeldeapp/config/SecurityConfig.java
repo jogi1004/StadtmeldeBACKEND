@@ -66,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/categories/*").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/categories/*").hasAuthority("ADMIN")
                         .requestMatchers("/status/*").hasAuthority("ADMIN")
+                        .requestMatchers("/reports/admin/*").hasAuthority("ADMIN")
                         .requestMatchers("/reports/*").hasAnyAuthority("USER", "ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
