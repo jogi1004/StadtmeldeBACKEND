@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
-import com.stadtmeldeapp.Entity.ReportingLocationEntity;
 import com.stadtmeldeapp.service.ReportingLocationService;
 
 @RestController
@@ -20,9 +19,9 @@ public class ReportingLocationController {
     private ReportingLocationService locationService;
 
     @GetMapping("/{name}")
-    public ResponseEntity<ReportingLocationEntity> getReportingLocationByName(@PathVariable String name) throws NotFoundException {
-        ReportingLocationEntity location = locationService.getReportingLocationByName(name);
-        return new ResponseEntity<>(location, HttpStatus.OK);
+    public ResponseEntity<Boolean> isReportingLocationByName(@PathVariable String name) throws NotFoundException {
+        boolean isLocation = locationService.isReportingLocationByName(name);
+        return new ResponseEntity<>(isLocation, HttpStatus.OK);
 
     }
 }
