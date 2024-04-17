@@ -29,6 +29,7 @@
                     <li class="nav-item"><a th:class="${aboutUs}? 'nav-link active' : 'nav-link'" th:href= "@{/aboutUs}">Über uns</a></li>
                     <li class="nav-item"><a th:class="${contact}? 'nav-link active' : 'nav-link'" th:href= "@{/contact}">Kontakt</a></li>
                     <li class="nav-item"><a th:class="${services}? 'nav-link active' : 'nav-link'" th:href= "@{/services}">Dienstleistungen</a></li>
+                    <li class="nav-item"><a th:class="${overview}? 'nav-link active' : 'nav-link'" th:href= "@{/overview}">Übersicht</a></li>
                     <li class="nav-item" th:if= "${User != null}"><a th:if= "${User.getRoles().getFirst().getName() eq 'ADMIN'}" th:class="${cityInfo}? 'nav-link active' : 'nav-link'" th:href= "@{/cityInfo}">Stadtinformationen</a></li>
                     <li class="nav-item" th:if= "${User != null}"><a th:if= "${User.getRoles().getFirst().getName() eq 'ADMIN'}" th:class="${reports}? 'nav-link active' : 'nav-link'" th:href= "@{/reports}">Getätigte Meldungen</a></li>
                 </ul>

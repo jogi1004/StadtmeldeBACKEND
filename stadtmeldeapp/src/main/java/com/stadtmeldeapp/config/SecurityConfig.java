@@ -76,6 +76,7 @@ public class SecurityConfig {
                         .requestMatchers("/aboutUs").permitAll()
                         .requestMatchers("/contact").permitAll()
                         .requestMatchers("/services").permitAll()
+                        .requestMatchers("/overview").permitAll()
                         .requestMatchers("/reports").hasAuthority("ADMIN")
                         .requestMatchers("/cityInfo").hasAuthority("ADMIN")
                         .anyRequest().authenticated())

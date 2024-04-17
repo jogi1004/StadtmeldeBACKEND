@@ -86,6 +86,16 @@ public class WebsiteController {
     return "services";
   }
 
+  @GetMapping("/overview")
+  public String overview(HttpSession session, Model model) throws NotFoundException {
+    UserEntity userEntity = userService.getUserByAuthentication();
+    if(userEntity != null){
+      model.addAttribute("User", userEntity);
+    }
+    model.addAttribute("overview", true);
+    return "overview";
+  }
+
   @GetMapping("/aboutUs")
   public String aboutUs(HttpSession session, Model model) throws NotFoundException {
     UserEntity userEntity = userService.getUserByAuthentication();

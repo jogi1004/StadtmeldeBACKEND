@@ -2,7 +2,12 @@
 <html lang="en" layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 <head>
-    <title>Login</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <title>Meldungen</title>
     <style>
         .bordered-table {
             border: 1px solid black;
@@ -14,13 +19,6 @@
             border: 1px solid black;
         }
     </style>
-    <script>
-        function openGoogleMaps(button) {
-            var latitude = button.getAttribute('data-latitude');
-            var longitude = button.getAttribute('data-longitude');
-            window.open('https://www.google.com/maps/search/?api=1&query=' + latitude + ',' + longitude, '_blank');
-        }
-    </script>
 </head>
 
 <body>
@@ -32,7 +30,8 @@
                     <h2 class="text-center mt-5">Getätigte Meldungen</h2>
                     <div class="row justify-content-center me-0">
                         <div class="col-lg-8">
-                            <p class="row justify-content-center">Hier kannst du deine getätigten Meldungen einsehen und den
+                            <p class="row justify-content-center">Hier kannst du deine getätigten Meldungen einsehen und
+                                den
                                 Bearbeitungsstatus
                                 verfolgen.</p>
                             <!-- Table to display the reported issues -->
@@ -44,14 +43,14 @@
                                         <th>Icon</th>
                                         <th>Timestamp</th>
                                         <th>Image</th>
-                                        <th>Longitude</th>
                                         <th>Latitude</th>
+                                        <th>Longitude</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr th:each="report : ${Reports}">
-                                        <td th:text="${report.titleOrsubcategoryName}"></td>
+                                    <tr th:each="report, iterStat: ${Reports}">
+                                        <td th:text="${iterStat.index + 1}"></td>
                                         <td>Status noch nicht vorhanden</td>
                                         <td>
                                             <img th:src="'data:image/jpeg;base64,' + ${#strings.toString(report.icon)}"
@@ -62,16 +61,48 @@
                                             <img th:src="'data:image/jpeg;base64,' + ${#strings.toString(report.image)}"
                                                 alt="Kein Bild vorhanden" style="max-width: 200px; max-height: 200px;">
                                         </td>
-                                        <td th:text="${report.longitude}"></td>
                                         <td th:text="${report.latitude}"></td>
-                                        <td>
-                                            <button type="button"
-                                                data-th-attr="data-latitude=${report.latitude}, data-longitude=${report.longitude}"
-                                                onclick="openGoogleMaps(this)">Open in Google Maps</button>
+                                        <td th:text="${report.longitude}"></td>
+                                        <td th:id="'data_' + ${iterStat.index + 1}"
+                                            data-th-attr="data-latitude=${report.latitude}, data-longitude=${report.longitude}">
+                                            <div th:id="'map_' + ${iterStat.index + 1}"
+                                                style="height: 300px; width: 400px;">
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
+
+                            <script>
+                                var divs = document.getElementsByTagName('div');
+
+                                for (var i = 0; i < divs.length; i++) {
+                                    var div = divs[i];
+
+                                    if (div.id && div.id.startsWith('map_')) {
+
+                                        var numStr = div.id.substring(4);
+
+                                        if (!isNaN(numStr)) {
+                                            var data = document.getElementById('data_' + numStr);
+                                            var lat = data.getAttribute('data-latitude');
+                                            var long = data.getAttribute('data-longitude');
+
+                                            var mapElement = document.getElementById(div.id);
+
+                                            var map = L.map(mapElement).setView([lat, long], 15);
+                                            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                                maxZoom: 19,
+                                                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                                            }).addTo(map);
+
+                                            var marker = L.marker([lat, long]).addTo(map);
+
+                                            marker.bindPopup("Koordinaten: " + marker.getLatLng().lat + ", " + marker.getLatLng().lng);
+                                        }
+                                    }
+                                }
+                            </script>
                         </div>
                     </div>
                 </form>
