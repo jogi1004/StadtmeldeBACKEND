@@ -24,13 +24,13 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a th:class="${home}? 'nav-link active' : 'nav-link'" aria-current="page" th:href="@{/}">Home</a></li>
-                    <li class="nav-item" th:if="${User == null}"><a th:class="${login}? 'nav-link active' : 'nav-link'" href="/login">Login</a></li>
-                    <li class="nav-item" th:if="${User}"><a th:class="${logout}? 'nav-link active' : 'nav-link'" href="/logout">Logout</a></li>
-                    <li class="nav-item"><a th:class="${aboutUs}? 'nav-link active' : 'nav-link'" th:href= "@{aboutUs}">Über uns</a></li>
-                    <li class="nav-item"><a th:class="${contact}? 'nav-link active' : 'nav-link'" th:href= "@{contact}">Kontakt</a></li>
-                    <li class="nav-item"><a th:class="${services}? 'nav-link active' : 'nav-link'" th:href= "@{services}">Dienstleistungen</a></li>
-                    <li class="nav-item"><a th:class="${cityInfo}? 'nav-link active' : 'nav-link'" th:href= "@{cityInfo}">Stadtinformationen</a></li>
-                    <li class="nav-item"><a th:class="${reports}? 'nav-link active' : 'nav-link'" th:href= "@{reports}">Getätigte Meldungen</a></li>
+                    <li class="nav-item" th:if="${User == null}"><a th:class="${login}? 'nav-link active' : 'nav-link'" th:href="@{/login}">Login</a></li>
+                    <li class="nav-item" th:if="${User}"><a th:class="${logout}? 'nav-link active' : 'nav-link'" th:href="@{/logout}">Logout</a></li>
+                    <li class="nav-item"><a th:class="${aboutUs}? 'nav-link active' : 'nav-link'" th:href= "@{/aboutUs}">Über uns</a></li>
+                    <li class="nav-item"><a th:class="${contact}? 'nav-link active' : 'nav-link'" th:href= "@{/contact}">Kontakt</a></li>
+                    <li class="nav-item"><a th:class="${services}? 'nav-link active' : 'nav-link'" th:href= "@{/services}">Dienstleistungen</a></li>
+                    <li class="nav-item" th:if= "${User != null}"><a th:if= "${User.getRoles().getFirst().getName() eq 'ADMIN'}" th:class="${cityInfo}? 'nav-link active' : 'nav-link'" th:href= "@{/cityInfo}">Stadtinformationen</a></li>
+                    <li class="nav-item" th:if= "${User != null}"><a th:if= "${User.getRoles().getFirst().getName() eq 'ADMIN'}" th:class="${reports}? 'nav-link active' : 'nav-link'" th:href= "@{/reports}">Getätigte Meldungen</a></li>
                 </ul>
             </div>
         </div>

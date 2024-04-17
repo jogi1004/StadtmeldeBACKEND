@@ -22,7 +22,7 @@
                             <h1 class="font-weight-light">CityCare - Deine Stadtmeldeapp</h1>
                             <p>Willkommen
                                 <span th:if="${User != null}">
-                                    <span th:text="${User + ','}"></span>
+                                    <span th:text="${User.getUsername + ','}"></span>
                                 </span>
                                 <span th:unless="${User != null}">Gast,</span>
                                 CityCare ist deine Plattform, um Schäden, Vandalismus und andere Probleme in deiner
@@ -33,7 +33,7 @@
                                 Schlaglöcher oder Graffiti melden und ihre Bearbeitung durch die Stadtverwaltung
                                 verfolgen.
                             </p>
-                            <a class="btn btn-primary" href="#!">Mach mit!</a>
+                            <a class="btn btn-primary" th:href="@{/login}">Mach mit!</a>
                         </div>
                     </div>
                     <!-- Call to Action-->
@@ -56,7 +56,7 @@
                                         wir eine
                                         effiziente Kommunikation zwischen Bürgern und Behörden fördern.</p>
                                 </div>
-                                <div class="card-footer"><a class="btn btn-primary btn-sm" th:href= "@{aboutUs}">Mehr erfahren</a></div>
+                                <div class="card-footer"><a class="btn btn-primary btn-sm" th:href= "@{/aboutUs}">Mehr erfahren</a></div>
                             </div>
                         </div>
                         <div class="col-md-4 mb-5">
@@ -70,7 +70,7 @@
                                         dich dabei, Schäden, Vandalismus und andere Probleme zu dokumentieren und den
                                         Fortschritt ihrer Behebung zu verfolgen.</p>
                                 </div>
-                                <div class="card-footer"><a class="btn btn-primary btn-sm" th:href= "@{services}">Mehr erfahren</a></div>
+                                <div class="card-footer"><a class="btn btn-primary btn-sm" th:href= "@{/services}">Mehr erfahren</a></div>
                             </div>
                         </div>
                         <div class="col-md-4 mb-5">
@@ -83,7 +83,7 @@
                                         möglich
                                         bei dir melden.</p>
                                 </div>
-                                <div class="card-footer"><a class="btn btn-primary btn-sm" th:href= "@{contact}">Kontaktieren</a></div>
+                                <div class="card-footer"><a class="btn btn-primary btn-sm" th:href= "@{/contact}">Kontaktieren</a></div>
                             </div>
                         </div>
                     </div>

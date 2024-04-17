@@ -3,6 +3,8 @@ package com.stadtmeldeapp.service;
 import java.util.Collections;
 import java.util.Optional;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -71,8 +73,8 @@ public class UserService {
     public UserEntity updateUser(UserEntity userEntity) throws NotFoundException {
         UserEntity updatedUser = repository.findByUsername(userEntity.getUsername())
                 .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
-            updatedUser.setProfilePicture(userEntity.getProfilePicture());
-            return repository.save(updatedUser);
+        updatedUser.setProfilePicture(userEntity.getProfilePicture());
+        return repository.save(updatedUser);
     }
 
     public boolean validate(String token, UserDetails userDetails) {
@@ -86,5 +88,14 @@ public class UserService {
         String username = jwtService.extractUsername(jwt);
         UserEntity user = getUserEntityByUsername(username);
         return user;
+    }
+
+    public UserEntity getUserByAuthentication() throws NotFoundException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(!authentication.getName().equals("anonymousUser")){
+            UserEntity userEntity = getUserEntityByUsername(authentication.getName());
+            return userEntity;
+        }
+        return null;
     }
 }

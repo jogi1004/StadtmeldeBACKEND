@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.stadtmeldeapp.service.JwtAuthFilter;
 import com.stadtmeldeapp.service.UserDetailsServiceImpl;
@@ -39,7 +40,6 @@ public class SecurityConfig {
         return authProvider;
     }
 
-
     @Bean
     AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder = http
@@ -66,14 +66,28 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/categories/*").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/categories/*").hasAuthority("ADMIN")
                         .requestMatchers("/status/*").hasAuthority("ADMIN")
-                        .requestMatchers("/reports/*").hasAnyAuthority("USER", "ADMIN")
+                        .requestMatchers("/reports/*").hasAuthority("ADMIN")
                         .requestMatchers("/css/*").permitAll()
                         .requestMatchers("/js/*").permitAll()
                         .requestMatchers("/images/*").permitAll()
                         .requestMatchers("/static/*").permitAll()
                         .requestMatchers("/templates/*").permitAll()
-                        .requestMatchers("/*").permitAll()
+                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/aboutUs").permitAll()
+                        .requestMatchers("/contact").permitAll()
+                        .requestMatchers("/services").permitAll()
+                        .requestMatchers("/reports").hasAuthority("ADMIN")
+                        .requestMatchers("/cityInfo").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/")
+                        .loginProcessingUrl("/login")
+                        .failureUrl("/login?error=true")
+                        .permitAll())
+                .logout(
+                    logout -> logout
+                            .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

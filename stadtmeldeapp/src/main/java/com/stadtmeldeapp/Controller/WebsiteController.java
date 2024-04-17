@@ -6,23 +6,19 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.stadtmeldeapp.DTO.LoginDataDTO;
+import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.DTO.ReportPictureDTO;
 import com.stadtmeldeapp.service.CategoryService;
-import com.stadtmeldeapp.service.JwtService;
 import com.stadtmeldeapp.service.ReportService;
-import com.stadtmeldeapp.service.UserDetailsServiceImpl;
+import com.stadtmeldeapp.service.UserService;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
 import com.stadtmeldeapp.Entity.SubcategoryEntity;
+import com.stadtmeldeapp.Entity.UserEntity;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -35,36 +31,32 @@ public class WebsiteController {
   Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired
-  private UserDetailsServiceImpl userDetailsServiceImpl;
-
-  @Autowired
-  private AuthenticationManager authenticationManager;
-
-  @Autowired
-  private JwtService jwtService;
-
-  @Autowired
   private CategoryService categoryService;
 
   @Autowired
   private ReportService reportService;
 
-  /*
-   * @Autowired
-   * private ReportingLocationService reportingLocationService;
-   */
+  @Autowired
+  private UserService userService;
+
   @GetMapping("/")
-  public String index(HttpSession session, Model model) {
-    model.addAttribute("token", session.getAttribute("token"));
+  public String index(HttpSession session, Model model) throws NotFoundException {
+    UserEntity userEntity = userService.getUserByAuthentication();
+    if(userEntity != null){
+      model.addAttribute("User", userEntity);
+    }
     model.addAttribute("home", true);
     return "landingPage";
   }
 
   @GetMapping("/cityInfo")
-  public String cityInfo(RedirectAttributes redirectAttributes, HttpSession session, Model model) {
-    model.addAttribute("token", session.getAttribute("token"));
+  public String cityInfo(RedirectAttributes redirectAttributes, HttpSession session, Model model) throws NotFoundException {
+    UserEntity userEntity = userService.getUserByAuthentication();
+    if(userEntity != null){
+      model.addAttribute("User", userEntity);
+    }
     model.addAttribute("cityInfo", true);
-    logger.info("GET MAIN CATEGORY BY ID");
+    logger.info("GET CATEGORYS");
     List<MaincategoryEntity> mainCategory = categoryService.getMaincategoriesByLocationName("Zweibrücken");
     List<SubcategoryEntity> subCategory = new ArrayList<SubcategoryEntity>();
     ArrayList<SubcategoryEntity> subCategoryList = new ArrayList<SubcategoryEntity>();
@@ -75,9 +67,7 @@ public class WebsiteController {
         subCategoryList.add(subcategoryEntity);
       }   
     } 
-    logger.info("Subcategory." + subCategory.toString());
     if (mainCategory != null) {
-      logger.info("Main Category found." + mainCategory.toString());
       model.addAttribute("MainCategories", mainCategory);
       model.addAttribute("SubCategories", subCategoryList);
       return "cityInfo";
@@ -87,29 +77,42 @@ public class WebsiteController {
   }
 
   @GetMapping("/services")
-  public String services(HttpSession session, Model model) {
-    model.addAttribute("token", session.getAttribute("token"));
+  public String services(HttpSession session, Model model) throws NotFoundException {
+    UserEntity userEntity = userService.getUserByAuthentication();
+    if(userEntity != null){
+      model.addAttribute("User", userEntity);
+    }
     model.addAttribute("services", true);
     return "services";
   }
 
   @GetMapping("/aboutUs")
-  public String aboutUs(HttpSession session, Model model) {
-    model.addAttribute("token", session.getAttribute("token"));
+  public String aboutUs(HttpSession session, Model model) throws NotFoundException {
+    UserEntity userEntity = userService.getUserByAuthentication();
+    if(userEntity != null){
+      model.addAttribute("User", userEntity);
+    }
     model.addAttribute("aboutUs", true);
     return "aboutUs";
   }
 
   @GetMapping("/contact")
-  public String contact(HttpSession session, Model model) {
+  public String contact(HttpSession session, Model model) throws NotFoundException {
+    UserEntity userEntity = userService.getUserByAuthentication();
+    if(userEntity != null){
+      model.addAttribute("User", userEntity);
+    }
     model.addAttribute("token", session.getAttribute("token"));
     model.addAttribute("contact", true);
     return "contact";
   }
 
   @GetMapping("/reports")
-  public String reports(HttpSession session, Model model) {
-    model.addAttribute("token", session.getAttribute("token"));
+  public String reports(HttpSession session, Model model) throws NotFoundException {
+    UserEntity userEntity = userService.getUserByAuthentication();
+    if(userEntity != null){
+      model.addAttribute("User", userEntity);
+    }
     model.addAttribute("reports", true);
     logger.info("GET REPORTS");
     List<ReportInfoDTO> reports = reportService.getReportsByReportingLocationId(1);
@@ -129,7 +132,6 @@ public class WebsiteController {
         reportList.add(new ReportPictureDTO(reportInfo.getTitleOrsubcategoryName(), iconBase64,
             reportInfo.getTimestamp(), imageBase64, reportInfo.getLongitude(), reportInfo.getLatitude()));
       }
-      logger.info("ReportList." + reportList.toString());
       model.addAttribute("Reports", reportList);
     }
     else {
@@ -138,28 +140,10 @@ public class WebsiteController {
     return "reports";
   }
 
-
   @GetMapping("/login")
   public String showLoginForm(Model model) {
-    model.addAttribute("LoginDataDTO", new LoginDataDTO());
     model.addAttribute("login", true);
     return "login";
   }
-
-  @PostMapping("/loginWebsite")
-  public String loginWebsite(@ModelAttribute("LoginDataDTO") LoginDataDTO request,
-      RedirectAttributes redirectAttributes, HttpSession session, Model model) {
-    model.addAttribute("home", true);
-    logger.info("LOGIN");
-    authenticationManager
-        .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-    logger.info("User " + request.getUsername() + " authenticated.");
-    String token = jwtService.generateToken(userDetailsServiceImpl.loadUserByUsername(request.getUsername()));
-    redirectAttributes.addFlashAttribute("User", request.getUsername());
-    session.setAttribute("token", token);
-    session.setAttribute("test", "test");
-    return "redirect:/";
-  }
-
 
 }
