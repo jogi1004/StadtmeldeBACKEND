@@ -30,6 +30,7 @@ import com.stadtmeldeapp.service.JwtService;
 import com.stadtmeldeapp.service.UserDetailsServiceImpl;
 import com.stadtmeldeapp.service.UserService;
 
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 
 @RestController
@@ -55,13 +56,13 @@ public class OpenUserController {
 
   @PostMapping("/register")
   public ResponseEntity<?> registerUser(@RequestBody @Valid RegisterDTO registerDto)
-      throws NotFoundException, NotAllowedException {
+      throws NotFoundException, NotAllowedException, MessagingException {
     // logger.info("REGISTER");
     UserEntity newUser = userService.register(registerDto);
     // logger.info("Creating user " + registerDto.username() + " failed. Username
     // already exists.");
     // logger.info("New user " + registerDto.username() + " created.");
-        emailSenderService.sendEmail(newUser.getEmail(), "Herzlich Willkommen!", "Hallo " + newUser.getUsername() + ",\nvielen Dank, dass du unseren Dienst nutzt!");
+        emailSenderService.sendWelcomeEmail(newUser.getEmail(), newUser.getUsername());
     return ResponseEntity.ok().body(newUser);
   }
 
