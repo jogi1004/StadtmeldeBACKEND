@@ -9,15 +9,18 @@
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="../static/css/styles.css" th:href="@{/css/styles.css}" rel="stylesheet" />
+    <link href="../static/css/eigeneStyles.css" th:href="@{/css/eigeneStyles.css}" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="/images/CityCareLogo.png">
     <script type="text/javascript" th:src="@{/js/scripts.js}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
 <body style="width: auto">
     <!-- Main Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-NavBar">
         <div class="container px-5">
-            <a class="navbar-brand" href="#!">CityCare</a>
+            <img class="navbar-brand" src="images/CityCareLogo.png" alt="CityCareLogo" style="max-width: 40px; max-height: 40px;">
+            <a class="navbar-brand" th:href="@{/}">CityCare</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
                 aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
@@ -30,8 +33,8 @@
                     <li class="nav-item"><a th:class="${contact}? 'nav-link active' : 'nav-link'" th:href= "@{/contact}">Kontakt</a></li>
                     <li class="nav-item"><a th:class="${services}? 'nav-link active' : 'nav-link'" th:href= "@{/services}">Dienstleistungen</a></li>
                     <li class="nav-item"><a th:class="${overview}? 'nav-link active' : 'nav-link'" th:href= "@{/overview}">Übersicht</a></li>
-                    <li class="nav-item" th:if= "${User != null}"><a th:if= "${User.getRoles().getFirst().getName() eq 'ADMIN'}" th:class="${cityInfo}? 'nav-link active' : 'nav-link'" th:href= "@{/cityInfo}">Stadtinformationen</a></li>
-                    <li class="nav-item" th:if= "${User != null}"><a th:if= "${User.getRoles().getFirst().getName() eq 'ADMIN'}" th:class="${reports}? 'nav-link active' : 'nav-link'" th:href= "@{/reports}">Getätigte Meldungen</a></li>
+                    <li class="nav-item" th:if= "${User != null}"><a th:if= "${User.getRoles().get(0).getName() eq 'ADMIN'}" th:class="${cityInfo}? 'nav-link active' : 'nav-link'" th:href= "@{/cityInfo}">Stadtinformationen</a></li>
+                    <li class="nav-item" th:if= "${User != null}"><a th:if= "${User.getRoles().get(0).getName() eq 'ADMIN'}" th:class="${reports}? 'nav-link active' : 'nav-link'" th:href= "@{/reports}">Getätigte Meldungen</a></li>
                 </ul>
             </div>
         </div>

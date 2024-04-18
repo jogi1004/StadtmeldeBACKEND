@@ -93,6 +93,9 @@ public class WebsiteController {
       model.addAttribute("User", userEntity);
     }
     model.addAttribute("overview", true);
+
+    List<MaincategoryEntity> mainCategory = categoryService.getMaincategoriesByLocationName("Zweibrücken");
+    model.addAttribute("MainCategory", mainCategory);
     return "overview";
   }
 

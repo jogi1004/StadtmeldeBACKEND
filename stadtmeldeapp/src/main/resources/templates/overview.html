@@ -10,29 +10,54 @@
 </head>
 
 <body>
-
     <div layout:fragment="content">
         <section class="my-5">
-            <div class="map" style="height: 300px; width: 400px;"></div>
-            <div class="map" style="height: 300px; width: 400px;"></div>
-            <script>
-                var maps = document.querySelectorAll('.map'); // Alle Elemente mit der Klasse 'map' auswählen
+            <div class="container px-4 px-lg-5">
+                <div class="borderSchemeMap">
+                    <div id="map" class="row justify-content-center" style="height: 400px; border-radius: 0.375rem;">
+                    </div>
+                    <script>
+                        var map = L.map('map').setView([49.261825, 7.361466], 13);
 
-                maps.forEach(function (mapElement) { // Iteriere über jedes 'map'-Element
-                    var map = L.map(mapElement).setView([49.261825, 7.361466], 13); // Karte initialisieren
-                    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        maxZoom: 19,
-                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    }).addTo(map);
+                        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            maxZoom: 19,
+                            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                        }).addTo(map);
 
-                    var marker = L.marker([49.261825, 7.361466]).addTo(map); // Marker hinzufügen
-                });
-            </script>
+                        var marker = L.marker([49.261825, 7.361466]).addTo(map); // Marker hinzufügen
+                        marker.bindPopup("Koordinaten: " + marker.getLatLng().lat + ", " + marker.getLatLng().lng);
+
+                    </script>
+                </div>
+
+                <div class="row gx-4 gx-lg-5 mx-0 mt-3">
+                    <div id="categorys" class="col-md-6 p-0">
+                        <div class="borderScheme me-2" style="overflow-y: auto; height: 500px;">
+                            <div th:if="${MainCategory} == null">
+                                <p>Es wurden noch keine Kategorien angelegt!</p>
+                            </div>
+                            <div class="borderScheme m-3 hover" th:each="category, status : ${MainCategory}" onclick="window.location.href='/cityInfo'">
+                                    <div th:text="${status.index + 1}" class="borderSchemeRightBottom p-0"
+                                        style="height: 100%; width: 30px; display: flex; align-items: center; justify-content: center;">
+                                    </div>
+                                    <p th:text="${category.getTitle()}"
+                                        style="display: flex; align-items: center; justify-content: center;">
+                                    </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="reports" class="col-md-6 p-0">
+                        <div class="borderScheme ms-2 h-100">
+                            <p>Meldungen</p>
+                        </div>
+                    </div>
+                </div>
+                <div style="height: 400px;">
+                    <p>Test</p>
+                </div>
+            </div>
         </section>
     </div>
-
-
-
 </body>
 
 </html>
