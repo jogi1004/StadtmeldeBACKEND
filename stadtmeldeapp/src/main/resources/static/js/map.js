@@ -1,4 +1,9 @@
-var map = L.map('map').setView([49.245408, 7.364850], 13);
+var map = L.map('map', {
+    maxBounds: [
+        [90, -180], // Obere linke Ecke (90°N, 180°W)
+        [-90, 180]  // Untere rechte Ecke (90°S, 180°E)
+    ]
+}).setView([49.245408, 7.364850], 13);
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
