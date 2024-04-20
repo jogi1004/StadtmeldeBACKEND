@@ -11,19 +11,24 @@ import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
+import com.stadtmeldeapp.DTO.MainCategoryWithSubCategoriesDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.DTO.ReportPictureDTO;
 import com.stadtmeldeapp.service.CategoryService;
 import com.stadtmeldeapp.service.ReportService;
+import com.stadtmeldeapp.service.StatusService;
 import com.stadtmeldeapp.service.UserService;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
+import com.stadtmeldeapp.Entity.StatusEntity;
 import com.stadtmeldeapp.Entity.SubcategoryEntity;
 import com.stadtmeldeapp.Entity.UserEntity;
 
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.GetMapping;
+
 import java.util.Base64;
+
 
 @Controller
 public class WebsiteController {
@@ -38,6 +43,9 @@ public class WebsiteController {
 
   @Autowired
   private UserService userService;
+
+  @Autowired
+  private StatusService statusService;
 
   @GetMapping("/")
   public String index(HttpSession session, Model model) throws NotFoundException {
@@ -94,8 +102,14 @@ public class WebsiteController {
     }
     model.addAttribute("overview", true);
 
-    List<MaincategoryEntity> mainCategory = categoryService.getMaincategoriesByLocationName("Zweibrücken");
-    model.addAttribute("MainCategory", mainCategory);
+    List<MainCategoryWithSubCategoriesDTO> mainCategoryWithSubCategories = categoryService.getMainCategoriesWithSubcategoriesByLocationName(/* userEntity.getAdminForLocation().getName() */ "Zweibrücken");
+    model.addAttribute("MainCategories", mainCategoryWithSubCategories);
+
+    List<ReportInfoDTO> reportInfoDTOs = reportService.getLatestReportsByReportingLocationId(/* userEntity.getAdminForLocation().getId() */ 1);
+    model.addAttribute("Reports", reportInfoDTOs);
+
+    List<StatusEntity> statusEntities = statusService.getStatusByReportingLocationId(/* userEntity.getAdminForLocation().getId() */ 1);
+    model.addAttribute("Status", statusEntities);
     return "overview";
   }
 
@@ -158,5 +172,6 @@ public class WebsiteController {
     model.addAttribute("login", true);
     return "login";
   }
+  
 
 }

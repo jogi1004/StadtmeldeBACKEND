@@ -111,6 +111,10 @@ public class ReportService {
                 report.getLatitude(), report.getUser().getUsername(), report.getUser().getProfilePicture());
     }
 
+    public List<ReportInfoDTO> getLatestReportsByReportingLocationId(int id) {
+        return toInfoDTOList(reportRepository.findFirst10ByReportingLocationIdOrderByReportingTimestampDesc(id));
+    }
+
     /*
      * public ReportEntity updateReport(int reportId, ReportDTO reportDto,
      * UserEntity user) throws Exception {

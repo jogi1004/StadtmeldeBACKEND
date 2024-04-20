@@ -6,10 +6,20 @@
 
 .borderScheme {
     --border-width: 1px;
+    --border-color: rgba(0, 0, 0, 0.329);
+    --border-radius: 0.375rem;
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: white;
+}
+
+.borderSchemeContainer {
+    --border-width: 1px;
     --border-color: rgba(0, 0, 0, 0.175);
     --border-radius: 0.375rem;
     border: var(--border-width) solid var(--border-color);
     border-radius: var(--border-radius);
+    background-color: #f0f0f0;
 }
 
 .borderSchemeMap {
@@ -21,19 +31,30 @@
     padding: 1rem;
     padding-left: 2rem;
     padding-right: 2rem;
+    background-color: #f0f0f0;
 }
 
 .borderSchemeRightBottom {
     --border-width: 1px;
-    --border-color: rgba(0, 0, 0, 0.175);
+    --border-color: rgba(0, 0, 0, 0.329);
     --border-radius: 0.375rem;
     border-right: var(--border-width) solid var(--border-color);
     border-bottom: var(--border-width) solid var(--border-color);
     border-radius: var(--border-radius);
 }
 
+.borderSchemeBottom {
+    --border-width: 1px;
+    --border-color: rgba(0, 0, 0, 0.329);
+    --border-radius: 0.375rem;
+    border-bottom: var(--border-width) solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
 .hover {
+    --border-radius: 0.375rem;
     background-color: white;
+    border-radius: var(--border-radius);
 }
 
 .hover:hover {
@@ -42,8 +63,29 @@
 }
 
 .scrollbar {
-    width: 33vh;
-    height: 500px;
     overflow-y: auto;
-    overflow-x: hidden;
+}
+
+.scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+    background-color: #cccccc;
+    border-radius: 6px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #808080;
+}
+
+.center {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
 }

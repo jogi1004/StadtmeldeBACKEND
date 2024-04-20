@@ -6,6 +6,7 @@
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script type="text/javascript" th:src="@{/js/overview.js}"></script>
     <title>Overview</title>
 </head>
 
@@ -13,47 +14,80 @@
     <div layout:fragment="content">
         <section class="my-5">
             <div class="container px-4 px-lg-5">
+                <h2 class="center">Karte</h2>
                 <div class="borderSchemeMap">
                     <div id="map" class="row justify-content-center" style="height: 400px; border-radius: 0.375rem;">
                     </div>
-                    <script>
-                        var map = L.map('map').setView([49.261825, 7.361466], 13);
-
-                        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                            maxZoom: 19,
-                            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                        }).addTo(map);
-
-                        var marker = L.marker([49.261825, 7.361466]).addTo(map); // Marker hinzufügen
-                        marker.bindPopup("Koordinaten: " + marker.getLatLng().lat + ", " + marker.getLatLng().lng);
-
-                    </script>
+                    <script type="text/javascript" th:src="@{/js/map.js}"></script>
                 </div>
 
-                <div class="row gx-4 gx-lg-5 mx-0 mt-3">
-                    <div id="categorys" class="col-md-6 p-0">
-                        <div class="borderScheme me-2" style="overflow-y: auto; height: 500px;">
-                            <div th:if="${MainCategory} == null">
-                                <p>Es wurden noch keine Kategorien angelegt!</p>
+                <h2 class="center mt-5 mx-0">Neuste Meldungen</h2>
+                <div class="row gx-4 gx-lg-5 mx-0 mt-3 pt-3 borderSchemeContainer" style="height: 400px;">
+                    <div class="col-md-12 px-3 scrollbar" style="height: 95%">
+                        <div th:if="${Reports} == null">
+                            <p>Es liegen derzeit keine Meldungen vor!</p>
+                        </div>
+                        <div class="borderScheme hover mb-3" th:each="report, state : ${Reports}"
+                            onclick="window.location.href='/reports'">
+                            <div th:text="${state.index + 1}" class="borderSchemeRightBottom p-0 center"
+                                style="height: 100%; width: 30px;">
                             </div>
-                            <div class="borderScheme m-3 hover" th:each="category, status : ${MainCategory}" onclick="window.location.href='/cityInfo'">
-                                    <div th:text="${status.index + 1}" class="borderSchemeRightBottom p-0"
-                                        style="height: 100%; width: 30px; display: flex; align-items: center; justify-content: center;">
+                            <p th:text="${report.getTitleOrsubcategoryName()}" class="center">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row gx-4 gx-lg-5 mx-0 mt-5">
+                    <div id="categoryTitle" class="col-md-6 p-0">
+                        <h2 class="center">Kategorien</h2>
+                    </div>
+                    <div id="reportTitle" class="col-md-6 p-0">
+                        <h2 class="center">Status</h2>
+                    </div>
+                </div>
+
+                <div class="row gx-4 gx-lg-5 mx-0">
+                    <div id="categorys" class="col-md-6 p-0">
+                        <div class="borderSchemeContainer pt-3 me-2" style="height: 500px;">
+                            <div class="col-md-12 px-2 scrollbar" style="height: 95%">
+                                <div th:if="${MainCategories} == null">
+                                    <p>Es wurden noch keine Kategorien angelegt!</p>
+                                </div>
+                                <div th:id="'Categories_' + ${status.index + 1}" class="borderScheme m-3 hover"
+                                    th:each="category, status : ${MainCategories}" onclick="toggleDropdown(this.id)">
+                                    <div th:id="'MainCategory_' + ${status.index + 1}">
+                                        <div th:text="${status.index + 1}" class="borderSchemeRightBottom p-0 center"
+                                            style="height: 100%; width: 30px;"></div>
+                                        <p th:text="${category.getTitle()}" class="center"></p>
                                     </div>
-                                    <p th:text="${category.getTitle()}"
-                                        style="display: flex; align-items: center; justify-content: center;">
-                                    </p>
+                                    <div th:id="'SubCategories_' + ${status.index + 1}" style="display: none;">
+                                        <div th:each="subcategory, iterStat : ${category.getSubCategories()}"
+                                            onclick="window.location.href='/cityInfo'" class="center">
+                                            <div th:text="${subcategory.getTitle()}"></div>
+                                            <hr />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div id="reports" class="col-md-6 p-0">
-                        <div class="borderScheme ms-2 h-100">
-                            <p>Meldungen</p>
+                        <div class="borderSchemeContainer pt-3 ms-2" style="height: 500px;">
+                            <div class="col-md-12 px-2 scrollbar" style="height: 95%">
+                                <div th:if="${Status} == null">
+                                    <p>Es wurden noch keine Status angelegt!</p>
+                                </div>
+                                <div class="borderScheme m-3 hover" th:each="status, state : ${Status}">
+                                    <div th:text="${state.index + 1}" class="borderSchemeRightBottom p-0 center"
+                                        style="height: 100%; width: 30px;">
+                                    </div>
+                                    <p th:text="${status.getName()}" class="center">
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div style="height: 400px;">
-                    <p>Test</p>
                 </div>
             </div>
         </section>

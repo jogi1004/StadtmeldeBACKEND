@@ -6,11 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
+import com.stadtmeldeapp.DTO.MainCategoryWithSubCategoriesDTO;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
 import com.stadtmeldeapp.Entity.SubcategoryEntity;
 import com.stadtmeldeapp.Repository.MaincategoryRepository;
 import com.stadtmeldeapp.Repository.SubcategoryRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -59,5 +61,18 @@ public class CategoryService {
 
     public List<MaincategoryEntity> getMaincategoriesByLocationName(String reportingLocationName) {
         return mainCategoryRepository.findByReportingLocationEntity_Name(reportingLocationName);
+    }
+
+    public List<MainCategoryWithSubCategoriesDTO> getMainCategoriesWithSubcategoriesByLocationName(String reportingLocationName) {
+        List<MainCategoryWithSubCategoriesDTO> mainCategoryWithSubCategoriesDTOs = new ArrayList<MainCategoryWithSubCategoriesDTO>();
+        
+        List<MaincategoryEntity> mainCategory = getMaincategoriesByLocationName(reportingLocationName);
+        
+        for (MaincategoryEntity maincategoryEntity : mainCategory) {
+            int mainCategoryId = maincategoryEntity.getId();
+            List<SubcategoryEntity> subcategoryEntities = getSubCategoriesByMainCategoryId(mainCategoryId);
+            mainCategoryWithSubCategoriesDTOs.add(new MainCategoryWithSubCategoriesDTO(maincategoryEntity, subcategoryEntities));
+        }
+        return mainCategoryWithSubCategoriesDTOs;
     }
 }
