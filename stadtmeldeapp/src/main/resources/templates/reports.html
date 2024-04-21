@@ -8,17 +8,6 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <title>Meldungen</title>
-    <style>
-        .bordered-table {
-            border: 1px solid black;
-            border-collapse: collapse;
-        }
-
-        .bordered-table th,
-        .bordered-table td {
-            border: 1px solid black;
-        }
-    </style>
 </head>
 
 <body>
@@ -26,86 +15,141 @@
     <div layout:fragment="content">
         <section class="my-5">
             <div class="row justify-content-center">
-                <form role="form" method="get" th:action="@{/mainWebsite/{id}(id=1)}" th:object="${MainCategories}">
-                    <h2 class="text-center mt-5">Getätigte Meldungen</h2>
-                    <div class="row justify-content-center me-0">
-                        <div class="col-lg-8">
-                            <p class="row justify-content-center">Hier kannst du deine getätigten Meldungen einsehen und
-                                den
-                                Bearbeitungsstatus
-                                verfolgen.</p>
-                            <!-- Table to display the reported issues -->
-                            <table class="table bordered-table">
-                                <thead>
-                                    <tr>
-                                        <th>Meldungsnummer</th>
-                                        <th>Status</th>
-                                        <th>Icon</th>
-                                        <th>Timestamp</th>
-                                        <th>Image</th>
-                                        <th>Latitude</th>
-                                        <th>Longitude</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="report, iterStat: ${Reports}">
-                                        <td th:text="${iterStat.index + 1}"></td>
-                                        <td>Status noch nicht vorhanden</td>
-                                        <td>
-                                            <img th:src="'data:image/jpeg;base64,' + ${#strings.toString(report.icon)}"
-                                                alt="Kein Icon vorhanden" style="max-width: 200px; max-height: 200px;">
-                                        </td>
-                                        <td th:text="${report.timestamp}"></td>
-                                        <td>
-                                            <img th:src="'data:image/jpeg;base64,' + ${#strings.toString(report.image)}"
-                                                alt="Kein Bild vorhanden" style="max-width: 200px; max-height: 200px;">
-                                        </td>
-                                        <td th:text="${report.latitude}"></td>
-                                        <td th:text="${report.longitude}"></td>
-                                        <td th:id="'data_' + ${iterStat.index + 1}"
-                                            data-th-attr="data-latitude=${report.latitude}, data-longitude=${report.longitude}">
-                                            <div th:id="'map_' + ${iterStat.index + 1}"
-                                                style="height: 300px; width: 400px;">
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
 
-                            <script>
-                                var divs = document.getElementsByTagName('div');
-
-                                for (var i = 0; i < divs.length; i++) {
-                                    var div = divs[i];
-
-                                    if (div.id && div.id.startsWith('map_')) {
-
-                                        var numStr = div.id.substring(4);
-
-                                        if (!isNaN(numStr)) {
-                                            var data = document.getElementById('data_' + numStr);
-                                            var lat = data.getAttribute('data-latitude');
-                                            var long = data.getAttribute('data-longitude');
-
-                                            var mapElement = document.getElementById(div.id);
-
-                                            var map = L.map(mapElement).setView([lat, long], 15);
-                                            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                                maxZoom: 19,
-                                                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                                            }).addTo(map);
-
-                                            var marker = L.marker([lat, long]).addTo(map);
-
-                                            marker.bindPopup("Koordinaten: " + marker.getLatLng().lat + ", " + marker.getLatLng().lng);
-                                        }
-                                    }
-                                }
-                            </script>
+                <div class="row gx-4 gx-lg-5">
+                    <div class="col-md-3 mb-5">
+                        <div id="reportNew" class="card h-100" style="height: 70vh;" ondrop="drop(event, 'reportNew', 'Neu')"
+                            ondragover="allowDrop(event)">
+                            <div class="card-header">
+                                <h2 class="card-title">Neu</h2>
+                            </div>
+                            <div id="reportNewBody" class="card-body scrollbar" style="height: 70vh;">
+                                <div th:id="'report_' + ${report.getId()}" class="card mb-3"
+                                    th:each="report, iterStat: ${ReportsNew}" draggable="true"
+                                    ondragstart="drag(event)">
+                                    <div class="card-body">
+                                        <p th:text="${report.getId()}"></p>
+                                        <p th:text="${report.getTitleOrsubcategoryName()}"></p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </form>
+                    <div class="col-md-3 mb-5">
+                        <div id="reportInProgress" class="card h-100" style="height: 70vh;"
+                            ondrop="drop(event, 'reportInProgress', 'In Bearbeitung')" ondragover="allowDrop(event)">
+                            <div class="card-header">
+                                <h2 class="card-title">In Bearbeitung</h2>
+                            </div>
+                            <div id="reportInProgressBody" class="card-body scrollbar" style="height: 70vh;">
+                                <div th:id="'report_' + ${report.getId()}" class="card mb-3"
+                                    th:each="report, iterStat: ${ReportsInProgress}" draggable="true"
+                                    ondragstart="drag(event)">
+                                    <div class="card-body">
+                                        <p th:text="${report.getId()}"></p>
+                                        <p th:text="${report.getTitleOrsubcategoryName()}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-5">
+                        <div id="reportDone" class="card h-100" style="height: 70vh;" ondrop="drop(event, 'reportDone', 'Abgeschlossen')"
+                            ondragover="allowDrop(event)">
+                            <div class="card-header">
+                                <h2 class="card-title">Abgeschlossen</h2>
+                            </div>
+                            <div id="reportDoneBody" class="card-body scrollbar" style="height: 70vh;">
+                                <div th:id="'report_' + ${report.getId()}" class="card mb-3"
+                                    th:each="report, iterStat: ${ReportsDone}" draggable="true"
+                                    ondragstart="drag(event)">
+                                    <div class="card-body">
+                                        <p th:text="${report.getId()}"></p>
+                                        <p th:text="${report.getTitleOrsubcategoryName()}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-5">
+                        <div id="reportRejected" class="card h-100" style="height: 70vh;"
+                            ondrop="drop(event, 'reportRejected', 'Abgelehnt')" ondragover="allowDrop(event)">
+                            <div class="card-header" style="background-color: lightcoral;">
+                                <h2 class="card-title">Abgelehnt</h2>
+                            </div>
+                            <div id="reportRejectedBody" class="card-body scrollbar" style="height: 70vh;">
+                                <div th:id="'report_' + ${report.getId()}" class="card mb-3"
+                                    th:each="report, iterStat: ${ReportsRejected}" draggable="true"
+                                    ondragstart="drag(event)">
+                                    <div class="card-body">
+                                        <p th:text="${report.getId()}"></p>
+                                        <p th:text="${report.getTitleOrsubcategoryName()}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        function allowDrop(ev) {
+                            ev.preventDefault();
+                        }
+
+                        function drag(ev) {
+                            ev.dataTransfer.setData("text", ev.target.id);
+                        }
+
+                        function drop(ev, target, state) {
+                            ev.preventDefault();
+                            var data = ev.dataTransfer.getData("text");
+                            var draggedElement = document.getElementById(data);
+                            console.log(draggedElement.getAttribute("id"));
+
+                            var targetBody = document.getElementById(target + 'Body');
+                            if (targetBody) {
+                                targetBody.appendChild(draggedElement);
+                                updateReport(draggedElement.getAttribute("id"), state);
+                            }
+                        }
+
+                        function updateReport(id, state) {
+                            console.log(id);
+                            console.log(state);
+
+                            var numStr = id.substring(7);
+                            const url = 'http://localhost:8080/reports/admin/' + numStr;
+                            console.log(url);
+
+                            const bodyData = typeof state === 'string' ? { state: state } : state;
+
+                            // Die Konfiguration für den Fetch Request
+                            const requestOptions = {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: state
+                            };
+
+                            // Fetch Request, um die Daten von der API abzurufen
+                            fetch(url, requestOptions)
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    // Daten erfolgreich abgerufen
+                                    console.log(data);
+                                })
+                                .catch(error => {
+                                    // Fehler behandeln
+                                    console.error('Fetch Error:', error);
+                                });
+                        }
+                    </script>
+                </div>
             </div>
         </section>
     </div>

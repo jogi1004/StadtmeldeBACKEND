@@ -19,6 +19,7 @@ import com.stadtmeldeapp.service.ReportService;
 import com.stadtmeldeapp.service.StatusService;
 import com.stadtmeldeapp.service.UserService;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
+import com.stadtmeldeapp.Entity.ReportEntity;
 import com.stadtmeldeapp.Entity.StatusEntity;
 import com.stadtmeldeapp.Entity.SubcategoryEntity;
 import com.stadtmeldeapp.Entity.UserEntity;
@@ -28,7 +29,6 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.Base64;
-
 
 @Controller
 public class WebsiteController {
@@ -50,7 +50,7 @@ public class WebsiteController {
   @GetMapping("/")
   public String index(HttpSession session, Model model) throws NotFoundException {
     UserEntity userEntity = userService.getUserByAuthentication();
-    if(userEntity != null){
+    if (userEntity != null) {
       model.addAttribute("User", userEntity);
     }
     model.addAttribute("home", true);
@@ -58,9 +58,10 @@ public class WebsiteController {
   }
 
   @GetMapping("/cityInfo")
-  public String cityInfo(RedirectAttributes redirectAttributes, HttpSession session, Model model) throws NotFoundException {
+  public String cityInfo(RedirectAttributes redirectAttributes, HttpSession session, Model model)
+      throws NotFoundException {
     UserEntity userEntity = userService.getUserByAuthentication();
-    if(userEntity != null){
+    if (userEntity != null) {
       model.addAttribute("User", userEntity);
     }
     model.addAttribute("cityInfo", true);
@@ -69,12 +70,12 @@ public class WebsiteController {
     List<SubcategoryEntity> subCategory = new ArrayList<SubcategoryEntity>();
     ArrayList<SubcategoryEntity> subCategoryList = new ArrayList<SubcategoryEntity>();
     for (MaincategoryEntity maincategoryEntity : mainCategory) {
-      int mainCategoryId = (int)maincategoryEntity.getId();
+      int mainCategoryId = (int) maincategoryEntity.getId();
       subCategory = categoryService.getSubCategoriesByMainCategoryId(mainCategoryId);
       for (SubcategoryEntity subcategoryEntity : subCategory) {
         subCategoryList.add(subcategoryEntity);
-      }   
-    } 
+      }
+    }
     if (mainCategory != null) {
       model.addAttribute("MainCategories", mainCategory);
       model.addAttribute("SubCategories", subCategoryList);
@@ -87,7 +88,7 @@ public class WebsiteController {
   @GetMapping("/services")
   public String services(HttpSession session, Model model) throws NotFoundException {
     UserEntity userEntity = userService.getUserByAuthentication();
-    if(userEntity != null){
+    if (userEntity != null) {
       model.addAttribute("User", userEntity);
     }
     model.addAttribute("services", true);
@@ -97,18 +98,27 @@ public class WebsiteController {
   @GetMapping("/overview")
   public String overview(HttpSession session, Model model) throws NotFoundException {
     UserEntity userEntity = userService.getUserByAuthentication();
-    if(userEntity != null){
+    if (userEntity != null) {
       model.addAttribute("User", userEntity);
     }
     model.addAttribute("overview", true);
 
-    List<MainCategoryWithSubCategoriesDTO> mainCategoryWithSubCategories = categoryService.getMainCategoriesWithSubcategoriesByLocationName(/* userEntity.getAdminForLocation().getName() */ "Zweibrücken");
+    List<MainCategoryWithSubCategoriesDTO> mainCategoryWithSubCategories = categoryService
+        .getMainCategoriesWithSubcategoriesByLocationName(
+            /* userEntity.getAdminForLocation().getName() */ "Zweibrücken");
     model.addAttribute("MainCategories", mainCategoryWithSubCategories);
 
-    List<ReportInfoDTO> reportInfoDTOs = reportService.getLatestReportsByReportingLocationId(/* userEntity.getAdminForLocation().getId() */ 1);
+    List<ReportInfoDTO> reportInfoDTOs = reportService.getLatestReportsByReportingLocationId(/*
+                                                                                              * userEntity.
+                                                                                              * getAdminForLocation().
+                                                                                              * getId()
+                                                                                              */ 1);
     model.addAttribute("Reports", reportInfoDTOs);
 
-    List<StatusEntity> statusEntities = statusService.getStatusByReportingLocationId(/* userEntity.getAdminForLocation().getId() */ 1);
+    List<StatusEntity> statusEntities = statusService.getStatusByReportingLocationId(/*
+                                                                                      * userEntity.getAdminForLocation()
+                                                                                      * .getId()
+                                                                                      */ 1);
     model.addAttribute("Status", statusEntities);
     return "overview";
   }
@@ -116,7 +126,7 @@ public class WebsiteController {
   @GetMapping("/aboutUs")
   public String aboutUs(HttpSession session, Model model) throws NotFoundException {
     UserEntity userEntity = userService.getUserByAuthentication();
-    if(userEntity != null){
+    if (userEntity != null) {
       model.addAttribute("User", userEntity);
     }
     model.addAttribute("aboutUs", true);
@@ -126,7 +136,7 @@ public class WebsiteController {
   @GetMapping("/contact")
   public String contact(HttpSession session, Model model) throws NotFoundException {
     UserEntity userEntity = userService.getUserByAuthentication();
-    if(userEntity != null){
+    if (userEntity != null) {
       model.addAttribute("User", userEntity);
     }
     model.addAttribute("token", session.getAttribute("token"));
@@ -137,31 +147,64 @@ public class WebsiteController {
   @GetMapping("/reports")
   public String reports(HttpSession session, Model model) throws NotFoundException {
     UserEntity userEntity = userService.getUserByAuthentication();
-    if(userEntity != null){
+    if (userEntity != null) {
       model.addAttribute("User", userEntity);
     }
     model.addAttribute("reports", true);
     logger.info("GET REPORTS");
-    List<ReportInfoDTO> reports = reportService.getReportsByReportingLocationId(1);
+    List<ReportEntity> reports = reportService.getReportEntitiesByReportingLocationId(1);
     if (reports != null) {
-      List<ReportPictureDTO> reportList = new ArrayList<ReportPictureDTO>();
-      for (ReportInfoDTO reportInfo : reports) {
+      List<ReportPictureDTO> reportListNew = new ArrayList<ReportPictureDTO>();
+      List<ReportPictureDTO> reportListInProgress = new ArrayList<ReportPictureDTO>();
+      List<ReportPictureDTO> reportListDone = new ArrayList<ReportPictureDTO>();
+      List<ReportPictureDTO> reportListRejected = new ArrayList<ReportPictureDTO>();
+      for (ReportEntity report : reports) {
         String iconBase64 = "X";
         String imageBase64 = "X";
-        if (reportInfo.getIcon() != null) {
-          byte[] iconBytes = reportInfo.getIcon();
-          iconBase64 = Base64.getEncoder().encodeToString(iconBytes);
-        }
-        if (reportInfo.getImage() != null){
-          byte[] imageBytes = reportInfo.getImage();
+        /*
+         * if (report.getIcon() != null) {
+         * byte[] iconBytes = report.getIcon();
+         * iconBase64 = Base64.getEncoder().encodeToString(iconBytes);
+         * }
+         */
+
+        // ICON ist Noch nicht in der ReportEntity Klasse, ODER wo kommt das ICON her???
+
+        if (report.getAdditionalPicture() != null) {
+          byte[] imageBytes = report.getAdditionalPicture();
           imageBase64 = Base64.getEncoder().encodeToString(imageBytes);
         }
-        reportList.add(new ReportPictureDTO(reportInfo.getTitleOrsubcategoryName(), iconBase64,
-            reportInfo.getTimestamp(), imageBase64, reportInfo.getLongitude(), reportInfo.getLatitude()));
+        String titleOrSubCategory;
+        if (report.getTitle() == null || report.getTitle().equals("")) {
+          titleOrSubCategory = report.getSubcategory().getTitle();
+        } else {
+          titleOrSubCategory = report.getTitle();
+        }
+
+        if (report.getStatus().getName().equals("Neu")) {
+          reportListNew.add(new ReportPictureDTO(report.getId(), titleOrSubCategory, iconBase64,
+              report.getReportingTimestamp(), imageBase64, report.getLongitude(), report.getLatitude(),
+              report.getStatus()));
+        } else if (report.getStatus().getName().equals("In Bearbeitung")) {
+          reportListInProgress.add(new ReportPictureDTO(report.getId(), titleOrSubCategory, iconBase64,
+              report.getReportingTimestamp(), imageBase64, report.getLongitude(), report.getLatitude(),
+              report.getStatus()));
+        } else if (report.getStatus().getName().equals("Abgeschlossen")) {
+          reportListDone.add(new ReportPictureDTO(report.getId(), titleOrSubCategory, iconBase64,
+              report.getReportingTimestamp(), imageBase64, report.getLongitude(), report.getLatitude(),
+              report.getStatus()));
+        } else if (report.getStatus().getName().equals("Abgelehnt")) {
+          reportListRejected.add(new ReportPictureDTO(report.getId(), titleOrSubCategory, iconBase64,
+              report.getReportingTimestamp(), imageBase64, report.getLongitude(), report.getLatitude(),
+              report.getStatus()));
+        }
+
       }
-      model.addAttribute("Reports", reportList);
-    }
-    else {
+      model.addAttribute("ReportsNew", reportListNew);
+      model.addAttribute("ReportsInProgress", reportListInProgress);
+      model.addAttribute("ReportsDone", reportListDone);
+      model.addAttribute("ReportsRejected", reportListRejected);
+    } else {
       logger.info("Reports not found.");
     }
     return "reports";
@@ -172,6 +215,5 @@ public class WebsiteController {
     model.addAttribute("login", true);
     return "login";
   }
-  
 
 }
