@@ -65,6 +65,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/categories/*").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/categories/*").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/categories/*").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/categories/*").hasAuthority("ADMIN")
                         .requestMatchers("/status/*").hasAuthority("ADMIN")
                         .requestMatchers("/reports/*").hasAuthority("ADMIN")
                         .requestMatchers("/css/*").permitAll()
@@ -79,6 +80,8 @@ public class SecurityConfig {
                         .requestMatchers("/reports").hasAuthority("ADMIN")
                         .requestMatchers("/cityInfo").hasAuthority("ADMIN")
                         .requestMatchers("/overview").hasAuthority("ADMIN")
+                        .requestMatchers("/reports/admin/*").hasAuthority("ADMIN")
+                        .requestMatchers("/reports/*").hasAnyAuthority("USER", "ADMIN")
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")

@@ -36,18 +36,16 @@ public class CategoryController {
     @GetMapping("/main/{id}")
     public ResponseEntity<MaincategoryEntity> getMainCategoryById(@PathVariable("id") int id) throws NotFoundException {
         MaincategoryEntity mainCategory = categoryService.getMainCategoryById(id);
-        if (mainCategory != null) {
-            return new ResponseEntity<>(mainCategory, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(mainCategory, HttpStatus.OK);
     }
 
     @PostMapping("/main")
     public ResponseEntity<MaincategoryEntity> createOrUpdateMainCategory(
             @RequestBody @NonNull MaincategoryDTO mainCategoryDTO) throws NotFoundException {
-        ReportingLocationEntity reportingLocationEntity = reportingLocationService.getReportingLocationById(mainCategoryDTO.getreportingLocationID());
+        ReportingLocationEntity reportingLocationEntity = reportingLocationService
+                .getReportingLocationById(mainCategoryDTO.reportingLocationId());
         MaincategoryEntity maincategoryEntity = new MaincategoryEntity();
-        maincategoryEntity.setTitle(mainCategoryDTO.getTitle());
+        maincategoryEntity.setTitle(mainCategoryDTO.title());
         maincategoryEntity.setReportingLocationEntity(reportingLocationEntity);
         MaincategoryEntity savedMainCategory = categoryService.saveMainCategory(maincategoryEntity);
         return new ResponseEntity<>(savedMainCategory, HttpStatus.CREATED);
@@ -76,9 +74,9 @@ public class CategoryController {
     @PostMapping("/sub")
     public ResponseEntity<SubcategoryEntity> createOrUpdateSubCategory(
             @RequestBody @NonNull SubcategoryDTO subcategoryDTO) throws NotFoundException {
-        MaincategoryEntity maincategoryEntity = categoryService.getMainCategoryById(subcategoryDTO.getMainCategoryID());
+        MaincategoryEntity maincategoryEntity = categoryService.getMainCategoryById(subcategoryDTO.maincategoryId());
         SubcategoryEntity subcategoryEntity = new SubcategoryEntity();
-        subcategoryEntity.setTitle(subcategoryDTO.getTitle());
+        subcategoryEntity.setTitle(subcategoryDTO.title());
         subcategoryEntity.setMaincategoryEntity(maincategoryEntity);
         SubcategoryEntity savedSubCategory = categoryService.saveSubCategory(subcategoryEntity);
         return new ResponseEntity<>(savedSubCategory, HttpStatus.CREATED);
@@ -108,10 +106,32 @@ public class CategoryController {
     public ResponseEntity<List<MaincategoryEntity>> getCategoriesByLocationName(
             @PathVariable("locationName") String locationName) {
         List<MaincategoryEntity> categories = categoryService.getMaincategoriesByLocationName(locationName);
-        if (categories.size()==0) {
+        if (categories.size() == 0) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(categories, HttpStatus.OK);
+    }
+
+    @PutMapping("/main/{id}")
+    public ResponseEntity<MaincategoryEntity> updateMainCategory(@PathVariable("id") int id,
+            @RequestBody @NonNull String newTitle) throws NotFoundException {
+        MaincategoryEntity existingMainCategory = categoryService.getMainCategoryById(id);
+        existingMainCategory.setTitle(newTitle);
+        MaincategoryEntity updatedMainCategory = categoryService.saveMainCategory(existingMainCategory);
+        return new ResponseEntity<>(updatedMainCategory, HttpStatus.OK);
+    }
+
+    @PutMapping("/sub/{id}")
+    public ResponseEntity<SubcategoryEntity> updateSubCategory(@PathVariable("id") int id,
+            @RequestBody @NonNull SubcategoryDTO newSubcategory) throws NotFoundException {
+        SubcategoryEntity existingSubCategory = categoryService.getSubCategoryById(id);
+
+        MaincategoryEntity maincategoryEntity = categoryService.getMainCategoryById(newSubcategory.maincategoryId());
+        existingSubCategory.setTitle(newSubcategory.title());
+        existingSubCategory.setMaincategoryEntity(maincategoryEntity);
+
+        SubcategoryEntity updatedSubCategory = categoryService.saveSubCategory(existingSubCategory);
+        return new ResponseEntity<>(updatedSubCategory, HttpStatus.OK);
     }
 
 }

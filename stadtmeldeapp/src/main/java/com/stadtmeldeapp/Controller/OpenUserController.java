@@ -25,10 +25,12 @@ import com.stadtmeldeapp.DTO.LoginDTO;
 import com.stadtmeldeapp.DTO.LoginResponseDTO;
 import com.stadtmeldeapp.DTO.RegisterDTO;
 import com.stadtmeldeapp.Entity.UserEntity;
+import com.stadtmeldeapp.service.EmailSenderService;
 import com.stadtmeldeapp.service.JwtService;
 import com.stadtmeldeapp.service.UserDetailsServiceImpl;
 import com.stadtmeldeapp.service.UserService;
 
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 
 @RestController
@@ -49,14 +51,18 @@ public class OpenUserController {
   @Autowired
   private JwtService jwtService;
 
+  @Autowired
+  private EmailSenderService emailSenderService;
+
   @PostMapping("/register")
   public ResponseEntity<?> registerUser(@RequestBody @Valid RegisterDTO registerDto)
-      throws NotFoundException, NotAllowedException {
+      throws NotFoundException, NotAllowedException, MessagingException {
     // logger.info("REGISTER");
     UserEntity newUser = userService.register(registerDto);
     // logger.info("Creating user " + registerDto.username() + " failed. Username
     // already exists.");
     // logger.info("New user " + registerDto.username() + " created.");
+        emailSenderService.sendWelcomeEmail(newUser.getEmail(), newUser.getUsername());
     return ResponseEntity.ok().body(newUser);
   }
 

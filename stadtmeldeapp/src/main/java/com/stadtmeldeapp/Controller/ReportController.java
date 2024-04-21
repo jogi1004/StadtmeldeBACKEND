@@ -12,6 +12,7 @@ import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.ReportDTO;
 import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
+import com.stadtmeldeapp.DTO.ReportUpdateDTO;
 import com.stadtmeldeapp.Entity.ReportEntity;
 import com.stadtmeldeapp.service.ReportService;
 
@@ -20,7 +21,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/reports")
@@ -31,11 +31,10 @@ public class ReportController {
 
     @PostMapping
     public ResponseEntity<ReportEntity> createReport(
-            @RequestParam(value = "image", required = false) MultipartFile image,
-            @ModelAttribute ReportDTO reportDTO) throws NotFoundException, IOException {
+            @RequestBody ReportDTO reportDTO) throws NotFoundException, IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        ReportEntity createdReport = reportService.createReport(reportDTO, username, image);
+        ReportEntity createdReport = reportService.createReport(reportDTO, username);
         return new ResponseEntity<>(createdReport, HttpStatus.CREATED);
     }
 
@@ -69,23 +68,21 @@ public class ReportController {
         return new ResponseEntity<>(report, HttpStatus.OK);
     }
 
-    /*
-     * @PutMapping("/{reportId}")
-     * public ResponseEntity<ReportEntity> updateReport(@PathVariable int
-     * reportId, @RequestBody ReportDTO reportDto, HttpServletRequest request) {
-     * String jwt = request.getHeader("Authorization");
-     * jwt= jwtService.removeBearerFromToken(jwt);
-     * String username = jwtService.extractUsername(jwt);
-     * UserEntity user = userService.getUserEntityByUsername(username);
-     * try {
-     * ReportEntity updatedReport = reportService.updateReport(reportId, reportDto,
-     * user);
-     * return new ResponseEntity<>(updatedReport, HttpStatus.OK);
-     * } catch (Exception e) {
-     * return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-     * }
-     * }
-     */
+    @PutMapping("/{reportId}")
+    public ResponseEntity<ReportInfoDTO> updateReport(@PathVariable int reportId, @RequestBody ReportUpdateDTO reportDto,
+            HttpServletRequest request) throws NotAllowedException, NotFoundException {
+        ReportInfoDTO updatedReport = reportService.updateReport(reportId, reportDto,
+                request);
+
+        return new ResponseEntity<>(updatedReport, HttpStatus.OK);
+    }
+
+    @PutMapping("/admin/{reportId}")
+    public ResponseEntity<ReportInfoDTO> updateReportStatus(@PathVariable int reportId, @RequestBody String newStatus, HttpServletRequest request) throws NotAllowedException, NotFoundException {
+        ReportInfoDTO updatedReport = reportService.updateReportStatus(reportId, newStatus,
+                request);
+        return new ResponseEntity<>(updatedReport, HttpStatus.OK);     
+    }
 
     @DeleteMapping("/{reportId}")
     public ResponseEntity<Void> deleteReport(@PathVariable int reportId, HttpServletRequest request)
