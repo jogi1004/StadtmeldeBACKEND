@@ -17,7 +17,7 @@ public class StaticMapService {
 
     public String getMapImage(double latitude, double longitude) throws Exception {
         String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude
-                + "&zoom=14&size=400x400&markers=color:red%7Clabel:C%7C" + latitude + "," + longitude
+                + "&zoom=14&size=400x400&markers=color:blue%7C" + latitude + "," + longitude
                 + "&key=" + API_KEY;
         URL url = new URL(imageUrl);
         URLConnection connection = url.openConnection();

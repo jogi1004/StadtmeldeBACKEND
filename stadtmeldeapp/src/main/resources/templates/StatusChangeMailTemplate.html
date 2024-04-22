@@ -10,7 +10,8 @@
         <td>
           <h1 style="color: #2c6e49">
             Hi
-            <strong th:text="${username}"></strong>!<br /><br />Der Status deiner Meldung hat sich geändert:
+            <strong th:text="${username}"></strong>!<br /><br />Der Status
+            deiner Meldung hat sich geändert:
           </h1>
         </td>
         <td>
@@ -28,14 +29,18 @@
         <td colspan="2">
           <p>&nbsp;</p>
           <p>
-            Deine Meldung <strong th:text="${reportTitle}"></strong> vom <strong th:text="${date}"></strong> hat jetzt den Status <strong th:text="${status}"></strong>
+            Deine Meldung <strong th:text="${reportTitle}"></strong> vom
+            <strong th:text="${date}"></strong> hat jetzt den Status
+            <strong th:text="${status}"></strong>
           </p>
           <p>&nbsp;</p>
         </td>
       </tr>
       <tr>
         <td colspan="2">
-          <img th:src="'data:image/png;base64,' + ${image}" />
+          <a th:href="${weblink}">
+            <img th:src="'data:image/png;base64,' + ${image}" />
+          </a>
         </td>
       </tr>
       <tr>

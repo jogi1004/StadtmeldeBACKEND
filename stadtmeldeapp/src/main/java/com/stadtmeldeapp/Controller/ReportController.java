@@ -103,7 +103,11 @@ public class ReportController {
         if (reportEntity != null)
             try {
                 emailSenderService.sendStatusChangeEmail(reportEntity.getUser().getEmail(),
-                        reportEntity.getUser().getUsername(), reportEntity.getStatus().getName(),
+                        reportEntity.getUser().getUsername(),
+                        (reportEntity.getTitle() == null || reportEntity.getTitle().isBlank())
+                                ? reportEntity.getSubcategory().getTitle()
+                                : reportEntity.getTitle(),
+                        reportEntity.getStatus().getName(),
                         new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(reportEntity.getReportingTimestamp()),
                         staticMapService.getMapImage(reportEntity.getLatitude(), reportEntity.getLongitude()));
             } catch (MessagingException | IOException e) {

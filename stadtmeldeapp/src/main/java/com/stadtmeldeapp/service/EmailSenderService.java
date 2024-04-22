@@ -34,7 +34,7 @@ public class EmailSenderService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper;
         helper = new MimeMessageHelper(message, true, "UTF-8");
-        helper.setPriority(2);
+        helper.setPriority(5);
         helper.setSubject("Willkommen bei CityCare!");
         helper.setFrom(emailFrom);
         helper.setTo(toEmail);
@@ -43,9 +43,10 @@ public class EmailSenderService {
     }
 
     @Async
-    public void sendStatusChangeEmail(String toEmail, String username, String status, String date, String image) throws MessagingException {
+    public void sendStatusChangeEmail(String toEmail, String username, String reportTitle, String status, String date, String image) throws MessagingException {
         Context context = new Context();
         context.setVariable("username", username);
+        context.setVariable("reportTitle", reportTitle);
         context.setVariable("status", status);
         context.setVariable("date", date);
         context.setVariable("image", image);
@@ -54,7 +55,7 @@ public class EmailSenderService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper;
         helper = new MimeMessageHelper(message, true, "UTF-8");
-        helper.setPriority(2);
+        helper.setPriority(4);
         helper.setSubject("Statusänderung deiner Meldung");
         helper.setFrom(emailFrom);
         helper.setTo(toEmail);
