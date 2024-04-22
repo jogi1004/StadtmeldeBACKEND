@@ -139,9 +139,22 @@ public class WebsiteController {
     if (userEntity != null) {
       model.addAttribute("User", userEntity);
     }
-    model.addAttribute("token", session.getAttribute("token"));
     model.addAttribute("contact", true);
     return "contact";
+  }
+
+  @GetMapping("/status")
+  public String status(HttpSession session, Model model) throws NotFoundException {
+    UserEntity userEntity = userService.getUserByAuthentication();
+    if (userEntity != null) {
+      model.addAttribute("User", userEntity);
+    }
+
+    List<StatusEntity> statusEntities =  statusService.getStatusByReportingLocationId(1);
+    model.addAttribute("Status", statusEntities);
+    
+    model.addAttribute("status", true);
+    return "status";
   }
 
   @GetMapping("/reports")

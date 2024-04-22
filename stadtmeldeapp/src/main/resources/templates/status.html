@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <title>Status</title>
+</head>
+
+<body>
+
+    <div layout:fragment="content">
+        <section class="my-5">
+            <div class="container px-4 px-lg-5">
+                <h2 class="text-center mt-5">Status</h2>
+                <div class="end">
+                    <button id="addStatusButton" class="icon-button"><img src="images/plusIcon.png" alt="Icon"></button>
+                </div>
+            </div>
+
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 mx-0 mt-3 pt-3 borderSchemeContainer" style="height: 70vh;">
+                    <div id="status" class="col-md-12 px-3 scrollbar" style="height: 95%">
+                        <div th:if="${Status} == null">
+                            <p>Es wurden derzeit noch keine Status angelegt!</p>
+                        </div>
+                        <div class="borderScheme hover mb-3" th:each="status, state : ${Status}">
+                            <div th:id="'status_index_' + ${state.index + 1}" th:text="${state.index + 1}"
+                                class="borderSchemeRightBottom p-0 center" style="height: 100%; width: 30px;">
+                            </div>
+                            <p th:text="${status.getName}" class="center">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                document.getElementById('addStatusButton').addEventListener('click', function () {
+                    // Neues Div erstellen
+                    var newDiv = document.createElement('div');
+                    newDiv.className = 'borderScheme hover mb-3';
+                    newDiv.style.minHeight = '60px';
+
+                    // Den Index des neuen Divs auf 1 setzen
+                    var newIndex = 1;
+
+                    // Die bestehenden Divs durchgehen und ihre Indizes anpassen
+                    var existingDivs = document.querySelectorAll('#status .borderScheme');
+                    for (var i = 0; i < existingDivs.length; i++) {
+                        var indexDiv = document.getElementById('status_index_' + (i + 1));
+                        indexDiv.id = 'status_index_' + (i + 2); // ID anpassen
+                        indexDiv.textContent = i + 2; // Index um eins erhöhen
+                    }
+
+                    // Neuen Inhalt für das Div hinzufügen
+                    var newContent = document.createTextNode(newIndex);
+                    var innerDiv = document.createElement('div');
+                    innerDiv.appendChild(newContent);
+                    innerDiv.id = 'status_index_' + newIndex;
+                    innerDiv.className = 'borderSchemeRightBottom p-0 center';
+                    innerDiv.style.height = '100%';
+                    innerDiv.style.width = '30px';
+                    newDiv.appendChild(innerDiv);
+
+                    // Das neue Div zum #status-Container hinzufügen
+                    var statusContainer = document.getElementById('status');
+                    statusContainer.insertBefore(newDiv, statusContainer.firstChild);
+                });
+
+            </script>
+        </section>
+    </div>
+
+</body>
+
+</html>
