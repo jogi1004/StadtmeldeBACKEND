@@ -18,5 +18,10 @@
     "name": "website.link",
     "type": "java.lang.String",
     "description": "A description for 'website.link'"
+  },
+  {
+    "name": "api.key",
+    "type": "java.lang.String",
+    "description": "A description for 'api.key'"
   }
 ]}
