@@ -27,11 +27,12 @@ public class StatusService {
         this.statusRepository = statusRepository;
     }
 
-    public List<StatusEntity> getAllStatus() {
-        return statusRepository.findAll();
+    public List<StatusEntity> getAllStatus(HttpServletRequest request) throws NotFoundException {
+        int locationId = userService.getUserFromRequest(request).getAdminForLocation().getId();
+        return statusRepository.findByReportingLocationEntityId(locationId);
     }
 
-    public StatusEntity getStatusById(int id) throws NotFoundException {
+    public StatusEntity getStatusById(int id, HttpServletRequest request) throws NotFoundException {
         return statusRepository.findById(id).orElseThrow(() -> new NotFoundException("Status nicht gefunden"));
     }
 
@@ -52,13 +53,8 @@ public class StatusService {
 
     public void deleteStatus(int id, HttpServletRequest request) throws NotFoundException, NotAllowedException {
         ReportingLocationEntity isAdminForLocation = userService.getUserFromRequest(request).getAdminForLocation();
-        ReportingLocationEntity statusLocation = getStatusById(id).getReportingLocationEntity();
+        ReportingLocationEntity statusLocation = getStatusById(id, request).getReportingLocationEntity();
         if (!statusLocation.equals(isAdminForLocation)) throw new NotAllowedException("Keine Berechtigung");
         statusRepository.deleteById(id);
     }
-
-    public List<StatusEntity> getStatusByReportingLocationId(int reportingLocationId) {
-        return statusRepository.findByReportingLocationEntityId(reportingLocationId);
-    }
-
 }
