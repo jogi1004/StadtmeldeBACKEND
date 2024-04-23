@@ -108,10 +108,12 @@ public class ReportService {
                 .orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
         return new ReportDetailInfoDTO(
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
-                        : report.getTitle(), report.getDescription(),
+                        : report.getTitle(),
+                report.getDescription(),
                 -1, report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
                 report.getLongitude(),
-                report.getLatitude(), report.getUser().getUsername(), report.getUser().getProfilePicture());
+                report.getLatitude(), report.getUser().getUsername(), report.getReportingLocation().getName(),
+                report.getUser().getProfilePicture());
     }
 
     public ReportInfoDTO updateReport(int reportId, ReportUpdateDTO reportDto,
@@ -170,7 +172,7 @@ public class ReportService {
             retReports
                     .add(new ReportInfoDTO(
                             (r.getTitle() == null || r.getTitle().isBlank()) ? r.getSubcategory().getTitle()
-                                    : r.getTitle(), r.getDescription(),
+                                    : r.getTitle(),
                             -1/* icon TODO */, r.getStatus(), r.getReportingTimestamp(), r.getAdditionalPicture(),
                             r.getLongitude(),
                             r.getLatitude()));
@@ -181,15 +183,15 @@ public class ReportService {
     public ReportInfoDTO toReportInfoDTO(ReportEntity report) {
         return new ReportInfoDTO(
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
-                        : report.getTitle(), report.getDescription(),
-                -1, report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(), //TODO
+                        : report.getTitle(),
+                -1, report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(), // TODO
                 report.getLongitude(),
                 report.getLatitude());
     }
 
     public ReportInfoDTO toReportInfoDTO(ReportDetailInfoDTO report) {
         return new ReportInfoDTO(
-                report.titleOrsubcategoryName(), report.description(),
+                report.titleOrsubcategoryName(),
                 report.iconId(), report.status(), report.timestamp(), report.image(),
                 report.longitude(),
                 report.latitude());
