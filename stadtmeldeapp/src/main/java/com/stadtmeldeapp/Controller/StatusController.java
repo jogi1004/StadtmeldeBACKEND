@@ -19,21 +19,17 @@ import java.util.List;
 public class StatusController {
 
     @Autowired
-    private final StatusService statusService;
-
-    public StatusController(StatusService statusService) {
-        this.statusService = statusService;
-    }
+    private StatusService statusService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<StatusEntity>> getAllStatus() {
-        List<StatusEntity> statusList = statusService.getAllStatus();
+    public ResponseEntity<List<StatusEntity>> getAllStatus(HttpServletRequest request) throws NotFoundException {
+        List<StatusEntity> statusList = statusService.getAllStatus(request);
         return new ResponseEntity<>(statusList, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StatusEntity> getStatusById(@PathVariable("id") int id) throws NotFoundException {
-        StatusEntity status = statusService.getStatusById(id);
+    public ResponseEntity<StatusEntity> getStatusById(@PathVariable("id") int id, HttpServletRequest request) throws NotFoundException {
+        StatusEntity status = statusService.getStatusById(id, request);
         return new ResponseEntity<>(status, HttpStatus.OK);
     }
 

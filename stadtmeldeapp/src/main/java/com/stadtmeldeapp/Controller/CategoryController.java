@@ -104,7 +104,6 @@ public class CategoryController {
         return new ResponseEntity<>(subCategories, HttpStatus.OK);
     }
 
-    @SuppressWarnings("null")
     @GetMapping("/main/location/{locationName}")
     public ResponseEntity<List<MaincategoryEntity>> getCategoriesByLocationName(
             @PathVariable("locationName") String locationName) {
