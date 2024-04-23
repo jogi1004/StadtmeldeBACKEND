@@ -1,8 +1,12 @@
 package com.stadtmeldeapp.Controller;
 
+import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.Entity.StatusEntity;
 import com.stadtmeldeapp.service.StatusService;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,22 +38,22 @@ public class StatusController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<StatusEntity> createStatus(@RequestBody StatusEntity status) {
-        StatusEntity createdStatus = statusService.createStatus(status);
+    public ResponseEntity<StatusEntity> createStatus(@RequestBody StatusEntity status, HttpServletRequest request) throws NotFoundException, NotAllowedException {
+        StatusEntity createdStatus = statusService.createStatus(status, request);
         return new ResponseEntity<>(createdStatus, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<StatusEntity> updateStatus(@PathVariable("id") int id,
-            @RequestBody StatusEntity updatedStatus) throws NotFoundException {
-        StatusEntity updated = statusService.updateStatus(id, updatedStatus);
+            @RequestBody StatusEntity updatedStatus, HttpServletRequest request) throws NotFoundException, NotAllowedException {
+        StatusEntity updated = statusService.updateStatus(id, updatedStatus, request);
         return new ResponseEntity<>(updated, HttpStatus.OK);
 
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStatus(@PathVariable("id") int id) {
-        statusService.deleteStatus(id);
+    public ResponseEntity<Void> deleteStatus(@PathVariable("id") int id, HttpServletRequest request) throws NotFoundException, NotAllowedException {
+        statusService.deleteStatus(id, request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
