@@ -109,7 +109,7 @@ public class CategoryController {
             @PathVariable("locationName") String locationName) {
         List<MaincategoryEntity> categories = categoryService.getMaincategoriesByLocationName(locationName);
         if (categories.size() == 0) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }

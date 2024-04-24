@@ -25,4 +25,8 @@ public class MaincategoryEntity {
     @JoinColumn(name = "reporting_location_id", nullable = false)
     private ReportingLocationEntity reportingLocationEntity;
 
+    @OneToOne
+    @JoinColumn(name = "icon_id", nullable = true)
+    private IconEntity iconEntity;
+
 }
