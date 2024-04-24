@@ -172,8 +172,7 @@ public class ReportService {
             retReports
                     .add(new ReportInfoDTO(
                             (r.getTitle() == null || r.getTitle().isBlank()) ? r.getSubcategory().getTitle()
-                                    : r.getTitle(),
-                            -1/* icon TODO */, r.getStatus(), r.getReportingTimestamp(), r.getAdditionalPicture(),
+                                    : r.getTitle(), r.getSubcategory().getMaincategoryEntity().getIconEntity().getId(), r.getStatus(), r.getReportingTimestamp(), r.getAdditionalPicture(),
                             r.getLongitude(),
                             r.getLatitude()));
         }
@@ -184,7 +183,7 @@ public class ReportService {
         return new ReportInfoDTO(
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
                         : report.getTitle(),
-                -1, report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(), // TODO
+                report.getSubcategory().getMaincategoryEntity().getIconEntity().getId(), report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
                 report.getLongitude(),
                 report.getLatitude());
     }
