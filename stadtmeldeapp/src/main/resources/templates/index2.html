@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>WorkTimeTrace</title>
+    <!-- Icons-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <!-- Core theme CSS-->
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="/css/eigeneStyles.css">
+</head>
+
+<body>
+    <!--navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-NavBar">
+        <div class="container">
+            <a class="navbar-brand">WorkTimeTrace</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li th:if="!${loggedIn}" class="nav-item"><a
+                            th:class="${landingPage}? 'nav-link active' : 'nav-link'" aria-current="page"
+                            th:href="@{/}">Home</a></li>
+                    <li th:if="!${loggedIn}" class="nav-item"><a th:class="${login}? 'nav-link active' : 'nav-link'"
+                            th:href="@{Login}">Login</a></li>
+                    <li th:if="${loggedIn}" class="nav-item"><a th:class="${kalender}? 'nav-link active' : 'nav-link'"
+                            th:href="@{Kalender?month=0}">Kalender</a></li>
+                    <li th:if="${loggedIn}" class="nav-item"><a th:class="${export}? 'nav-link active' : 'nav-link'"
+                            th:href="@{Export}">Export</a></li>
+                    <li th:if="${loggedIn}" class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false" th:text="${username}"></a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" th:href="@{/Benutzerinformationen}">Benutzinformationen</a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider" />
+                            </li>
+                            <li><a class="dropdown-item" th:href="@{/Logout}">Abmelden</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!--Page Content-->
+    <div class="container px-4 px-lg-5 min-vh-85">
+        <!--Landing Page Content-->
+        <div th:if="${landingPage}">
+            <div class="row gx-4 gx-lg-5 align-items-center my-5">
+                <div class="col-lg-7"><img class="img-fluid rounded mb-4 mb-lg-0" src="/images/WorkingPerson.jpg"
+                        alt="..." /></div>
+                <div class="col-lg-5">
+                    <h1 class="font-weight-light">WorkTimeTrace</h1>
+                    <p>Eine Anwendung, die zur Erfassung und Verwaltung von Arbeitszeiten verwendet werden kann. Sie
+                        richtet sich in erster Linie an Arbeitnehmer, die ihre Arbeitszeiten in die Anwendung eingeben
+                        können. Durch die Eingabe des Gehalts ist es möglich, sich automatisch eine monatliche
+                        Abrechnung zu generieren.</p>
+                    <a class="btn btn-primary" th:href="@{Registration}">Jetzt Registrieren</a>
+                </div>
+            </div>
+            <!--Call to Action-->
+            <div class="card text-white bg-secondary my-5 py-4 text-center">
+                <div class="card-body">
+                    <p class="text-white m-0 h3">Efficiency in every embrace, track your work with WorkTimeTrace.</p>
+                </div>
+            </div>
+            <!--Content Row-->
+            <div class="row gx-4 gx-lg-5 mb-3">
+                <div class="col-md-4 mb-5">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h2 class="card-title">Arbeitszeiten einfach Tracken</h2>
+                            <p class="card-text">Einfache Möglichkeit Überblick über sein Gehalt zu behalten.</p>
+                        </div>
+                        <div class="card-footer"><a class="btn btn-primary btn-sm" href="#!" style="display: none;">More
+                                Info</a></div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-5">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h2 class="card-title">Monatliche Gehaltsübersichten</h2>
+                            <p class="card-text">Bessere monatliche Übersicht über Gehalt und die Variation über die
+                                Zeit.</p>
+                        </div>
+                        <div class="card-footer"><a class="btn btn-primary btn-sm" href="#!" style="display: none;">More
+                                Info</a></div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-5">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h2 class="card-title">Abrechnungen generieren</h2>
+                            <p class="card-text">Einfach und schnell generierbare monatliche Abrechnungen.</p>
+                        </div>
+                        <div class="card-footer"><a class="btn btn-primary btn-sm" href="#!" style="display: none;">More
+                                Info</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="text-center mt-5">
+                <header class="text-start">
+                    <div th:if="${kalender ?: false && loggedIn ?: false}">
+                        <h1 th:text="${title}"></h1>
+                    </div>
+                    <div th:if="${export ?: false && loggedIn ?: false}">
+                        <h1 th:text="${title}"></h1>
+                    </div>
+                    <div th:if="${kalenderTag ?: false && loggedIn ?: false}">
+                        <h1 th:text="${title}"></h1>
+                    </div>
+                    <div th:if="${benutzerinformationen ?: false && loggedIn ?: false}">
+                        <h1 th:text="${title}"></h1>
+                    </div>
+                </header>
+
+                <main class="mb-5">
+                    <ul th:if="${kalender ?: false && loggedIn ?: false}" class="mb-0 arrow-botton">
+                        <li><a th:href="@{${previousMonthUrl}}"><i
+                                    class="fas fa-arrow-left color-black borderSchema me-2 pt-2 pe-2 ps-2 pb-2 hover"></i></a>
+                        </li>
+                        <li><a th:href="@{${nextMonthUrl}}"><i
+                                    class="fas fa-arrow-right color-black borderSchema pt-2 pe-2 ps-2 pb-2 hover"></i></a>
+                        </li>
+                    </ul>
+                    <div th:if="${kalender ?: false && loggedIn ?: false}" class="h-100" style="display: block;">
+                        <div class="borderSchema w-100 h-100 flexBox-column-layout mt-1">
+                            <div class="borderSchemaBottom h-100 flexBox-row-layout mt-3 mx-3">
+                                <div th:each="days :${kalenderTage}" class="w-100 mx-2">
+                                    <p th:text="${days}" class="fontSizeMed-Bold"></p>
+                                </div>
+                            </div>
+                            <div th:each="week, weekStat :${datum}" class="h-100 flexBox-row-layout m-3">
+                                <a th:each="day, dayStat :${week}" class="calendar-link w-100 borderSchema vh-10 mx-1 hover"
+                                    th:href="@{'KalenderTag?day=' + ${day.getDay} + '&month=' + ${day.getMonth} + '&year=' + ${day.getYear}}">
+                                    <p th:id="dayNr + ${day.getDay()}" th:text="${day.getDay()}"
+                                        th:class="${day.getColor()}? 'color-black' : 'color-gray'"></p>
+                                    <p th:id="pos + ${day.getDay()}" th:text="${day.getHourCount()}"></p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${export ?: false && loggedIn ?: false}">
+                        <div class="borderSchema mt-5">
+                            <div class="mx-5 mt-3" style="display: flex; justify-content: start;">
+                                <h3>Stunden als PDF exportieren</h3>
+                            </div>
+                            <div class="m-5">
+                                <form role="form" method="post" th:action="@{/Export}" th:object="${pdfExport}">
+                                    <div class="pb-3">
+                                        <div class="col-md-6"
+                                            style="width: 100%; display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+                                            <label for="hourRate" style="flex: 1;">Stundenlohn</label>
+                                            <input type="number" step="0.01" class="form-control" id="hourRate" name="hourRate" th:field="*{hourRate}"
+                                                placeholder="Stundenlohn" style="flex: 3;">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">ExportPDF generieren</button>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div th:if="${kalenderTag ?: false && loggedIn ?: false}">
+                        <div class="borderSchema pt-3 pb-3 pe-5 ps-5 mt-5">
+                            <form role="form" method="post" th:action="@{/KalenderTag}" th:object="${hourDate}">
+                                <div class="pb-3">
+                                    <div class="col-md-6"
+                                        style="width: 100%; display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+                                        <label for="date" style="flex: 1;">Datum</label>
+                                        <input type="date" class="form-control" id="date" name="date" th:field="*{date}"
+                                            placeholder="Datum" style="flex: 3;">
+                                    </div>
+                                </div>
+                                <div class="pb-3">
+                                    <div class="col-md-6"
+                                        style="width: 100%; display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+                                        <label for="hour" style="flex: 1;">Stundenanzahl</label>
+                                        <input type="number" step="0.05" class="form-control" id="hour" name="hour"
+                                            th:field="*{hour}" placeholder="Stundenanzahl" style="flex: 3;">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Speichern</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div th:if="${benutzerinformationen ?: false && loggedIn ?: false}">
+                        <div class="borderSchema mt-5" style="display: flex; justify-content: center;">
+                            <table class="mt-5 mb-5">
+                                <tr class="borderSchemaBottom" style="height: 15px;"></tr>
+                                <tr>
+                                    <td style="display: flex; justify-content: start;">
+                                        <p>Benutzername:</p>
+                                    </td>
+                                    <td></td>
+                                    <td class="ps-5" style="display: flex; justify-content: start;">
+                                        <p id="benutzername" th:text="${user.getUsername}"></p>
+                                    </td>
+                                </tr>
+                                <tr class="borderSchemaBottom" style="height: 15px;"></tr>
+                                <tr>
+                                    <td style="display: flex; justify-content: start;">
+                                        <p>Vorname:</p>
+                                    </td>
+                                    <td style="width: 75px;"></td>
+                                    <td class="ps-5" style="display: flex; justify-content: start;">
+                                        <p id="vorname" th:text="${user.getFirstname}"></p>
+                                    </td>
+                                </tr>
+                                <tr class="borderSchemaBottom" style="height: 15px;"></tr>
+                                <tr class="mt-3">
+                                    <td style="display: flex; justify-content: start;">
+                                        <p>Nachname:</p>
+                                    </td>
+                                    <td></td>
+                                    <td class="ps-5" style="display: flex; justify-content: start;">
+                                        <p id="nachname" th:text="${user.getLastname}"></p>
+                                    </td>
+                                </tr>
+                                <tr class="borderSchemaBottom" style="height: 15px;"></tr>
+                                <tr>
+                                    <td style="display: flex; justify-content: start;">
+                                        <p>Adresse:</p>
+                                    </td>
+                                    <td></td>
+                                    <td class="ps-5"
+                                        style="display: flex; flex-direction: column; justify-content: start; align-items: start;">
+                                        <p th:text="${user.getStreet} + ' ' + ${user.getHousenumber}"></p>
+                                        <p th:text="${user.getZipcode} + ' ' + ${user.getCity}"></p>
+                                    </td>
+                                </tr>
+                                <tr class=" borderSchemaBottom"></tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div th:if="${registration}"
+                        style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 60vh;">
+                        <div class="mb-4" th:if="${registration ?: false && !loggedIn ?: true}">
+                            <h1 th:text="${title}"></h1>
+                        </div>
+                        <div class="borderSchema pt-3 pb-3 pe-5 ps-5 mt-3" style="width: 50%;">
+                            <div class="errorSchema mb-3" th:if="${registrationError != null}">
+                                <p class="mb-1 mt-1" th:text="${registrationError}"></p>
+                            </div>
+                            <form role="form" method="post" th:action="@{/Registration}" th:object="${user}">
+                                <div class="pb-3" style="display: flex; justify-content: center;">
+                                    <div class="col-md-6" style="width: 100%;">
+                                        <label for="firstname">Vorname</label>
+                                        <input type="text" class="form-control" id="firstname" name="firstname"
+                                            th:field="*{firstname}" placeholder="Vorname">
+                                    </div>
+                                </div>
+                                <div class="pb-3" style="display: flex; justify-content: center;">
+                                    <div class="col-md-6" style="width: 100%;">
+                                        <label for="lastname">Nachname</label>
+                                        <input type="text" class="form-control" id="lastname" name="lastname"
+                                            th:field="*{lastname}" placeholder="Nachname">
+                                    </div>
+                                </div>
+                                <div class="pb-3" style="display: flex; justify-content: center;">
+                                    <div class="col-md-6" style="width: 100%;">
+                                        <label for="username">Benutzername</label>
+                                        <input type="text" class="form-control" id="username" name="username"
+                                            th:field="*{username}" placeholder="Benutzername">
+                                    </div>
+                                </div>
+                                <div class="pb-3" style="display: flex; justify-content: center;">
+                                    <div class="col-md-6" style="width: 100%;">
+                                        <label for="street">Straße</label>
+                                        <input type="text" class="form-control" id="street" name="street"
+                                            th:field="*{street}" placeholder="Straße">
+                                    </div>
+                                </div>
+                                <div class="pb-3" style="display: flex; justify-content: center;">
+                                    <div class="col-md-6 me-1" style="flex: 1; width: 100%;">
+                                        <label for="housenumber">Hausnummer</label>
+                                        <input type="text" class="form-control" id="housenumber" name="housenumber"
+                                            th:field="*{housenumber}" placeholder="Nr">
+                                    </div>
+                                    <div class="col-md-6" style="flex: 2; width: 100%;">
+                                        <label for="zipcode">Postleitzahl</label>
+                                        <input type="text" class="form-control" id="zipcode" name="zipcode"
+                                            th:field="*{zipcode}" placeholder="Postleitzahl">
+                                    </div>
+                                </div>
+                                <div class="pb-3" style="display: flex; justify-content: center;">
+                                    <div class="col-md-6" style="width: 100%;">
+                                        <label for="city">Stadt</label>
+                                        <input type="text" class="form-control" id="city" name="city" th:field="*{city}"
+                                            placeholder="Stadt">
+                                    </div>
+                                </div>
+                                <div class="pb-3" style="display: flex; justify-content: center;">
+                                    <div class="col-md-6" style="width: 100%;">
+                                        <label for="password">Passwort</label>
+                                        <input type="password" class="form-control" id="password" name="password"
+                                            th:field="*{password}" placeholder="Passwort">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Registrieren</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div th:if="${login}"
+                        style="display: flex; flex-direction: column; height: 60vh; justify-content: center; align-items: center;">
+                        <div class="mb-4" th:if="${login ?: false && !loggedIn ?: true}">
+                            <h1 th:text="${title}"></h1>
+                        </div>
+                        <div class="borderSchema pt-3 pb-3 pe-5 ps-5" style="width: 50%;">
+                            <div class="errorSchema mb-3" th:if="${loginError != null}">
+                                <p class="mb-1 mt-1" th:text="${loginError}"></p>
+                            </div>
+                            <form role="form" method="post" th:action="@{/Login}" th:object="${logindata}">
+                                <div class="pb-3" style="display: flex; justify-content: center;">
+                                    <div class="col-md-6" style="width: 100%;">
+                                        <label for="username">Benutzername</label>
+                                        <input type="text" class="form-control" id="username" name="username"
+                                            th:field="*{username}" placeholder="Benutzername">
+                                    </div>
+                                </div>
+                                <div class="pb-3" style="display: flex; justify-content: center;">
+                                    <div class="col-md-6" style="width: 100%;">
+                                        <label for="password">Passwort</label>
+                                        <input type="password" class="form-control" id="password" name="password"
+                                            th:field="*{password}" placeholder="Passwort">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Login</button>
+                            </form>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+    <footer class="py-5 bg-dark">
+        <div class="container px-4 px-lg-5">
+            <p class="m-0 text-center text-white">Copyright &copy; 2024 WorkTimeTrace</p>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

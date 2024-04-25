@@ -8,3 +8,5 @@ public record ReportInfoDTO(String titleOrsubcategoryName, int iconId, StatusEnt
                 Timestamp timestamp,
                 byte[] image, double longitude, double latitude) {
 }
+
+

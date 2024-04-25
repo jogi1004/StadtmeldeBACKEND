@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <title>Login</title>
+</head>
+
+<body>
+
+    <div layout:fragment="content">
+        <section class="my-5">
+            <div class="center me-0">
+                <h2 class="text-center mt-5">City Information</h2>
+                <div class="col-lg-8">
+                    <!-- City Information Section -->
+                    <h3>Stadt: Muss Noch</h3>
+                    <h4>Main Categories:</h4>
+                    <table th:if="${MainCategories != null}"
+                        style="width: 60%; border: 1px solid black; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th
+                                    style="padding: 10px; text-align: left; background-color: #f2f2f2; border: 1 px solid black;">
+                                    ID</th>
+                                <th
+                                    style="padding: 10px; text-align: left; background-color: #aaf9f3; border: 1 px solid black;">
+                                    Title</th>
+                                <th
+                                    style="padding: 10px; text-align: left; background-color: #f2f2f2; border: 1 px solid black;">
+                                    Reporting Location ID</th>
+                                <th
+                                    style="padding: 10px; text-align: left; background-color: #aaf9f3; border: 1 px solid black;">
+                                    Reporting Location Name</th>
+                                <th
+                                    style="padding: 10px; text-align: left; background-color: #f2f2f2; border: 1 px solid black;">
+                                    Actions</th>
+                                <th
+                                    style="padding: 10px; text-align: left; background-color: #aaf9f3; border: 1 px solid black;">
+                                    Subcategories</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="mainCategory : ${MainCategories}" style="border: 1px solid black;">
+                                <td th:text="${mainCategory.id}"
+                                    style="padding: 10px; text-align: left; background-color: #f2f2f2; border: 1px solid black;">
+                                </td>
+                                <td th:text="${mainCategory.title}"
+                                    style="padding: 10px; text-align: left; background-color: #aaf9f3; border: 1px solid black;">
+                                </td>
+                                <td th:text="${mainCategory.reportingLocationEntity.id}"
+                                    style="padding: 10px; text-align: left; background-color: #f2f2f2; border: 1px solid black;">
+                                </td>
+                                <td th:text="${mainCategory.reportingLocationEntity.name}"
+                                    style="padding: 10px; text-align: left; background-color: #aaf9f3; border: 1px solid black;">
+                                </td>
+                                <td
+                                    style="padding: 10px; text-align: left; background-color: #f2f2f2; border: 1px solid black;">
+                                    <a th:href="@{/mainCategoryEdit/{id}(id=${mainCategory.id})}"
+                                        class="btn btn-warning">Edit</a>
+                                    <a th:href="@{/mainCategoryDelete/{id}(id=${mainCategory.id})}"
+                                        class="btn btn-danger">Delete</a>
+                                </td>
+                                <td colspan="4"
+                                    style="padding: 10px; text-align: left; background-color: #aaf9f3; border: 1px solid black;">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Title</th>
+                                                <th>Main Category ID</th>
+                                                <th>Main Category Title</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="subcategory : ${SubCategories}"
+                                                th:if="${subcategory != null && subcategory.maincategoryEntity.id == mainCategory.id}">
+                                                <td th:text="${subcategory.id}"
+                                                    style="padding: 10px; text-align: left; background-color: #f2f2f2; border: 1px solid black;">
+                                                </td>
+                                                <td th:text="${subcategory.title}"
+                                                    style="padding: 10px; text-align: left; background-color: #aaf9f3; border: 1px solid black;">
+                                                </td>
+                                                <td th:text="${subcategory.maincategoryEntity.id}"
+                                                    style="padding: 10px; text-align: left; background-color: #f2f2f2; border: 1px solid black;">
+                                                </td>
+                                                <td th:text="${subcategory.maincategoryEntity.title}"
+                                                    style="padding: 10px; text-align: left; background-color: #aaf9f3; border: 1px solid black;">
+                                                </td>
+                                                <td
+                                                    style="padding: 10px; text-align: left; background-color: #f2f2f2; border: 1px solid black;">
+                                                    <a th:href="@{/subcategoryDelete/{id}(id=${subcategory.id})}"
+                                                        class="btn btn-danger">Delete</a>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <a th:href="@{/subcategoryAdd/{id}(id=${mainCategory.id})}"
+                                                        class="btn btn-success">Add</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    </div>
+    </section>
+    </div>
+
+</body>
+
+</html>
