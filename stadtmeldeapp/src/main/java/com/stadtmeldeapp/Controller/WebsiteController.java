@@ -57,14 +57,14 @@ public class WebsiteController {
     return "landingPage";
   }
 
-  @GetMapping("/cityInfo")
+  @GetMapping("/category")
   public String cityInfo(RedirectAttributes redirectAttributes, HttpSession session, Model model)
       throws NotFoundException {
     UserEntity userEntity = userService.getUserByAuthentication();
     if (userEntity != null) {
       model.addAttribute("User", userEntity);
     }
-    model.addAttribute("cityInfo", true);
+    model.addAttribute("category", true);
     logger.info("GET CATEGORYS");
     List<MaincategoryEntity> mainCategory = categoryService.getMaincategoriesByLocationName("Zweibrücken");
     List<SubcategoryEntity> subCategory = new ArrayList<SubcategoryEntity>();
@@ -79,10 +79,10 @@ public class WebsiteController {
     if (mainCategory != null) {
       model.addAttribute("MainCategories", mainCategory);
       model.addAttribute("SubCategories", subCategoryList);
-      return "cityInfo";
+      return "category";
     }
     logger.info("Main Category not found.");
-    return "cityInfo";
+    return "category";
   }
 
   @GetMapping("/services")

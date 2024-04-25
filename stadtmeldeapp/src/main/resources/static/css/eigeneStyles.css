@@ -117,3 +117,14 @@ footer {
     width: 24px;
     height: auto;
 }
+
+.icon-button-edit {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.icon-button-edit img {
+    width: 18px;
+    height: auto;
+}

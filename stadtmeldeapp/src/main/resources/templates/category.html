@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <title>Kategorien</title>
+</head>
+
+<body>
+
+    <div layout:fragment="content">
+        <section class="my-5">
+            <div class="container px-4 px-lg-5">
+                <h2 class="text-center mt-5">Meldungs-Kategorien</h2>
+                <div class="end">
+                    <button id="addCategoryButton" class="icon-button" onclick="addDIV()"><img src="images/plusIcon.png"
+                            alt="Icon"></button>
+                </div>
+            </div>
+
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 mx-0 mt-3 pt-3 borderSchemeContainer" style="height: 70vh;">
+                    <div id="categoryContainer" class="col-md-12 px-3 scrollbar" style="height: 95%">
+                        <div th:if="${MainCategories} == null">
+                            <p>Es wurden derzeit noch keine Kategorien angelegt!</p>
+                        </div>
+                        <div th:id="'category_' + ${state.index + 1}" class="borderScheme hover mb-3"
+                            th:each="category, state : ${MainCategories}" ondblclick="changeToInput(this)"
+                            onclick="openOtherWindow(this)">
+                            <div style="display: flex;">
+                                <div th:id="'index_category_' + ${state.index + 1}" th:text="${state.index + 1}"
+                                    class="borderSchemeRightBottom p-0 center" style="height: 100%; width: 30px;">
+                                </div>
+                                <div class="end">
+                                    <button th:id="'editCategoryButton_' + ${state.index + 1}" class="icon-button-edit"
+                                        onclick="convertParagraphToInput(this)"><img src="images/editIcon.png"
+                                            alt="Icon"></button>
+                                </div>
+                            </div>
+                            <p th:id="'category_paragraph_' + ${state.index + 1}" th:text="${category.getTitle}"
+                                class="center">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+
+                function convertParagraphToInput(element) {
+                    console.log(element);
+                    var numStr = element.id.substring(19);
+
+                    var paragraph = document.getElementById('category_paragraph_' + numStr);
+                    var newText = document.createTextNode(paragraph.textContent);
+                    console.log(newText);
+
+                    var userInput = document.createElement('input');
+                    userInput.type = 'text';
+                    userInput.className = 'center';
+                    userInput.style.border = 'none';
+                    userInput.style.outline = 'none';
+                    userInput.style.textAlign = 'center';
+                    userInput.value = paragraph.innerText;
+
+                    // Parent-Div hover class zuweisen
+                    var parentDiv = document.getElementById('category_' + numStr);
+                    parentDiv.className = 'borderScheme mb-3';
+                    parentDiv.style.minHeight = '68px';
+                    parentDiv.replaceChild(userInput, paragraph);
+
+                    userInput.focus();
+
+                    // Event Listener für das Blur-Ereignis hinzufügen
+                    userInput.addEventListener('blur', function () {
+                        convertInputToParagraph(userInput, numStr)
+                    });
+
+                    // Event Listener für die Eingabe hinzufügen
+                    userInput.addEventListener('keyup', function (event) {
+                        // Wenn Enter gedrückt wurde
+                        if (event.keyCode === 13) {
+                            convertInputToParagraph(userInput, numStr);
+                            // Event-Listener für das blur-Ereignis entfernen, um mehrfaches Einfügen zu verhindern
+                            userInput.removeEventListener('blur', convertInputToParagraph);
+                        }
+                    });
+                }
+
+                function changeToInput(element) {
+                    console.log('doppelKlick');
+                    console.log(element.id);
+                }
+
+                function openOtherWindow(element) {
+                    console.log('Klick');
+                    console.log(element.id);
+                }
+
+                function convertInputToParagraph(inputElement, numStr) {
+                    var parentDiv = document.getElementById('category_' + numStr);
+                    var paragraph = document.createElement('p');
+                    paragraph.id = 'category_paragraph_' + numStr;
+                    paragraph.textContent = inputElement.value;
+                    paragraph.className = 'center'
+
+                    // Parent-Div hover class zuweisen
+                    parentDiv.className = 'borderScheme hover mb-3';
+
+                    parentDiv.replaceChild(paragraph, inputElement);
+                }
+
+                function addDIV() {
+                    // Wähle das Elternelement aus
+                    var parentDiv = document.getElementById('categoryContainer');
+
+                    // Erhalte eine NodeList aller direkten Kindknoten
+                    var childrenCount = parentDiv.children.length + 1;
+
+                    // Neues Div erstellen
+                    var newDiv = document.createElement('div');
+                    newDiv.id = 'category_' + childrenCount;
+                    newDiv.className = 'borderScheme mb-3';
+                    newDiv.style.minHeight = '68px';
+
+                    // Neuen Inhalt für das Div hinzufügen
+                    var newContent = document.createTextNode(childrenCount);
+                    var headerDiv = document.createElement('div');
+                    headerDiv.style.display = 'flex';
+
+                    var innerDivCount = document.createElement('div');
+                    innerDivCount.appendChild(newContent);
+                    innerDivCount.id = 'index_category_' + childrenCount;
+                    innerDivCount.className = 'borderSchemeRightBottom p-0 center';
+                    innerDivCount.style.height = '100%';
+                    innerDivCount.style.width = '30px';
+                    headerDiv.appendChild(innerDivCount);
+
+                    var innerDivEdit = document.createElement('div');
+                    innerDivEdit.className = 'end';
+                    var editButton = document.createElement("button");
+                    editButton.setAttribute("id", 'editCategoryButton_' + childrenCount);
+                    editButton.classList.add("icon-button-edit");
+                    var imgElement = document.createElement("img");
+                    imgElement.setAttribute("src", "images/editIcon.png");
+                    imgElement.setAttribute("alt", "Icon");
+                    editButton.appendChild(imgElement);
+                    editButton.onclick = function () {
+                        convertParagraphToInput(this);
+                    };
+                    innerDivEdit.appendChild(editButton);
+                    headerDiv.appendChild(innerDivEdit);
+
+                    newDiv.appendChild(headerDiv);
+
+                    // Neues <input> Element erstellen
+                    var userInput = document.createElement('input');
+                    userInput.type = 'text';
+                    userInput.className = 'center'; // Zentriert den Text im Input-Feld
+                    userInput.placeholder = 'Hier den Namen der neuen Kategorie eingeben';
+                    userInput.style.border = 'none'; // Rahmen ausblenden
+                    userInput.style.outline = 'none'; // Außenlinie ausblenden
+                    userInput.style.textAlign = 'center'; // Text zentrieren
+                    userInput.onchange = newDiv.appendChild(userInput);
+
+                    // Das neue Div zum #status-Container hinzufügen
+                    var statusContainer = document.getElementById('categoryContainer');
+                    statusContainer.appendChild(newDiv);
+
+                    // Fokus auf das Input-Feld setzen
+                    setTimeout(function () {
+                        userInput.focus();
+                    }, 0);
+
+                    // Event Listener für das Blur-Ereignis hinzufügen
+                    userInput.addEventListener('blur', function () {
+                        convertInputToParagraph(userInput, childrenCount)
+                    });
+
+                    // Event Listener für die Eingabe hinzufügen
+                    userInput.addEventListener('keyup', function (event) {
+                        // Wenn Enter gedrückt wurde
+                        if (event.keyCode === 13) {
+                            convertInputToParagraph(userInput, childrenCount);
+                            // Event-Listener für das blur-Ereignis entfernen, um mehrfaches Einfügen zu verhindern
+                            userInput.removeEventListener('blur', convertInputToParagraph);
+                        }
+                    });
+                };
+
+            </script>
+        </section>
+    </div>
+
+</body>
+
+</html>
