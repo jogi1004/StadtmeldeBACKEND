@@ -119,7 +119,7 @@ public class ReportService {
                 report.getLatitude(), report.getUser().getUsername(), report.getReportingLocation().getName(),
                 report.getUser().getProfilePicture());
     }
-    
+
     public List<ReportInfoDTO> getLatestReportsByReportingLocationId(int id) {
         return toInfoDTOList(reportRepository.findFirst10ByReportingLocationIdOrderByReportingTimestampDesc(id));
     }
@@ -142,11 +142,14 @@ public class ReportService {
         return toReportInfoDTO(reportRepository.save(report));
     }
 
-    public ReportInfoDTO updateReportStatus(int reportId, String newStatus) throws NotFoundException {
-
+    public ReportInfoDTO updateReportStatus(int reportId, String newStatus,
+            HttpServletRequest request) throws NotAllowedException, NotFoundException {
         ReportEntity report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
 
+        if (!report.getReportingLocation().equals(userService.getUserFromRequest(request).getAdminForLocation())) {
+            throw new NotAllowedException("Keine Berechtigung!");
+        }
         StatusEntity status = statusRepository
                 .findByReportingLocationEntityIdAndName(report.getReportingLocation().getId(), newStatus)
                 .orElseThrow(() -> new NotFoundException("Status nicht gefunden"));
@@ -176,7 +179,10 @@ public class ReportService {
             retReports
                     .add(new ReportInfoDTO(
                             (r.getTitle() == null || r.getTitle().isBlank()) ? r.getSubcategory().getTitle()
-                                    : r.getTitle(), (r.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1 : r.getSubcategory().getMaincategoryEntity().getIconEntity().getId()), r.getStatus(), r.getReportingTimestamp(), r.getAdditionalPicture(),
+                                    : r.getTitle(),
+                            (r.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1
+                                    : r.getSubcategory().getMaincategoryEntity().getIconEntity().getId()),
+                            r.getStatus(), r.getReportingTimestamp(), r.getAdditionalPicture(),
                             r.getLongitude(),
                             r.getLatitude()));
         }
@@ -187,7 +193,9 @@ public class ReportService {
         return new ReportInfoDTO(
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
                         : report.getTitle(),
-                        (report.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1 : report.getSubcategory().getMaincategoryEntity().getIconEntity().getId()), report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
+                (report.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1
+                        : report.getSubcategory().getMaincategoryEntity().getIconEntity().getId()),
+                report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
                 report.getLongitude(),
                 report.getLatitude());
     }
