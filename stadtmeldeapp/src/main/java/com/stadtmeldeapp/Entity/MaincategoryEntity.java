@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -25,7 +26,7 @@ public class MaincategoryEntity {
     @JoinColumn(name = "reporting_location_id", nullable = false)
     private ReportingLocationEntity reportingLocationEntity;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "icon_id", nullable = true)
     private IconEntity iconEntity;
 
