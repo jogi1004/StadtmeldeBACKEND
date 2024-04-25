@@ -113,9 +113,11 @@ public class ReportService {
         return new ReportDetailInfoDTO(
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
                         : report.getTitle(),
+                report.getDescription(),
                 -1, report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
                 report.getLongitude(),
-                report.getLatitude(), report.getUser().getUsername(), report.getUser().getProfilePicture());
+                report.getLatitude(), report.getUser().getUsername(), report.getReportingLocation().getName(),
+                report.getUser().getProfilePicture());
     }
     
     public List<ReportInfoDTO> getLatestReportsByReportingLocationId(int id) {
@@ -169,12 +171,12 @@ public class ReportService {
 
     public List<ReportInfoDTO> toInfoDTOList(List<ReportEntity> reports) {
         List<ReportInfoDTO> retReports = new ArrayList<>();
+
         for (ReportEntity r : reports) {
             retReports
                     .add(new ReportInfoDTO(
                             (r.getTitle() == null || r.getTitle().isBlank()) ? r.getSubcategory().getTitle()
-                                    : r.getTitle(),
-                            -1/* icon TODO */, r.getStatus(), r.getReportingTimestamp(), r.getAdditionalPicture(),
+                                    : r.getTitle(), (r.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1 : r.getSubcategory().getMaincategoryEntity().getIconEntity().getId()), r.getStatus(), r.getReportingTimestamp(), r.getAdditionalPicture(),
                             r.getLongitude(),
                             r.getLatitude()));
         }
@@ -185,7 +187,7 @@ public class ReportService {
         return new ReportInfoDTO(
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
                         : report.getTitle(),
-                -1, report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(), //TODO
+                        (report.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1 : report.getSubcategory().getMaincategoryEntity().getIconEntity().getId()), report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
                 report.getLongitude(),
                 report.getLatitude());
     }
