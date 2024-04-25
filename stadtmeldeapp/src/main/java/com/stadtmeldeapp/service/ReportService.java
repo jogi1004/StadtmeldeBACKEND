@@ -168,11 +168,12 @@ public class ReportService {
 
     public List<ReportInfoDTO> toInfoDTOList(List<ReportEntity> reports) {
         List<ReportInfoDTO> retReports = new ArrayList<>();
+
         for (ReportEntity r : reports) {
             retReports
                     .add(new ReportInfoDTO(
                             (r.getTitle() == null || r.getTitle().isBlank()) ? r.getSubcategory().getTitle()
-                                    : r.getTitle(), r.getSubcategory().getMaincategoryEntity().getIconEntity().getId(), r.getStatus(), r.getReportingTimestamp(), r.getAdditionalPicture(),
+                                    : r.getTitle(), (r.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1 : r.getSubcategory().getMaincategoryEntity().getIconEntity().getId()), r.getStatus(), r.getReportingTimestamp(), r.getAdditionalPicture(),
                             r.getLongitude(),
                             r.getLatitude()));
         }
@@ -183,7 +184,7 @@ public class ReportService {
         return new ReportInfoDTO(
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
                         : report.getTitle(),
-                report.getSubcategory().getMaincategoryEntity().getIconEntity().getId(), report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
+                        (report.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1 : report.getSubcategory().getMaincategoryEntity().getIconEntity().getId()), report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
                 report.getLongitude(),
                 report.getLatitude());
     }
