@@ -4,6 +4,8 @@ WORKDIR /compile
 COPY . .
 RUN mvn package -DskipTests
 
+ENV JAVA_TOOL_OPTIONS "-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError"
+
 FROM eclipse-temurin:21-jre
 ARG profile
 ENV profile ${profile}
