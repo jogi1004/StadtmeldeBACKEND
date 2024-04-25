@@ -85,6 +85,10 @@ public class ReportService {
         return reportRepository.save(report);
     }
 
+    public ReportEntity getReportById(int id) {
+        return reportRepository.findById(id).orElse(null);
+    }
+
     public List<ReportInfoDTO> getReportsByUserId(int userId) {
         return toInfoDTOList(reportRepository.findAllByUserId(userId));
 
@@ -142,12 +146,11 @@ public class ReportService {
         return toReportInfoDTO(reportRepository.save(report));
     }
 
-    public ReportInfoDTO updateReportStatus(int reportId, String newStatus,
-            HttpServletRequest request) throws NotAllowedException, NotFoundException {
+    public ReportInfoDTO updateReportStatus(int reportId, String newStatus) throws NotAllowedException, NotFoundException {
         ReportEntity report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
 
-        if (!report.getReportingLocation().equals(userService.getUserFromRequest(request).getAdminForLocation())) {
+        if (!report.getReportingLocation().equals(userService.getUserByAuthentication().getAdminForLocation())) {
             throw new NotAllowedException("Keine Berechtigung!");
         }
         StatusEntity status = statusRepository

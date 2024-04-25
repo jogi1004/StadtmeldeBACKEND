@@ -15,7 +15,8 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 
 // Die URL zur API
-const url = 'http://localhost:8080/location/id/1';
+var hostname = window.location.origin;
+const url =  hostname + '/location/id/1';
 
 // Die Konfiguration für den Fetch Request
 const requestOptions = {

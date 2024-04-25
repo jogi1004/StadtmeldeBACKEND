@@ -14,7 +14,6 @@ import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.DTO.ReportUpdateDTO;
 import com.stadtmeldeapp.Entity.ReportEntity;
-import com.stadtmeldeapp.Repository.ReportRepository;
 import com.stadtmeldeapp.service.EmailSenderService;
 import com.stadtmeldeapp.service.ReportService;
 import com.stadtmeldeapp.service.StaticMapService;
@@ -35,9 +34,6 @@ public class ReportController {
 
     @Autowired
     private ReportService reportService;
-
-    @Autowired
-    private ReportRepository reportRepository;
 
     @Autowired
     private EmailSenderService emailSenderService;
@@ -95,11 +91,9 @@ public class ReportController {
     }
 
     @PutMapping("/admin/{reportId}")
-    public ResponseEntity<ReportInfoDTO> updateReportStatus(@PathVariable int reportId, @RequestBody String newStatus,
-            HttpServletRequest request) throws Exception {
-        ReportInfoDTO updatedReport = reportService.updateReportStatus(reportId, newStatus,
-                request);
-        ReportEntity reportEntity = reportRepository.findById(reportId).orElse(null);
+    public ResponseEntity<ReportInfoDTO> updateReportStatus(@PathVariable int reportId, @RequestBody String newStatus) throws Exception {
+        ReportInfoDTO updatedReport = reportService.updateReportStatus(reportId, newStatus);
+        ReportEntity reportEntity = reportService.getReportById(reportId);
         if (reportEntity != null)
             try {
                 emailSenderService.sendStatusChangeEmail(reportEntity.getUser().getEmail(),

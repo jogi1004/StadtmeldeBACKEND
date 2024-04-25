@@ -6,6 +6,7 @@
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script type="text/javascript" th:src="@{/js/reports.js}"></script>
 
     <title>Meldungen</title>
 </head>
@@ -18,8 +19,8 @@
 
                 <div class="row gx-4 gx-lg-5">
                     <div class="col-md-3 mb-5">
-                        <div id="reportNew" class="card h-100" style="height: 70vh;" ondrop="drop(event, 'reportNew', 'Neu')"
-                            ondragover="allowDrop(event)">
+                        <div id="reportNew" class="card h-100" style="height: 70vh;"
+                            ondrop="drop(event, 'reportNew', 'Neu')" ondragover="allowDrop(event)">
                             <div class="card-header">
                                 <h2 class="card-title">Neu</h2>
                             </div>
@@ -54,8 +55,8 @@
                         </div>
                     </div>
                     <div class="col-md-3 mb-5">
-                        <div id="reportDone" class="card h-100" style="height: 70vh;" ondrop="drop(event, 'reportDone', 'Abgeschlossen')"
-                            ondragover="allowDrop(event)">
+                        <div id="reportDone" class="card h-100" style="height: 70vh;"
+                            ondrop="drop(event, 'reportDone', 'Abgeschlossen')" ondragover="allowDrop(event)">
                             <div class="card-header">
                                 <h2 class="card-title">Abgeschlossen</h2>
                             </div>
@@ -89,66 +90,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <script>
-                        function allowDrop(ev) {
-                            ev.preventDefault();
-                        }
-
-                        function drag(ev) {
-                            ev.dataTransfer.setData("text", ev.target.id);
-                        }
-
-                        function drop(ev, target, state) {
-                            ev.preventDefault();
-                            var data = ev.dataTransfer.getData("text");
-                            var draggedElement = document.getElementById(data);
-                            console.log(draggedElement.getAttribute("id"));
-
-                            var targetBody = document.getElementById(target + 'Body');
-                            if (targetBody) {
-                                targetBody.appendChild(draggedElement);
-                                updateReport(draggedElement.getAttribute("id"), state);
-                            }
-                        }
-
-                        function updateReport(id, state) {
-                            console.log(id);
-                            console.log(state);
-
-                            var numStr = id.substring(7);
-                            const url = 'http://localhost:8080/reports/admin/' + numStr;
-                            console.log(url);
-
-                            const bodyData = typeof state === 'string' ? { state: state } : state;
-
-                            // Die Konfiguration für den Fetch Request
-                            const requestOptions = {
-                                method: 'PUT',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: state
-                            };
-
-                            // Fetch Request, um die Daten von der API abzurufen
-                            fetch(url, requestOptions)
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error('Network response was not ok');
-                                    }
-                                    return response.json();
-                                })
-                                .then(data => {
-                                    // Daten erfolgreich abgerufen
-                                    console.log(data);
-                                })
-                                .catch(error => {
-                                    // Fehler behandeln
-                                    console.error('Fetch Error:', error);
-                                });
-                        }
-                    </script>
                 </div>
             </div>
         </section>
