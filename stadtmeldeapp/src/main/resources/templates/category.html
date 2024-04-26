@@ -2,6 +2,10 @@
 <html lang="en" layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
     <title>Kategorien</title>
 </head>
 
@@ -24,147 +28,150 @@
                             <p>Es wurden derzeit noch keine Kategorien angelegt!</p>
                         </div>
                         <div th:id="'category_' + ${state.index + 1}" class="borderScheme hover mb-3"
-                            th:each="category, state : ${MainCategories}" ondblclick="changeToInput(this)"
-                            onclick="openOtherWindow(this)">
-                            <div style="display: flex;">
-                                <div th:id="'index_category_' + ${state.index + 1}" th:text="${state.index + 1}"
-                                    class="borderSchemeRightBottom p-0 center" style="height: 100%; width: 30px;">
+                            th:each="category, state : ${MainCategories}">
+                            <div th:id="'innerCategoryContainer_' + ${state.index +1}" class="categoryContainer">
+                                <div th:id="'category_header_' + ${state.index + 1}" class="categoryHeader"
+                                    onclick="openCategoryDetailView(this)">
+                                    <div th:id="'index_category_' + ${state.index + 1}" th:text="${state.index + 1}"
+                                        class="borderSchemeRightBottom p-0 center" style="height: 30px; width: 30px;">
+                                    </div>
                                 </div>
-                                <div class="end">
-                                    <button th:id="'editCategoryButton_' + ${state.index + 1}" class="icon-button-edit"
-                                        onclick="convertParagraphToInput(this)"><img src="images/editIcon.png"
-                                            alt="Icon"></button>
+                                <div th:id="'category_body_' + ${state.index + 1}" class="center categoryBody"
+                                    onclick="openCategoryDetailView(this)">
+                                    <p class="m-0 center" th:id="'category_paragraph_' + ${state.index + 1}"
+                                        th:text="${category.getTitle}" style="width: 100%;">
+                                    </p>
+                                </div>
+                                <div th:id="'category_footer_' + ${state.index + 1}" class="categoryFooter p-1">
+                                    <button th:id="'editCategoryButton_' + ${state.index + 1}"
+                                        class="icon-button-edit endTop hwAuto" onclick="convertParagraphToInput(this)">
+                                        <img src="images/editIcon.png" alt="Icon">
+                                    </button>
+                                    <button th:id="'deleteCategoryButton_' + ${state.index + 1}"
+                                        class="icon-button-edit endBottom hwAuto" onclick="deleteCategory(this)">
+                                        <img src="images/deleteIcon.png" alt="Icon">
+                                    </button>
                                 </div>
                             </div>
-                            <p th:id="'category_paragraph_' + ${state.index + 1}" th:text="${category.getTitle}"
-                                class="center">
-                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog"
+                aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Löschen bestätigen</h5>
+                            <button type="button" class="close" aria-label="Close" onclick="closeModal()">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Bist du sicher das du die Kategorie löschen willst?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal()">Abbrechen</button>
+                            <button type="button" class="btn btn-danger"
+                                onclick="confirmDeleteCategory()">Löschen</button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <script>
-
-                function convertParagraphToInput(element) {
-                    console.log(element);
-                    var numStr = element.id.substring(19);
-
-                    var paragraph = document.getElementById('category_paragraph_' + numStr);
-                    var newText = document.createTextNode(paragraph.textContent);
-                    console.log(newText);
-
-                    var userInput = document.createElement('input');
-                    userInput.type = 'text';
-                    userInput.className = 'center';
-                    userInput.style.border = 'none';
-                    userInput.style.outline = 'none';
-                    userInput.style.textAlign = 'center';
-                    userInput.value = paragraph.innerText;
-
-                    // Parent-Div hover class zuweisen
-                    var parentDiv = document.getElementById('category_' + numStr);
-                    parentDiv.className = 'borderScheme mb-3';
-                    parentDiv.style.minHeight = '68px';
-                    parentDiv.replaceChild(userInput, paragraph);
-
-                    userInput.focus();
-
-                    // Event Listener für das Blur-Ereignis hinzufügen
-                    userInput.addEventListener('blur', function () {
-                        convertInputToParagraph(userInput, numStr)
-                    });
-
-                    // Event Listener für die Eingabe hinzufügen
-                    userInput.addEventListener('keyup', function (event) {
-                        // Wenn Enter gedrückt wurde
-                        if (event.keyCode === 13) {
-                            convertInputToParagraph(userInput, numStr);
-                            // Event-Listener für das blur-Ereignis entfernen, um mehrfaches Einfügen zu verhindern
-                            userInput.removeEventListener('blur', convertInputToParagraph);
-                        }
-                    });
-                }
-
-                function changeToInput(element) {
-                    console.log('doppelKlick');
-                    console.log(element.id);
-                }
-
-                function openOtherWindow(element) {
-                    console.log('Klick');
-                    console.log(element.id);
-                }
-
-                function convertInputToParagraph(inputElement, numStr) {
-                    var parentDiv = document.getElementById('category_' + numStr);
-                    var paragraph = document.createElement('p');
-                    paragraph.id = 'category_paragraph_' + numStr;
-                    paragraph.textContent = inputElement.value;
-                    paragraph.className = 'center'
-
-                    // Parent-Div hover class zuweisen
-                    parentDiv.className = 'borderScheme hover mb-3';
-
-                    parentDiv.replaceChild(paragraph, inputElement);
-                }
-
                 function addDIV() {
-                    // Wähle das Elternelement aus
-                    var parentDiv = document.getElementById('categoryContainer');
+                    // CategoryConatainer
+                    var categoryContainer = document.getElementById('categoryContainer');
 
-                    // Erhalte eine NodeList aller direkten Kindknoten
-                    var childrenCount = parentDiv.children.length + 1;
+                    // Anzahl aller Kategorien
+                    var categoryCount = categoryContainer.children.length + 1;
 
                     // Neues Div erstellen
                     var newDiv = document.createElement('div');
-                    newDiv.id = 'category_' + childrenCount;
+                    newDiv.id = 'category_' + categoryCount;
                     newDiv.className = 'borderScheme mb-3';
                     newDiv.style.minHeight = '68px';
 
-                    // Neuen Inhalt für das Div hinzufügen
-                    var newContent = document.createTextNode(childrenCount);
-                    var headerDiv = document.createElement('div');
-                    headerDiv.style.display = 'flex';
+                    // Neues InnerNewDiv erstellen
+                    var innerNewDiv = document.createElement('div');
+                    innerNewDiv.id = 'innerCategoryContainer_' + categoryCount;
+                    innerNewDiv.className = 'categoryContainer';
 
-                    var innerDivCount = document.createElement('div');
-                    innerDivCount.appendChild(newContent);
-                    innerDivCount.id = 'index_category_' + childrenCount;
-                    innerDivCount.className = 'borderSchemeRightBottom p-0 center';
-                    innerDivCount.style.height = '100%';
-                    innerDivCount.style.width = '30px';
-                    headerDiv.appendChild(innerDivCount);
-
-                    var innerDivEdit = document.createElement('div');
-                    innerDivEdit.className = 'end';
-                    var editButton = document.createElement("button");
-                    editButton.setAttribute("id", 'editCategoryButton_' + childrenCount);
-                    editButton.classList.add("icon-button-edit");
-                    var imgElement = document.createElement("img");
-                    imgElement.setAttribute("src", "images/editIcon.png");
-                    imgElement.setAttribute("alt", "Icon");
-                    editButton.appendChild(imgElement);
-                    editButton.onclick = function () {
-                        convertParagraphToInput(this);
+                    // categoryContainer innere Container erstellen
+                    var categoryHeader = document.createElement('div');
+                    categoryHeader.id = 'category_header_' + categoryCount;
+                    categoryHeader.className = 'categoryHeader';
+                    categoryHeader.onclick = function () {
+                        openCategoryDetailView(this);
                     };
-                    innerDivEdit.appendChild(editButton);
-                    headerDiv.appendChild(innerDivEdit);
+                    var categoryBody = document.createElement('div');
+                    categoryBody.id = 'category_body_' + categoryCount;
+                    categoryBody.className = 'center categoryBody';
+                    categoryBody.onclick = function () {
+                        openCategoryDetailView(this);
+                    };
+                    var categoryFooter = document.createElement('div');
+                    categoryFooter.id = 'category_footer_' + categoryCount;
+                    categoryFooter.className = 'categoryFooter p-1';
 
-                    newDiv.appendChild(headerDiv);
+                    // categoryHeader Index hinzufügen
+                    var categoryIndex = document.createTextNode(categoryCount);
+                    var categoryHeaderInnerDiv = document.createElement('div');
+                    categoryHeaderInnerDiv.appendChild(categoryIndex);
+                    categoryHeaderInnerDiv.id = 'index_category_' + categoryCount;
+                    categoryHeaderInnerDiv.className = 'borderSchemeRightBottom p-0 center';
+                    categoryHeaderInnerDiv.style.height = '30px';
+                    categoryHeaderInnerDiv.style.width = '30px';
+                    categoryHeader.appendChild(categoryHeaderInnerDiv);
 
-                    // Neues <input> Element erstellen
+                    // categoryBody mit neuem Input-Element füllen
                     var userInput = document.createElement('input');
                     userInput.type = 'text';
-                    userInput.className = 'center'; // Zentriert den Text im Input-Feld
                     userInput.placeholder = 'Hier den Namen der neuen Kategorie eingeben';
                     userInput.style.border = 'none'; // Rahmen ausblenden
                     userInput.style.outline = 'none'; // Außenlinie ausblenden
                     userInput.style.textAlign = 'center'; // Text zentrieren
-                    userInput.onchange = newDiv.appendChild(userInput);
+                    userInput.style.width = '100%'; // Input Element 100% breite geben
+                    categoryBody.appendChild(userInput);
 
-                    // Das neue Div zum #status-Container hinzufügen
-                    var statusContainer = document.getElementById('categoryContainer');
-                    statusContainer.appendChild(newDiv);
+                    // categoryFooter neuen editButton hinzufügen
+                    var editButton = document.createElement("button");
+                    editButton.setAttribute("id", 'editCategoryButton_' + categoryCount);
+                    editButton.className = 'icon-button-edit endTop hwAuto';
+                    var imgElementEdit = document.createElement("img");
+                    imgElementEdit.setAttribute("src", "images/editIcon.png");
+                    imgElementEdit.setAttribute("alt", "Icon");
+                    editButton.appendChild(imgElementEdit);
+                    editButton.onclick = function () {
+                        convertParagraphToInput(this);
+                    };
+                    categoryFooter.appendChild(editButton);
+
+                    // catgeoryFooter neuen deleteButton hinzufügen
+                    var deleteButton = document.createElement("button");
+                    deleteButton.setAttribute("id", 'deleteCategoryButton_' + categoryCount);
+                    deleteButton.className = 'icon-button-edit endBottom hwAuto';
+                    var imgElementDelete = document.createElement("img");
+                    imgElementDelete.setAttribute("src", "images/deleteIcon.png");
+                    imgElementDelete.setAttribute("alt", "Icon");
+                    deleteButton.appendChild(imgElementDelete);
+                    deleteButton.onclick = function () {
+                        deleteCategory(this);
+                    };
+                    categoryFooter.appendChild(deleteButton);
+
+                    // alle Container dem neuen div anhängen
+                    innerNewDiv.appendChild(categoryHeader);
+                    innerNewDiv.appendChild(categoryBody);
+                    innerNewDiv.appendChild(categoryFooter);
+
+                    // innerNewDiv dem newDiv hinzufügen
+                    newDiv.appendChild(innerNewDiv);
+
+                    // Das neue Div zum Category-Container hinzufügen
+                    categoryContainer.appendChild(newDiv);
 
                     // Fokus auf das Input-Feld setzen
                     setTimeout(function () {
@@ -173,19 +180,132 @@
 
                     // Event Listener für das Blur-Ereignis hinzufügen
                     userInput.addEventListener('blur', function () {
-                        convertInputToParagraph(userInput, childrenCount)
+                        convertInputToParagraph(userInput, categoryCount)
                     });
 
                     // Event Listener für die Eingabe hinzufügen
                     userInput.addEventListener('keyup', function (event) {
                         // Wenn Enter gedrückt wurde
                         if (event.keyCode === 13) {
-                            convertInputToParagraph(userInput, childrenCount);
-                            // Event-Listener für das blur-Ereignis entfernen, um mehrfaches Einfügen zu verhindern
-                            userInput.removeEventListener('blur', convertInputToParagraph);
+                            convertInputToParagraph(userInput, categoryCount);
                         }
                     });
                 };
+
+                function convertParagraphToInput(element) {
+                    // item id
+                    var numStr = element.id.substring(19);
+
+                    // p-ELement und categoryBody
+                    var paragraph = document.getElementById('category_paragraph_' + numStr);
+                    var categoryBody = document.getElementById('category_body_' + numStr);
+
+                    // categoryBody mit neuem Input-Element füllen
+                    var userInput = document.createElement('input');
+                    userInput.type = 'text';
+                    userInput.style.border = 'none'; // Rahmen ausblenden
+                    userInput.style.outline = 'none'; // Außenlinie ausblenden
+                    userInput.style.textAlign = 'center'; // Text zentrieren
+                    userInput.style.width = '100%'; // Input Element 100% breite geben
+                    userInput.value = paragraph.innerText;
+
+                    categoryBody.replaceChild(userInput, paragraph);
+
+                    // Parent-Div hover class zuweisen
+                    var parentDiv = document.getElementById('category_' + numStr);
+                    parentDiv.className = 'borderScheme mb-3';
+                    parentDiv.style.minHeight = '68px';
+
+                    userInput.focus();
+
+                    // Event Listener für das Blur-Ereignis hinzufügen
+                    userInput.addEventListener('blur', function () {
+                        convertInputToParagraph(userInput, numStr);
+                    });
+
+                    // Event Listener für die Eingabe hinzufügen
+                    userInput.addEventListener('keyup', function (event) {
+                        // Wenn Enter gedrückt wurde
+                        if (event.keyCode === 13) {
+                            convertInputToParagraph(userInput, numStr);
+                        }
+                    });
+                }
+
+                function openCategoryDetailView(element) {
+                    var hostname = window.location.origin;
+                    window.location.href = hostname + '/status';
+                }
+
+                function convertInputToParagraph(inputElement, numStr) {
+                    var categoryDiv = document.getElementById('category_' + numStr);
+                    var categoryBody = document.getElementById('category_body_' + numStr);
+                    var paragraph = document.createElement('p');
+                    paragraph.id = 'category_paragraph_' + numStr;
+                    paragraph.textContent = inputElement.value;
+                    paragraph.className = 'center m-0';
+
+                    // Parent-Div hover class zuweisen
+                    categoryDiv.className = 'borderScheme hover mb-3';
+
+                    inputElement.style.display = 'none';
+                    categoryBody.innerHTML = "";
+                    categoryBody.appendChild(paragraph);
+                }
+
+                function deleteCategory(element) {
+                    console.log('delete: ' + element.id);
+                    var modal = document.getElementById('confirmationModal');
+                    modal.ariaHidden = 'false';
+                }
+
+                function deleteCategory(element) {
+                    console.log("Delete button clicked"); // Konsolenausgabe für Debugging
+                    // Extrahiere die Nummer der Kategorie aus der ID des Elements
+                    var categoryId = element.id.split('_')[1];
+
+                    // Finde das entsprechende Element, das gelöscht werden soll
+                    var categoryDiv = document.getElementById('category_' + categoryId);
+
+                    // Extrahiere den Namen der Kategorie aus dem Paragrapheninhalt
+                    var categoryParagraph = document.getElementById('category_paragraph_' + categoryId);
+                    var categoryName = categoryParagraph.textContent.trim();
+
+                    // Füge den Kategorienamen in das Löschmodal ein
+                    var modalBody = document.querySelector('#confirmationModal .modal-body');
+                    modalBody.textContent = "Bist du sicher, dass du die Kategorie \"" + categoryName + "\" löschen möchtest?";
+
+                    // Setze das Löschmodal auf die Kategorie-ID, damit wir sie später löschen können
+                    $('#confirmationModal').data('categoryId', categoryId);
+
+                    // Öffne das Löschmodal
+                    $('#confirmationModal').modal('show');
+                }
+
+                // Funktion, um die Kategorie tatsächlich zu löschen
+                function confirmDeleteCategory() {
+
+                    console.log("Delete button modal clicked"); // Konsolenausgabe für Debugging
+                    // Kategorie-ID aus dem Modal extrahieren
+                    var categoryId = $('#confirmationModal').data('categoryId');
+
+                    // Element mit der entsprechenden Kategorie-ID entfernen
+                    var categoryDiv = document.getElementById('category_' + categoryId);
+                    categoryDiv.parentNode.removeChild(categoryDiv);
+
+                    // Modal schließen und das Modal-Backdrop-Element entfernen
+                    $('#confirmationModal').modal('toggle');
+
+                    // MUSS NOCH EIN RELOAD HIN UM DIE IDS ZU AKTUALISIEREN
+                }
+
+                function closeModal() {
+                    $('#confirmationModal').modal('toggle');
+                }
+
+                function reload() {
+                    location.reload();
+                }
 
             </script>
         </section>

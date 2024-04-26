@@ -21,7 +21,6 @@ import com.stadtmeldeapp.service.UserService;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
 import com.stadtmeldeapp.Entity.ReportEntity;
 import com.stadtmeldeapp.Entity.StatusEntity;
-import com.stadtmeldeapp.Entity.SubcategoryEntity;
 import com.stadtmeldeapp.Entity.UserEntity;
 
 import jakarta.servlet.http.HttpSession;
@@ -67,18 +66,8 @@ public class WebsiteController {
     model.addAttribute("category", true);
     logger.info("GET CATEGORYS");
     List<MaincategoryEntity> mainCategory = categoryService.getMaincategoriesByLocationName("Zweibrücken");
-    List<SubcategoryEntity> subCategory = new ArrayList<SubcategoryEntity>();
-    ArrayList<SubcategoryEntity> subCategoryList = new ArrayList<SubcategoryEntity>();
-    for (MaincategoryEntity maincategoryEntity : mainCategory) {
-      int mainCategoryId = (int) maincategoryEntity.getId();
-      subCategory = categoryService.getSubCategoriesByMainCategoryId(mainCategoryId);
-      for (SubcategoryEntity subcategoryEntity : subCategory) {
-        subCategoryList.add(subcategoryEntity);
-      }
-    }
     if (mainCategory != null) {
       model.addAttribute("MainCategories", mainCategory);
-      model.addAttribute("SubCategories", subCategoryList);
       return "category";
     }
     logger.info("Main Category not found.");
