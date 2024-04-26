@@ -3,13 +3,13 @@ package com.stadtmeldeapp.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.ReportDTO;
 import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
+import com.stadtmeldeapp.DTO.ReportUpdateDTO;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
 import com.stadtmeldeapp.Entity.ReportEntity;
 import com.stadtmeldeapp.Entity.ReportingLocationEntity;
@@ -49,7 +49,7 @@ public class ReportService {
     @Autowired
     private UserService userService;
 
-    public ReportEntity createReport(ReportDTO reportDto, String username, MultipartFile image)
+    public ReportEntity createReport(ReportDTO reportDto, String username)
             throws NotFoundException, IOException {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
@@ -71,20 +71,23 @@ public class ReportService {
 
         ReportEntity report = new ReportEntity();
         report.setSubcategory(subcategory);
-        report.setTitle(reportDto.title());
+        if (reportDto.title() != null)
+            report.setTitle(reportDto.title());
         report.setDescription(reportDto.description());
         report.setLongitude(reportDto.longitude());
         report.setLatitude(reportDto.latitude());
         report.setReportingLocation(reportingLocation);
         report.setUser(user);
         report.setStatus(statusX);
-        if (image != null) {
-            report.setAdditionalPicture(image.getBytes());
-        }
+        if (reportDto.additionalPicture() != null)
+            report.setAdditionalPicture(reportDto.additionalPicture());
 
         return reportRepository.save(report);
     }
 
+    public ReportEntity getReportById(int id) {
+        return reportRepository.findById(id).orElse(null);
+    }
     public List<ReportInfoDTO> getReportsByUserId(int userId) {
         return toInfoDTOList(reportRepository.findAllByUserId(userId));
 
@@ -99,6 +102,9 @@ public class ReportService {
         return toInfoDTOList(reportRepository.findAllByReportingLocationId(reportingLocationId));
     }
 
+    public List<ReportEntity> getReportEntitiesByReportingLocationId(int reportingLocationId) {
+        return reportRepository.findAllByReportingLocationId(reportingLocationId);
+    }
     public List<ReportInfoDTO> getReportsByReportingLocationName(String reportingLocationTitle) {
         return toInfoDTOList(reportRepository.findAllByReportingLocationName(reportingLocationTitle));
     }
@@ -109,29 +115,48 @@ public class ReportService {
         return new ReportDetailInfoDTO(
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
                         : report.getTitle(),
-                null, report.getReportingTimestamp(), report.getAdditionalPicture(), report.getLongitude(),
-                report.getLatitude(), report.getUser().getUsername(), report.getUser().getProfilePicture());
+                report.getDescription(),
+                -1, report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
+                report.getLongitude(),
+                report.getLatitude(), report.getUser().getUsername(), report.getReportingLocation().getName(),
+                report.getUser().getProfilePicture());
     }
 
-    /*
-     * public ReportEntity updateReport(int reportId, ReportDTO reportDto,
-     * UserEntity user) throws Exception {
-     * 
-     * ReportEntity report = reportRepository.findById(reportId)
-     * .orElseThrow();
-     * 
-     * if (!report.getUser().equals(user)) {
-     * throw new Exception("You are not authorized to update this report");
-     * }
-     * 
-     * // Update report details
-     * report.setTitle(reportDto.title());
-     * report.setDescription(reportDto.description());
-     * report.setLongitude(reportDto.longitude());
-     * report.setLatitude(reportDto.latitude());
-     * return reportRepository.save(report);
-     * }
-     */
+    public List<ReportInfoDTO> getLatestReportsByReportingLocationId(int id) {
+        return toInfoDTOList(reportRepository.findFirst10ByReportingLocationIdOrderByReportingTimestampDesc(id));
+    }
+
+    public ReportInfoDTO updateReport(int reportId, ReportUpdateDTO reportDto,
+            HttpServletRequest request) throws NotAllowedException, NotFoundException {
+
+        ReportEntity report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
+
+        if (!report.getUser().equals(userService.getUserFromRequest(request))) {
+            throw new NotAllowedException("Keine Berechtigung!");
+        }
+        if (reportDto.title() != null && !report.getSubcategory().getTitle().equals("Sonstiges")) {
+            throw new NotAllowedException("Meldungen außerhalb der Kategorie 'Sonstiges' haben keinen Titel");
+        }
+        report.setTitle(reportDto.title());
+        report.setDescription(reportDto.description());
+        report.setAdditionalPicture(reportDto.additionalPicture());
+        return toReportInfoDTO(reportRepository.save(report));
+    }
+
+    public ReportInfoDTO updateReportStatus(int reportId, String newStatus) throws NotAllowedException, NotFoundException {
+        ReportEntity report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
+
+        if (!report.getReportingLocation().equals(userService.getUserByAuthentication().getAdminForLocation())) {
+            throw new NotAllowedException("Keine Berechtigung!");
+        }
+        StatusEntity status = statusRepository
+                .findByReportingLocationEntityIdAndName(report.getReportingLocation().getId(), newStatus)
+                .orElseThrow(() -> new NotFoundException("Status nicht gefunden"));
+        report.setStatus(status);
+        return toReportInfoDTO(report);
+    }
 
     public void deleteReport(int reportId, HttpServletRequest request)
             throws NotFoundException, NotAllowedException {
@@ -155,9 +180,31 @@ public class ReportService {
                     .add(new ReportInfoDTO(
                             (r.getTitle() == null || r.getTitle().isBlank()) ? r.getSubcategory().getTitle()
                                     : r.getTitle(),
-                            null/* icon */, r.getReportingTimestamp(), r.getAdditionalPicture(), r.getLongitude(),
+                            (r.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1
+                                    : r.getSubcategory().getMaincategoryEntity().getIconEntity().getId()),
+                            r.getStatus(), r.getReportingTimestamp(), r.getAdditionalPicture(),
+                            r.getLongitude(),
                             r.getLatitude()));
         }
         return retReports;
+    }
+
+    public ReportInfoDTO toReportInfoDTO(ReportEntity report) {
+        return new ReportInfoDTO(
+                (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
+                        : report.getTitle(),
+                (report.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1
+                        : report.getSubcategory().getMaincategoryEntity().getIconEntity().getId()),
+                report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
+                report.getLongitude(),
+                report.getLatitude());
+    }
+
+    public ReportInfoDTO toReportInfoDTO(ReportDetailInfoDTO report) {
+        return new ReportInfoDTO(
+                report.titleOrsubcategoryName(),
+                report.iconId(), report.status(), report.timestamp(), report.image(),
+                report.longitude(),
+                report.latitude());
     }
 }

@@ -2,6 +2,9 @@ package com.stadtmeldeapp.DTO;
 
 import java.sql.Timestamp;
 
-public record ReportDetailInfoDTO (String titleOrsubcategoryName, byte[] icon, Timestamp timestamp,  byte[] image, double longitude, double latitude, String username, byte[] userProfilePicture) {
-    
+import com.stadtmeldeapp.Entity.StatusEntity;
+
+public record ReportDetailInfoDTO(String titleOrsubcategoryName, String description, int iconId, StatusEntity status,
+                Timestamp timestamp,
+                byte[] image, double longitude, double latitude, String username, String locationName, byte[] userProfilePicture) {
 }

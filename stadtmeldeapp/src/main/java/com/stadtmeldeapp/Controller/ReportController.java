@@ -12,15 +12,21 @@ import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.ReportDTO;
 import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
+import com.stadtmeldeapp.DTO.ReportUpdateDTO;
 import com.stadtmeldeapp.Entity.ReportEntity;
+import com.stadtmeldeapp.service.EmailSenderService;
 import com.stadtmeldeapp.service.ReportService;
+import com.stadtmeldeapp.service.StaticMapService;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
+
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/reports")
@@ -29,13 +35,18 @@ public class ReportController {
     @Autowired
     private ReportService reportService;
 
+    @Autowired
+    private EmailSenderService emailSenderService;
+
+    @Autowired
+    private StaticMapService staticMapService;
+
     @PostMapping
     public ResponseEntity<ReportEntity> createReport(
-            @RequestParam(value = "image", required = false) MultipartFile image,
-            @ModelAttribute ReportDTO reportDTO) throws NotFoundException, IOException {
+            @RequestBody ReportDTO reportDTO) throws NotFoundException, IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        ReportEntity createdReport = reportService.createReport(reportDTO, username, image);
+        ReportEntity createdReport = reportService.createReport(reportDTO, username);
         return new ResponseEntity<>(createdReport, HttpStatus.CREATED);
     }
 
@@ -69,23 +80,35 @@ public class ReportController {
         return new ResponseEntity<>(report, HttpStatus.OK);
     }
 
-    /*
-     * @PutMapping("/{reportId}")
-     * public ResponseEntity<ReportEntity> updateReport(@PathVariable int
-     * reportId, @RequestBody ReportDTO reportDto, HttpServletRequest request) {
-     * String jwt = request.getHeader("Authorization");
-     * jwt= jwtService.removeBearerFromToken(jwt);
-     * String username = jwtService.extractUsername(jwt);
-     * UserEntity user = userService.getUserEntityByUsername(username);
-     * try {
-     * ReportEntity updatedReport = reportService.updateReport(reportId, reportDto,
-     * user);
-     * return new ResponseEntity<>(updatedReport, HttpStatus.OK);
-     * } catch (Exception e) {
-     * return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-     * }
-     * }
-     */
+    @PutMapping("/{reportId}")
+    public ResponseEntity<ReportInfoDTO> updateReport(@PathVariable int reportId,
+            @RequestBody ReportUpdateDTO reportDto,
+            HttpServletRequest request) throws NotAllowedException, NotFoundException {
+        ReportInfoDTO updatedReport = reportService.updateReport(reportId, reportDto,
+                request);
+
+        return new ResponseEntity<>(updatedReport, HttpStatus.OK);
+    }
+
+    @PutMapping("/admin/{reportId}")
+    public ResponseEntity<ReportInfoDTO> updateReportStatus(@PathVariable int reportId, @RequestBody String newStatus) throws Exception {
+        ReportInfoDTO updatedReport = reportService.updateReportStatus(reportId, newStatus);
+        ReportEntity reportEntity = reportService.getReportById(reportId);
+        if (reportEntity != null)
+            try {
+                emailSenderService.sendStatusChangeEmail(reportEntity.getUser().getEmail(),
+                        reportEntity.getUser().getUsername(),
+                        (reportEntity.getTitle() == null || reportEntity.getTitle().isBlank())
+                                ? reportEntity.getSubcategory().getTitle()
+                                : reportEntity.getTitle(),
+                        reportEntity.getStatus().getName(),
+                        new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(reportEntity.getReportingTimestamp()),
+                        staticMapService.getMapImage(reportEntity.getLatitude(), reportEntity.getLongitude()));
+            } catch (MessagingException | IOException e) {
+                e.printStackTrace();
+            }
+        return new ResponseEntity<>(updatedReport, HttpStatus.OK);
+    }
 
     @DeleteMapping("/{reportId}")
     public ResponseEntity<Void> deleteReport(@PathVariable int reportId, HttpServletRequest request)

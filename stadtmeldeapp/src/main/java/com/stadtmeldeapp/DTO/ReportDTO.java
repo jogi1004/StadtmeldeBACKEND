@@ -8,5 +8,6 @@ public record ReportDTO(
         String description,
         Double longitude,
         Double latitude,
-        String reportingLocationName) {
+        String reportingLocationName,
+        byte[] additionalPicture) {
 }

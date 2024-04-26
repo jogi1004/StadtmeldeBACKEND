@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.stadtmeldeapp.service.JwtAuthFilter;
 import com.stadtmeldeapp.service.UserDetailsServiceImpl;
@@ -39,7 +40,6 @@ public class SecurityConfig {
         return authProvider;
     }
 
-
     @Bean
     AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder = http
@@ -57,16 +57,36 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Cross-Site-Request-Forgery
+                .cors(cors -> cors.disable())
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/auth/*").permitAll()
                         .requestMatchers("/swagger-ui/*", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/user/*").hasAnyAuthority("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/categories/*").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/categories/*").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/categories/*").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/categories/*").hasAuthority("ADMIN")
                         .requestMatchers("/status/*").hasAuthority("ADMIN")
-                        .requestMatchers("/reports/*").hasAnyAuthority("USER", "ADMIN")
+                        .requestMatchers("/css/*").permitAll()
+                        .requestMatchers("/js/*").permitAll()
+                        .requestMatchers("/images/*").permitAll()
+                        .requestMatchers("/static/*").permitAll()
+                        .requestMatchers("/templates/*").permitAll()
+                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/aboutUs").permitAll()
+                        .requestMatchers("/contact").permitAll()
+                        .requestMatchers("/services").permitAll()
+                        .requestMatchers("/cityInfo").hasAuthority("ADMIN")
+                        .requestMatchers("/overview").hasAuthority("ADMIN")
+                        .requestMatchers("/reports/admin/*").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/overview")
+                        .loginProcessingUrl("/login")
+                        .failureUrl("/login?error=true")
+                        .permitAll())
+                .logout(
+                    logout -> logout
+                            .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

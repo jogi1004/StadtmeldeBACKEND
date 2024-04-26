@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <title>CityCare</title>
+</head>
+
+<body>
+
+    <div layout:fragment="content">
+        <section>
+            <!-- Page Content-->
+            <div id="content">
+                <!-- Home -->
+                <div id="home" class="container px-4 px-lg-5 mt-5">
+                    <!-- Heading Row-->
+                    <div class="row gx-4 gx-lg-5 align-items-center my-5">
+                        <div class="col-lg-7"><img class="img-fluid rounded mb-4 mb-lg-0"
+                                src="/images/streetdamage.jpeg" />
+                        </div>
+                        <div class="col-lg-5">
+                            <h1 class="font-weight-light">CityCare - Deine Stadtmeldeapp</h1>
+                            <p>Willkommen
+                                <span th:if="${User != null}">
+                                    <span th:text="${User.getUsername + ','}"></span>
+                                </span>
+                                <span th:unless="${User != null}">Gast,</span>
+                                CityCare ist deine Plattform, um Schäden, Vandalismus und andere Probleme in deiner
+                                Stadt zu
+                                melden und deren Bearbeitung durch die Stadtverwaltung zu verfolgen. Mit unserer
+                                benutzerfreundlichen App kannst du schnell und einfach Probleme wie defekte
+                                Straßenlaternen,
+                                Schlaglöcher oder Graffiti melden und ihre Bearbeitung durch die Stadtverwaltung
+                                verfolgen.
+                            </p>
+                            <a class="btn btn-primary" th:href="@{/login}">Mach mit!</a>
+                        </div>
+                    </div>
+                    <!-- Call to Action-->
+                    <div class="card text-white bg-secondary my-5 py-4 text-center">
+                        <div class="card-body">
+                            <p class="text-white m-0">Gemeinsam für ein sauberes Stadtbild!</p>
+                        </div>
+                    </div>
+                    <!-- Content Row-->
+                    <div class="row gx-4 gx-lg-5">
+                        <div class="col-md-4 mb-5">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h2 class="card-title">Über CityCare</h2>
+                                    <p>CityCare wurde gegründet, um Bürgern eine einfache Möglichkeit zu bieten,
+                                        Probleme in
+                                        ihrer Stadt zu melden und deren Bearbeitung durch die Stadtverwaltung zu
+                                        verfolgen.
+                                        Unser Ziel ist es, Städte sicherer, sauberer und lebenswerter zu machen, indem
+                                        wir eine
+                                        effiziente Kommunikation zwischen Bürgern und Behörden fördern.</p>
+                                </div>
+                                <div class="card-footer"><a class="btn btn-primary btn-sm" th:href= "@{/aboutUs}">Mehr erfahren</a></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-5">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h2 class="card-title">Unsere Dienstleistungen</h2>
+                                    <p>CityCare bietet eine einfache und effektive Möglichkeit, Probleme in deiner Stadt
+                                        zu
+                                        melden und deren Bearbeitung durch die Stadtverwaltung zu verfolgen. Wir
+                                        unterstützen
+                                        dich dabei, Schäden, Vandalismus und andere Probleme zu dokumentieren und den
+                                        Fortschritt ihrer Behebung zu verfolgen.</p>
+                                </div>
+                                <div class="card-footer"><a class="btn btn-primary btn-sm" th:href= "@{/services}">Mehr erfahren</a></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-5">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h2 class="card-title">Kontaktiere uns</h2>
+                                    <p>Hast du Fragen, Feedback oder Anregungen? Wir stehen dir gerne zur Verfügung!
+                                        Kontaktiere
+                                        unser Support-Team per E-Mail oder Telefon, und wir werden uns so schnell wie
+                                        möglich
+                                        bei dir melden.</p>
+                                </div>
+                                <div class="card-footer"><a class="btn btn-primary btn-sm" th:href= "@{/contact}">Kontaktieren</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+            </div>
+        </section>
+    </div>
+
+</body>
+
+</html>

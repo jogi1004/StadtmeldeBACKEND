@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
+import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.MaincategoryDTO;
 import com.stadtmeldeapp.DTO.SubcategoryDTO;
@@ -15,6 +16,7 @@ import com.stadtmeldeapp.Entity.SubcategoryEntity;
 import com.stadtmeldeapp.service.CategoryService;
 import com.stadtmeldeapp.service.ReportingLocationService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -36,29 +38,27 @@ public class CategoryController {
     @GetMapping("/main/{id}")
     public ResponseEntity<MaincategoryEntity> getMainCategoryById(@PathVariable("id") int id) throws NotFoundException {
         MaincategoryEntity mainCategory = categoryService.getMainCategoryById(id);
-        if (mainCategory != null) {
-            return new ResponseEntity<>(mainCategory, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(mainCategory, HttpStatus.OK);
     }
 
     @PostMapping("/main")
     public ResponseEntity<MaincategoryEntity> createOrUpdateMainCategory(
-            @RequestBody @NonNull MaincategoryDTO mainCategoryDTO) throws NotFoundException {
-        ReportingLocationEntity reportingLocationEntity = reportingLocationService.getReportingLocationById(mainCategoryDTO.getreportingLocationID());
+            @RequestBody @NonNull MaincategoryDTO mainCategoryDTO, HttpServletRequest request) throws NotFoundException, NotAllowedException {
+        ReportingLocationEntity reportingLocationEntity = reportingLocationService
+                .getReportingLocationById(mainCategoryDTO.reportingLocationId());
         MaincategoryEntity maincategoryEntity = new MaincategoryEntity();
-        maincategoryEntity.setTitle(mainCategoryDTO.getTitle());
+        maincategoryEntity.setTitle(mainCategoryDTO.title());
         maincategoryEntity.setReportingLocationEntity(reportingLocationEntity);
-        MaincategoryEntity savedMainCategory = categoryService.saveMainCategory(maincategoryEntity);
+        MaincategoryEntity savedMainCategory = categoryService.saveMainCategory(maincategoryEntity, request);
         return new ResponseEntity<>(savedMainCategory, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/main/{id}")
-    public ResponseEntity<Void> deleteMainCategory(@PathVariable("id") int id) throws NotFoundException {
+    public ResponseEntity<Void> deleteMainCategory(@PathVariable("id") int id, HttpServletRequest request) throws NotFoundException, NotAllowedException {
         MaincategoryEntity maincategoryEntity = categoryService.getMainCategoryById(id);
 
         if (maincategoryEntity != null) {
-            categoryService.deleteMainCategory(id);
+            categoryService.deleteMainCategory(id, request);
             return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -75,21 +75,21 @@ public class CategoryController {
 
     @PostMapping("/sub")
     public ResponseEntity<SubcategoryEntity> createOrUpdateSubCategory(
-            @RequestBody @NonNull SubcategoryDTO subcategoryDTO) throws NotFoundException {
-        MaincategoryEntity maincategoryEntity = categoryService.getMainCategoryById(subcategoryDTO.getMainCategoryID());
+            @RequestBody @NonNull SubcategoryDTO subcategoryDTO, HttpServletRequest request) throws NotFoundException, NotAllowedException {
+        MaincategoryEntity maincategoryEntity = categoryService.getMainCategoryById(subcategoryDTO.maincategoryId());
         SubcategoryEntity subcategoryEntity = new SubcategoryEntity();
-        subcategoryEntity.setTitle(subcategoryDTO.getTitle());
+        subcategoryEntity.setTitle(subcategoryDTO.title());
         subcategoryEntity.setMaincategoryEntity(maincategoryEntity);
-        SubcategoryEntity savedSubCategory = categoryService.saveSubCategory(subcategoryEntity);
+        SubcategoryEntity savedSubCategory = categoryService.saveSubCategory(subcategoryEntity, request);
         return new ResponseEntity<>(savedSubCategory, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/sub/{id}")
-    public ResponseEntity<Void> deleteSubCategory(@PathVariable("id") int id) throws NotFoundException {
+    public ResponseEntity<Void> deleteSubCategory(@PathVariable("id") int id, HttpServletRequest request) throws NotFoundException, NotAllowedException {
         SubcategoryEntity subcategoryEntity = categoryService.getSubCategoryById(id);
 
         if (subcategoryEntity != null) {
-            categoryService.deleteSubCategory(id);
+            categoryService.deleteSubCategory(id, request);
             return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -103,15 +103,35 @@ public class CategoryController {
         return new ResponseEntity<>(subCategories, HttpStatus.OK);
     }
 
-    @SuppressWarnings("null")
     @GetMapping("/main/location/{locationName}")
     public ResponseEntity<List<MaincategoryEntity>> getCategoriesByLocationName(
             @PathVariable("locationName") String locationName) {
         List<MaincategoryEntity> categories = categoryService.getMaincategoriesByLocationName(locationName);
-        if (categories.size()==0) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        if (categories.size() == 0) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
+    @PutMapping("/main/{id}")
+    public ResponseEntity<MaincategoryEntity> updateMainCategory(@PathVariable("id") int id,
+            @RequestBody @NonNull String newTitle, HttpServletRequest request) throws NotFoundException, NotAllowedException {
+        MaincategoryEntity existingMainCategory = categoryService.getMainCategoryById(id);
+        existingMainCategory.setTitle(newTitle);
+        MaincategoryEntity updatedMainCategory = categoryService.saveMainCategory(existingMainCategory, request);
+        return new ResponseEntity<>(updatedMainCategory, HttpStatus.OK);
+    }
+
+    @PutMapping("/sub/{id}")
+    public ResponseEntity<SubcategoryEntity> updateSubCategory(@PathVariable("id") int id,
+            @RequestBody @NonNull SubcategoryDTO newSubcategory, HttpServletRequest request) throws NotFoundException, NotAllowedException {
+        SubcategoryEntity existingSubCategory = categoryService.getSubCategoryById(id);
+
+        MaincategoryEntity maincategoryEntity = categoryService.getMainCategoryById(newSubcategory.maincategoryId());
+        existingSubCategory.setTitle(newSubcategory.title());
+        existingSubCategory.setMaincategoryEntity(maincategoryEntity);
+
+        SubcategoryEntity updatedSubCategory = categoryService.saveSubCategory(existingSubCategory, request);
+        return new ResponseEntity<>(updatedSubCategory, HttpStatus.OK);
+    }
 }

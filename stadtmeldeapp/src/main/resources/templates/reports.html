@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script type="text/javascript" th:src="@{/js/reports.js}"></script>
+
+    <title>Meldungen</title>
+</head>
+
+<body>
+
+    <div layout:fragment="content">
+        <section class="my-5">
+            <div class="row center">
+
+                <div class="row gx-4 gx-lg-5">
+                    <div class="col-md-3 mb-5">
+                        <div id="reportNew" class="card h-100" style="height: 70vh;"
+                            ondrop="drop(event, 'reportNew', 'Neu')" ondragover="allowDrop(event)">
+                            <div class="card-header">
+                                <h2 class="card-title">Neu</h2>
+                            </div>
+                            <div id="reportNewBody" class="card-body scrollbar" style="height: 70vh;">
+                                <div th:id="'report_' + ${report.getId()}" class="card mb-3"
+                                    th:each="report, iterStat: ${ReportsNew}" draggable="true"
+                                    ondragstart="drag(event)">
+                                    <div class="card-body">
+                                        <p th:text="${report.getId()}"></p>
+                                        <p th:text="${report.getTitleOrsubcategoryName()}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-5">
+                        <div id="reportInProgress" class="card h-100" style="height: 70vh;"
+                            ondrop="drop(event, 'reportInProgress', 'In Bearbeitung')" ondragover="allowDrop(event)">
+                            <div class="card-header">
+                                <h2 class="card-title">In Bearbeitung</h2>
+                            </div>
+                            <div id="reportInProgressBody" class="card-body scrollbar" style="height: 70vh;">
+                                <div th:id="'report_' + ${report.getId()}" class="card mb-3"
+                                    th:each="report, iterStat: ${ReportsInProgress}" draggable="true"
+                                    ondragstart="drag(event)">
+                                    <div class="card-body">
+                                        <p th:text="${report.getId()}"></p>
+                                        <p th:text="${report.getTitleOrsubcategoryName()}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-5">
+                        <div id="reportDone" class="card h-100" style="height: 70vh;"
+                            ondrop="drop(event, 'reportDone', 'Abgeschlossen')" ondragover="allowDrop(event)">
+                            <div class="card-header">
+                                <h2 class="card-title">Abgeschlossen</h2>
+                            </div>
+                            <div id="reportDoneBody" class="card-body scrollbar" style="height: 70vh;">
+                                <div th:id="'report_' + ${report.getId()}" class="card mb-3"
+                                    th:each="report, iterStat: ${ReportsDone}" draggable="true"
+                                    ondragstart="drag(event)">
+                                    <div class="card-body">
+                                        <p th:text="${report.getId()}"></p>
+                                        <p th:text="${report.getTitleOrsubcategoryName()}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-5">
+                        <div id="reportRejected" class="card h-100" style="height: 70vh;"
+                            ondrop="drop(event, 'reportRejected', 'Abgelehnt')" ondragover="allowDrop(event)">
+                            <div class="card-header" style="background-color: lightcoral;">
+                                <h2 class="card-title">Abgelehnt</h2>
+                            </div>
+                            <div id="reportRejectedBody" class="card-body scrollbar" style="height: 70vh;">
+                                <div th:id="'report_' + ${report.getId()}" class="card mb-3"
+                                    th:each="report, iterStat: ${ReportsRejected}" draggable="true"
+                                    ondragstart="drag(event)">
+                                    <div class="card-body">
+                                        <p th:text="${report.getId()}"></p>
+                                        <p th:text="${report.getTitleOrsubcategoryName()}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+</body>
+
+</html>

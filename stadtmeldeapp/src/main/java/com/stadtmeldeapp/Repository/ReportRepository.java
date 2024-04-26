@@ -15,4 +15,6 @@ public interface ReportRepository extends JpaRepository<ReportEntity, Integer> {
     List<ReportEntity> findAllByReportingLocationId(int reportingLocationId);
 
     List<ReportEntity> findAllByReportingLocationName(String reportingLocationName);
+
+    List<ReportEntity> findFirst10ByReportingLocationIdOrderByReportingTimestampDesc(Integer reportingLocationId);
 }
