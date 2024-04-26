@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.ArrayList;
 import jakarta.servlet.http.HttpServletRequest;
 
-
 @Service
 @Transactional
 public class CategoryService {
@@ -31,7 +30,6 @@ public class CategoryService {
 
     @Autowired
     private UserService userService;
-
     public List<MaincategoryEntity> getAllMainCategories() {
         return mainCategoryRepository.findAll();
     }

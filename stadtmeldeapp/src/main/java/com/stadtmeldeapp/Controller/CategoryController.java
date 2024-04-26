@@ -17,7 +17,6 @@ import com.stadtmeldeapp.service.CategoryService;
 import com.stadtmeldeapp.service.ReportingLocationService;
 
 import jakarta.servlet.http.HttpServletRequest;
-
 import java.util.List;
 
 @RestController
@@ -135,5 +134,4 @@ public class CategoryController {
         SubcategoryEntity updatedSubCategory = categoryService.saveSubCategory(existingSubCategory, request);
         return new ResponseEntity<>(updatedSubCategory, HttpStatus.OK);
     }
-
 }

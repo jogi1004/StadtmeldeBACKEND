@@ -111,8 +111,10 @@ public class ReportService {
     }
 
     public ReportDetailInfoDTO getReportDetails(int id) throws NotFoundException {
+        System.out.println("START DETAILS");
         ReportEntity report = reportRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
+                System.out.println("REPORT SERVICE");
         return new ReportDetailInfoDTO(
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
                         : report.getTitle(),

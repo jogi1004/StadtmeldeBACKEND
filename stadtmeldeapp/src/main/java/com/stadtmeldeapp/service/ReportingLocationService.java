@@ -1,7 +1,6 @@
 package com.stadtmeldeapp.service;
 
 import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
@@ -37,6 +36,7 @@ public class ReportingLocationService {
     }
 
     public ReportingLocationEntity createReportingLocation(ReportingLocationEntity reportingLocation) {
+
         return reportingLocationRepository.save(reportingLocation);
     }
 }

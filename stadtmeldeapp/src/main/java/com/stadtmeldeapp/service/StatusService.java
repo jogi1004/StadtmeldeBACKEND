@@ -11,7 +11,6 @@ import com.stadtmeldeapp.Entity.StatusEntity;
 import com.stadtmeldeapp.Repository.StatusRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
-
 import java.util.List;
 
 @Service
@@ -20,7 +19,7 @@ public class StatusService {
 
     @Autowired
     private UserService userService;
-
+  
     private final StatusRepository statusRepository;
 
     public StatusService(StatusRepository statusRepository) {
@@ -54,7 +53,7 @@ public class StatusService {
             throw new NotAllowedException("Keine Berechtigung");
         return statusRepository.save(status);
     }
-
+  
     public List<StatusEntity> getStatusByReportingLocationId(int reportingLocationId) {
         return statusRepository.findByReportingLocationEntityId(reportingLocationId);
     }
