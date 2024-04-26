@@ -39,9 +39,6 @@ public class UserEntity {
     private String email;
 
     @Column(nullable = true)
-    private byte[] profilePicture;
-
-    @Column(nullable = true)
     private boolean notificationsEnabled;
 
     @Column
