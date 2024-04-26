@@ -29,5 +29,4 @@ public class MaincategoryEntity {
     @ManyToOne
     @JoinColumn(name = "icon_id", nullable = true)
     private IconEntity iconEntity;
-
 }

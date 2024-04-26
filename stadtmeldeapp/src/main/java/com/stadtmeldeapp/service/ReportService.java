@@ -88,7 +88,6 @@ public class ReportService {
     public ReportEntity getReportById(int id) {
         return reportRepository.findById(id).orElse(null);
     }
-
     public List<ReportInfoDTO> getReportsByUserId(int userId) {
         return toInfoDTOList(reportRepository.findAllByUserId(userId));
 
@@ -106,7 +105,6 @@ public class ReportService {
     public List<ReportEntity> getReportEntitiesByReportingLocationId(int reportingLocationId) {
         return reportRepository.findAllByReportingLocationId(reportingLocationId);
     }
-
     public List<ReportInfoDTO> getReportsByReportingLocationName(String reportingLocationTitle) {
         return toInfoDTOList(reportRepository.findAllByReportingLocationName(reportingLocationTitle));
     }
@@ -177,7 +175,6 @@ public class ReportService {
 
     public List<ReportInfoDTO> toInfoDTOList(List<ReportEntity> reports) {
         List<ReportInfoDTO> retReports = new ArrayList<>();
-
         for (ReportEntity r : reports) {
             retReports
                     .add(new ReportInfoDTO(
