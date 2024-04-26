@@ -8,7 +8,6 @@ import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.ReportDTO;
 import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
-import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.DTO.ReportUpdateDTO;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
 import com.stadtmeldeapp.Entity.ReportEntity;
@@ -89,17 +88,17 @@ public class ReportService {
         return reportRepository.findById(id).orElse(null);
     }
 
-    public List<ReportInfoDTO> getReportsByUserId(int userId) {
+    public List<ReportDetailInfoDTO> getReportsByUserId(int userId) {
         return toInfoDTOList(reportRepository.findAllByUserId(userId));
 
     }
 
-    public List<ReportInfoDTO> getReportsByUserId(HttpServletRequest request) throws NotFoundException {
+    public List<ReportDetailInfoDTO> getReportsByUserId(HttpServletRequest request) throws NotFoundException {
         int userId = userService.getUserFromRequest(request).getId();
         return getReportsByUserId(userId);
     }
 
-    public List<ReportInfoDTO> getReportsByReportingLocationId(int reportingLocationId) {
+    public List<ReportDetailInfoDTO> getReportsByReportingLocationId(int reportingLocationId) {
         return toInfoDTOList(reportRepository.findAllByReportingLocationId(reportingLocationId));
     }
 
@@ -107,7 +106,7 @@ public class ReportService {
         return reportRepository.findAllByReportingLocationId(reportingLocationId);
     }
 
-    public List<ReportInfoDTO> getReportsByReportingLocationName(String reportingLocationTitle) {
+    public List<ReportDetailInfoDTO> getReportsByReportingLocationName(String reportingLocationTitle) {
         return toInfoDTOList(reportRepository.findAllByReportingLocationName(reportingLocationTitle));
     }
 
@@ -118,17 +117,16 @@ public class ReportService {
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
                         : report.getTitle(),
                 report.getDescription(),
-                -1, report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
+                report.getSubcategory().getMaincategoryEntity().getIconEntity().getId(), report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
                 report.getLongitude(),
-                report.getLatitude(), report.getUser().getUsername(), report.getReportingLocation().getName(),
-                report.getUser().getProfilePicture());
+                report.getLatitude(), report.getUser().getUsername(), report.getReportingLocation().getName());
     }
 
-    public List<ReportInfoDTO> getLatestReportsByReportingLocationId(int id) {
+    public List<ReportDetailInfoDTO> getLatestReportsByReportingLocationId(int id) {
         return toInfoDTOList(reportRepository.findFirst10ByReportingLocationIdOrderByReportingTimestampDesc(id));
     }
 
-    public ReportInfoDTO updateReport(int reportId, ReportUpdateDTO reportDto,
+    public ReportDetailInfoDTO updateReport(int reportId, ReportUpdateDTO reportDto,
             HttpServletRequest request) throws NotAllowedException, NotFoundException {
 
         ReportEntity report = reportRepository.findById(reportId)
@@ -143,10 +141,10 @@ public class ReportService {
         report.setTitle(reportDto.title());
         report.setDescription(reportDto.description());
         report.setAdditionalPicture(reportDto.additionalPicture());
-        return toReportInfoDTO(reportRepository.save(report));
+        return toReportDetailInfoDTO(reportRepository.save(report));
     }
 
-    public ReportInfoDTO updateReportStatus(int reportId, String newStatus) throws NotAllowedException, NotFoundException {
+    public ReportDetailInfoDTO updateReportStatus(int reportId, String newStatus) throws NotAllowedException, NotFoundException {
         ReportEntity report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
 
@@ -157,7 +155,7 @@ public class ReportService {
                 .findByReportingLocationEntityIdAndName(report.getReportingLocation().getId(), newStatus)
                 .orElseThrow(() -> new NotFoundException("Status nicht gefunden"));
         report.setStatus(status);
-        return toReportInfoDTO(report);
+        return toReportDetailInfoDTO(report);
     }
 
     public void deleteReport(int reportId, HttpServletRequest request)
@@ -175,39 +173,32 @@ public class ReportService {
         reportRepository.delete(report);
     }
 
-    public List<ReportInfoDTO> toInfoDTOList(List<ReportEntity> reports) {
-        List<ReportInfoDTO> retReports = new ArrayList<>();
+    public List<ReportDetailInfoDTO> toInfoDTOList(List<ReportEntity> reports) {
+        List<ReportDetailInfoDTO> retReports = new ArrayList<>();
 
         for (ReportEntity r : reports) {
             retReports
-                    .add(new ReportInfoDTO(
+                    .add(new ReportDetailInfoDTO(
                             (r.getTitle() == null || r.getTitle().isBlank()) ? r.getSubcategory().getTitle()
                                     : r.getTitle(),
+                                    r.getDescription(),
                             (r.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1
                                     : r.getSubcategory().getMaincategoryEntity().getIconEntity().getId()),
                             r.getStatus(), r.getReportingTimestamp(), r.getAdditionalPicture(),
                             r.getLongitude(),
-                            r.getLatitude()));
+                            r.getLatitude(), r.getUser().getUsername(), r.getReportingLocation().getName()));
         }
         return retReports;
     }
 
-    public ReportInfoDTO toReportInfoDTO(ReportEntity report) {
-        return new ReportInfoDTO(
+    public ReportDetailInfoDTO toReportDetailInfoDTO(ReportEntity report) {
+        return new ReportDetailInfoDTO(
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
-                        : report.getTitle(),
+                        : report.getTitle(), report.getDescription(),
                 (report.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1
                         : report.getSubcategory().getMaincategoryEntity().getIconEntity().getId()),
                 report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
                 report.getLongitude(),
-                report.getLatitude());
-    }
-
-    public ReportInfoDTO toReportInfoDTO(ReportDetailInfoDTO report) {
-        return new ReportInfoDTO(
-                report.titleOrsubcategoryName(),
-                report.iconId(), report.status(), report.timestamp(), report.image(),
-                report.longitude(),
-                report.latitude());
+                report.getLatitude(), report.getUser().getUsername(), report.getReportingLocation().getName());
     }
 }

@@ -1,7 +1,7 @@
 package com.stadtmeldeapp.Controller;
 
 import org.springframework.web.bind.annotation.RestController;
-import com.stadtmeldeapp.DTO.ReportInfoDTO;
+import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.service.ReportService;
 
 import java.util.List;
@@ -21,8 +21,8 @@ public class WebsiteRestController {
     private ReportService reportService;
     
     @GetMapping("/location/id/{locationId}")
-    public ResponseEntity<List<ReportInfoDTO>> getReportsByLocationId(@PathVariable int locationId) {
-        List<ReportInfoDTO> reports = reportService.getReportsByReportingLocationId(locationId);
+    public ResponseEntity<List<ReportDetailInfoDTO>> getReportsByLocationId(@PathVariable int locationId) {
+        List<ReportDetailInfoDTO> reports = reportService.getReportsByReportingLocationId(locationId);
         return new ResponseEntity<>(reports, HttpStatus.OK);
     }
     

@@ -11,7 +11,6 @@ import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.ReportDTO;
 import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
-import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.DTO.ReportUpdateDTO;
 import com.stadtmeldeapp.Entity.ReportEntity;
 import com.stadtmeldeapp.service.EmailSenderService;
@@ -51,26 +50,26 @@ public class ReportController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ReportInfoDTO>> getAllReportsByUserId(@PathVariable int userId) {
-        List<ReportInfoDTO> reports = reportService.getReportsByUserId(userId);
+    public ResponseEntity<List<ReportDetailInfoDTO>> getAllReportsByUserId(@PathVariable int userId) {
+        List<ReportDetailInfoDTO> reports = reportService.getReportsByUserId(userId);
         return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 
     @GetMapping("/mine")
-    public ResponseEntity<List<ReportInfoDTO>> getMyReports(HttpServletRequest request) throws NotFoundException {
-        List<ReportInfoDTO> reports = reportService.getReportsByUserId(request);
+    public ResponseEntity<List<ReportDetailInfoDTO>> getMyReports(HttpServletRequest request) throws NotFoundException {
+        List<ReportDetailInfoDTO> reports = reportService.getReportsByUserId(request);
         return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 
     @GetMapping("/location/id/{locationId}")
-    public ResponseEntity<List<ReportInfoDTO>> getReportsByLocationId(@PathVariable int locationId) {
-        List<ReportInfoDTO> reports = reportService.getReportsByReportingLocationId(locationId);
+    public ResponseEntity<List<ReportDetailInfoDTO>> getReportsByLocationId(@PathVariable int locationId) {
+        List<ReportDetailInfoDTO> reports = reportService.getReportsByReportingLocationId(locationId);
         return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 
     @GetMapping("/location/name/{locationName}")
-    public ResponseEntity<List<ReportInfoDTO>> getReportsByLocationName(@PathVariable String locationName) {
-        List<ReportInfoDTO> reports = reportService.getReportsByReportingLocationName(locationName);
+    public ResponseEntity<List<ReportDetailInfoDTO>> getReportsByLocationName(@PathVariable String locationName) {
+        List<ReportDetailInfoDTO> reports = reportService.getReportsByReportingLocationName(locationName);
         return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 
@@ -81,18 +80,18 @@ public class ReportController {
     }
 
     @PutMapping("/{reportId}")
-    public ResponseEntity<ReportInfoDTO> updateReport(@PathVariable int reportId,
+    public ResponseEntity<ReportDetailInfoDTO> updateReport(@PathVariable int reportId,
             @RequestBody ReportUpdateDTO reportDto,
             HttpServletRequest request) throws NotAllowedException, NotFoundException {
-        ReportInfoDTO updatedReport = reportService.updateReport(reportId, reportDto,
+        ReportDetailInfoDTO updatedReport = reportService.updateReport(reportId, reportDto,
                 request);
 
         return new ResponseEntity<>(updatedReport, HttpStatus.OK);
     }
 
     @PutMapping("/admin/{reportId}")
-    public ResponseEntity<ReportInfoDTO> updateReportStatus(@PathVariable int reportId, @RequestBody String newStatus) throws Exception {
-        ReportInfoDTO updatedReport = reportService.updateReportStatus(reportId, newStatus);
+    public ResponseEntity<ReportDetailInfoDTO> updateReportStatus(@PathVariable int reportId, @RequestBody String newStatus) throws Exception {
+        ReportDetailInfoDTO updatedReport = reportService.updateReportStatus(reportId, newStatus);
         ReportEntity reportEntity = reportService.getReportById(reportId);
         if (reportEntity != null)
             try {

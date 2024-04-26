@@ -12,7 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.MainCategoryWithSubCategoriesDTO;
-import com.stadtmeldeapp.DTO.ReportInfoDTO;
+import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportPictureDTO;
 import com.stadtmeldeapp.service.CategoryService;
 import com.stadtmeldeapp.service.ReportService;
@@ -108,12 +108,12 @@ public class WebsiteController {
             /* userEntity.getAdminForLocation().getName() */ "Zweibrücken");
     model.addAttribute("MainCategories", mainCategoryWithSubCategories);
 
-    List<ReportInfoDTO> reportInfoDTOs = reportService.getLatestReportsByReportingLocationId(/*
+    List<ReportDetailInfoDTO> ReportDetailInfoDTOs = reportService.getLatestReportsByReportingLocationId(/*
                                                                                               * userEntity.
                                                                                               * getAdminForLocation().
                                                                                               * getId()
                                                                                               */ 1);
-    model.addAttribute("Reports", reportInfoDTOs);
+    model.addAttribute("Reports", ReportDetailInfoDTOs);
 
     List<StatusEntity> statusEntities = statusService.getStatusByReportingLocationId(/*
                                                                                       * userEntity.getAdminForLocation()
