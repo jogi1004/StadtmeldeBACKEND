@@ -53,7 +53,7 @@ public class UserService {
         RoleEntity role = roleService.findRoleByName("USER");
 
         UserEntity user = new UserEntity(request.username(), hashedPassword, request.email(),
-                Collections.singletonList(role), -1, null);
+                Collections.singletonList(role), null, null);
 
         return repository.save(user);
     }
@@ -71,10 +71,11 @@ public class UserService {
         UserEntity user = repository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
         byte[] profilePic = null;
-        if (user.getProfilePictureId() > 0) {
+        if (user.getProfilePictureId() != null) {
             Optional<ProfilePictureEntity> image = imageRepository.findById(user.getProfilePictureId());
-            if (image.isPresent())
+            if (image.isPresent()){
                 profilePic = image.get().getImage();
+            }  
         }
 
         UserInfoDTO userInfoDTO = new UserInfoDTO(user.getId(), username, user.getEmail(), profilePic,

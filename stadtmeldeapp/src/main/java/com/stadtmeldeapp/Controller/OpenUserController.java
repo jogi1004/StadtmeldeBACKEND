@@ -58,7 +58,7 @@ public class OpenUserController {
   public ResponseEntity<Void> registerUser(@RequestBody @Valid RegisterDTO registerDto)
       throws NotFoundException, NotAllowedException, MessagingException {
     UserEntity newUser = userService.register(registerDto);
-        //emailSenderService.sendWelcomeEmail(newUser.getEmail(), newUser.getUsername());
+    emailSenderService.sendWelcomeEmail(newUser.getEmail(), newUser.getUsername());
     return ResponseEntity.ok().build();
   }
 

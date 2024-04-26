@@ -42,12 +42,12 @@ public class UserEntity {
 
     @Column(nullable = true)
     private byte[] profilePicture;
-    
-    @Column(nullable = true)
-    private int profilePictureId;
 
     @Column(nullable = true)
     private boolean notificationsEnabled;
+
+    @Column(name = "profile_picture_id", nullable = true)
+    private Integer profilePictureId;
 
     @Column
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -58,13 +58,12 @@ public class UserEntity {
     @JoinColumn(name = "isAdminForLocationId", referencedColumnName = "id")
     private ReportingLocationEntity adminForLocation;
 
-    public UserEntity(String username, String password, String email, List<RoleEntity> roles, int profilePictureId,
+    public UserEntity(String username, String password, String email, List<RoleEntity> roles, Integer profilePictureId,
             ReportingLocationEntity adminForLocation) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.roles = roles;
-        System.out.println("USER ENTITY" + profilePictureId);
         this.profilePictureId = profilePictureId;
         this.notificationsEnabled = false;
         this.adminForLocation = adminForLocation;

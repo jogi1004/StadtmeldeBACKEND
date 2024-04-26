@@ -16,14 +16,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProfilePictureEntity {
 
-    public ProfilePictureEntity(byte[] image) {
-        this.image = image;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(nullable = false)
     private byte[] image;
+
+    public ProfilePictureEntity(byte[] image) {
+        this.image = image;
+    }
 }
