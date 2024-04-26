@@ -17,12 +17,14 @@ import jakarta.persistence.Table;
 
 import lombok.NoArgsConstructor;
 import jakarta.persistence.JoinColumn;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Entity
 @Table(name = "users")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserEntity {
 
     @Id
@@ -40,6 +42,9 @@ public class UserEntity {
 
     @Column(nullable = true)
     private byte[] profilePicture;
+    
+    @Column(nullable = true)
+    private int profilePictureId;
 
     @Column(nullable = true)
     private boolean notificationsEnabled;
@@ -53,14 +58,15 @@ public class UserEntity {
     @JoinColumn(name = "isAdminForLocationId", referencedColumnName = "id")
     private ReportingLocationEntity adminForLocation;
 
-    public UserEntity(String username, String password, String email, List<RoleEntity> roles,
+    public UserEntity(String username, String password, String email, List<RoleEntity> roles, int profilePictureId,
             ReportingLocationEntity adminForLocation) {
         this.username = username;
         this.password = password;
         this.email = email;
-        this.profilePicture = null;
-        this.notificationsEnabled = false;
         this.roles = roles;
+        System.out.println("USER ENTITY" + profilePictureId);
+        this.profilePictureId = profilePictureId;
+        this.notificationsEnabled = false;
         this.adminForLocation = adminForLocation;
     }
 }

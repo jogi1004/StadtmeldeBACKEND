@@ -11,11 +11,13 @@ import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.DTO.ReportUpdateDTO;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
+import com.stadtmeldeapp.Entity.ProfilePictureEntity;
 import com.stadtmeldeapp.Entity.ReportEntity;
 import com.stadtmeldeapp.Entity.ReportingLocationEntity;
 import com.stadtmeldeapp.Entity.StatusEntity;
 import com.stadtmeldeapp.Entity.SubcategoryEntity;
 import com.stadtmeldeapp.Entity.UserEntity;
+import com.stadtmeldeapp.Repository.ProfilePictureRepository;
 import com.stadtmeldeapp.Repository.MaincategoryRepository;
 import com.stadtmeldeapp.Repository.ReportRepository;
 import com.stadtmeldeapp.Repository.ReportingLocationRepository;
@@ -28,6 +30,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -45,6 +48,8 @@ public class ReportService {
     private StatusRepository statusRepository;
     @Autowired
     private MaincategoryRepository maincategoryRepository;
+    @Autowired
+    private ProfilePictureRepository imageRepository;
 
     @Autowired
     private UserService userService;
@@ -112,16 +117,20 @@ public class ReportService {
     }
 
     public ReportDetailInfoDTO getReportDetails(int id) throws NotFoundException {
+        System.out.println("START DETAILS");
         ReportEntity report = reportRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
+                System.out.println("REPORT SERVICE");
+        Optional<ProfilePictureEntity> userProfilePicture = imageRepository
+                .findById(report.getUser().getProfilePictureId());
         return new ReportDetailInfoDTO(
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
                         : report.getTitle(),
                 report.getDescription(),
-                -1, report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
+                report.getSubcategory().getMaincategoryEntity().getIconEntity().getId(), report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
                 report.getLongitude(),
                 report.getLatitude(), report.getUser().getUsername(), report.getReportingLocation().getName(),
-                report.getUser().getProfilePicture());
+                userProfilePicture.isPresent() ? userProfilePicture.get().getImage() : null);
     }
 
     public List<ReportInfoDTO> getLatestReportsByReportingLocationId(int id) {
@@ -146,7 +155,8 @@ public class ReportService {
         return toReportInfoDTO(reportRepository.save(report));
     }
 
-    public ReportInfoDTO updateReportStatus(int reportId, String newStatus) throws NotAllowedException, NotFoundException {
+    public ReportInfoDTO updateReportStatus(int reportId, String newStatus)
+            throws NotAllowedException, NotFoundException {
         ReportEntity report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
 

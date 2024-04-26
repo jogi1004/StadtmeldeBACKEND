@@ -55,22 +55,16 @@ public class OpenUserController {
   private EmailSenderService emailSenderService;
 
   @PostMapping("/register")
-  public ResponseEntity<?> registerUser(@RequestBody @Valid RegisterDTO registerDto)
+  public ResponseEntity<Void> registerUser(@RequestBody @Valid RegisterDTO registerDto)
       throws NotFoundException, NotAllowedException, MessagingException {
-    // logger.info("REGISTER");
     UserEntity newUser = userService.register(registerDto);
-    // logger.info("Creating user " + registerDto.username() + " failed. Username
-    // already exists.");
-    // logger.info("New user " + registerDto.username() + " created.");
-        emailSenderService.sendWelcomeEmail(newUser.getEmail(), newUser.getUsername());
-    return ResponseEntity.ok().body(newUser);
+        //emailSenderService.sendWelcomeEmail(newUser.getEmail(), newUser.getUsername());
+    return ResponseEntity.ok().build();
   }
 
   @PostMapping(value = "/login")
   public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginDTO request) {
-    // logger.info("LOGIN");
     authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
-    // logger.info("User " + request.username() + " authenticated.");
     String token = jwtService.generateToken(userDetailsServiceImpl.loadUserByUsername(request.username()));
     return ResponseEntity.ok(new LoginResponseDTO(request.username(), token));
   }

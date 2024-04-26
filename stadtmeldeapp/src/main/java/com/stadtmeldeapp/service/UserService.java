@@ -15,8 +15,11 @@ import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.RegisterDTO;
 import com.stadtmeldeapp.DTO.UserInfoDTO;
+import com.stadtmeldeapp.DTO.UserInfoNoProfilePictureDTO;
+import com.stadtmeldeapp.Entity.ProfilePictureEntity;
 import com.stadtmeldeapp.Entity.RoleEntity;
 import com.stadtmeldeapp.Entity.UserEntity;
+import com.stadtmeldeapp.Repository.ProfilePictureRepository;
 import com.stadtmeldeapp.Repository.UserRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,35 +33,51 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
     private final JwtService jwtService;
+    private final ProfilePictureRepository imageRepository;
 
     public UserService(UserRepository repository, PasswordEncoder passwordEncoder, RoleService roleService,
-            JwtService jwtService) {
+            JwtService jwtService, ProfilePictureRepository imageRepository) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.roleService = roleService;
         this.jwtService = jwtService;
+        this.imageRepository = imageRepository;
     }
 
     @Transactional
     public UserEntity register(@Valid @RequestBody RegisterDTO request) throws NotFoundException, NotAllowedException {
-        Optional<UserEntity> existingUser = repository.findByUsername(request.username());
-        if (existingUser.isPresent()) {
+        if (repository.existsByUsername(request.username()))
             throw new NotAllowedException("Nutzername existiert bereits");
-        }
 
         String hashedPassword = passwordEncoder.encode(request.password());
         RoleEntity role = roleService.findRoleByName("USER");
 
         UserEntity user = new UserEntity(request.username(), hashedPassword, request.email(),
-                Collections.singletonList(role), null);
+                Collections.singletonList(role), -1, null);
 
         return repository.save(user);
     }
 
-    public UserInfoDTO getUserInfoByUsername(String username) throws NotFoundException {
+    public UserInfoNoProfilePictureDTO getUserInfoByUsername(String username) throws NotFoundException {
         UserEntity user = repository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
-        UserInfoDTO userInfoDTO = new UserInfoDTO(user.getId(), username, user.getEmail(), user.getProfilePicture(),
+        UserInfoNoProfilePictureDTO userInfoDTO = new UserInfoNoProfilePictureDTO(user.getId(), username,
+                user.getEmail(),
+                user.isNotificationsEnabled(), user.getRoles(), user.getAdminForLocation());
+        return userInfoDTO;
+    }
+
+    public UserInfoDTO getUserInfoByUsernameWithProfilePicture(String username) throws NotFoundException {
+        UserEntity user = repository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
+        byte[] profilePic = null;
+        if (user.getProfilePictureId() > 0) {
+            Optional<ProfilePictureEntity> image = imageRepository.findById(user.getProfilePictureId());
+            if (image.isPresent())
+                profilePic = image.get().getImage();
+        }
+
+        UserInfoDTO userInfoDTO = new UserInfoDTO(user.getId(), username, user.getEmail(), profilePic,
                 user.isNotificationsEnabled(), user.getRoles(), user.getAdminForLocation());
         return userInfoDTO;
     }
@@ -69,12 +88,26 @@ public class UserService {
         return user;
     }
 
+    /*
+     * @Transactional
+     * public UserEntity updateUser(UserEntity userEntity) throws NotFoundException
+     * {
+     * UserEntity updatedUser = repository.findByUsername(userEntity.getUsername())
+     * .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
+     * updatedUser.setEmail(userEntity.getEmail());
+     * updatedUser.setNotificationsEnabled(userEntity.isNotificationsEnabled());
+     * updatedUser.setAdminForLocation(userEntity.getAdminForLocation());
+     * updatedUser.setProfilePictureId(userEntity.getProfilePictureId());
+     * return repository.save(updatedUser);
+     * }
+     */
+
     @Transactional
-    public UserEntity updateUser(UserEntity userEntity) throws NotFoundException {
-        UserEntity updatedUser = repository.findByUsername(userEntity.getUsername())
-                .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
-        updatedUser.setProfilePicture(userEntity.getProfilePicture());
-        return repository.save(updatedUser);
+    public void updateProfilePicture(byte[] image, HttpServletRequest request) throws NotFoundException {
+        UserEntity user = getUserFromRequest(request);
+        int imageId = imageRepository.save(new ProfilePictureEntity(image)).getId();
+        System.out.println("USER SERVICE" + imageId);
+        user.setProfilePictureId(imageId);
     }
 
     public boolean validate(String token, UserDetails userDetails) {
@@ -92,7 +125,7 @@ public class UserService {
 
     public UserEntity getUserByAuthentication() throws NotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(!authentication.getName().equals("anonymousUser")){
+        if (!authentication.getName().equals("anonymousUser")) {
             UserEntity userEntity = getUserEntityByUsername(authentication.getName());
             return userEntity;
         }
