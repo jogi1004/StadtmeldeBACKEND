@@ -28,6 +28,7 @@ import com.stadtmeldeapp.Repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -50,9 +51,10 @@ public class ReportService {
     private MaincategoryRepository maincategoryRepository;
     @Autowired
     private ProfilePictureRepository imageRepository;
-
     @Autowired
     private UserService userService;
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MMMM yyyy, HH:mm 'Uhr'");
 
     public ReportEntity createReport(ReportDTO reportDto, String username)
             throws NotFoundException, IOException {
@@ -115,17 +117,15 @@ public class ReportService {
     }
 
     public ReportDetailInfoDTO getReportDetails(int id) throws NotFoundException {
-        System.out.println("START DETAILS");
         ReportEntity report = reportRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
-                System.out.println("REPORT SERVICE");
         Optional<ProfilePictureEntity> userProfilePicture = imageRepository
                 .findById(report.getUser().getProfilePictureId());
         return new ReportDetailInfoDTO(
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
                         : report.getTitle(),
                 report.getDescription(),
-                report.getSubcategory().getMaincategoryEntity().getIconEntity().getId(), report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
+                report.getSubcategory().getMaincategoryEntity().getIconEntity().getId(), report.getStatus(), dateFormat.format(report.getReportingTimestamp()), report.getAdditionalPicture(),
                 report.getLongitude(),
                 report.getLatitude(), report.getUser().getUsername(), report.getReportingLocation().getName(),
                 userProfilePicture.isPresent() ? userProfilePicture.get().getImage() : null);
@@ -192,7 +192,7 @@ public class ReportService {
                                     : r.getTitle(),
                             (r.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1
                                     : r.getSubcategory().getMaincategoryEntity().getIconEntity().getId()),
-                            r.getStatus(), r.getReportingTimestamp(), r.getAdditionalPicture(),
+                            r.getStatus(), dateFormat.format(r.getReportingTimestamp()), r.getAdditionalPicture(),
                             r.getLongitude(),
                             r.getLatitude()));
         }
@@ -205,7 +205,7 @@ public class ReportService {
                         : report.getTitle(),
                 (report.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1
                         : report.getSubcategory().getMaincategoryEntity().getIconEntity().getId()),
-                report.getStatus(), report.getReportingTimestamp(), report.getAdditionalPicture(),
+                report.getStatus(), dateFormat.format(report.getReportingTimestamp()), report.getAdditionalPicture(),
                 report.getLongitude(),
                 report.getLatitude());
     }

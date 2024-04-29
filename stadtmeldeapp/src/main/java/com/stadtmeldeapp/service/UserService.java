@@ -107,7 +107,6 @@ public class UserService {
     public void updateProfilePicture(byte[] image, HttpServletRequest request) throws NotFoundException {
         UserEntity user = getUserFromRequest(request);
         int imageId = imageRepository.save(new ProfilePictureEntity(image)).getId();
-        System.out.println("USER SERVICE" + imageId);
         user.setProfilePictureId(imageId);
     }
 
