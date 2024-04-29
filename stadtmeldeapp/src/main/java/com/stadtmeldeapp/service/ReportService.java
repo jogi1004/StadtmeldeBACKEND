@@ -10,16 +10,24 @@ import com.stadtmeldeapp.DTO.ReportDTO;
 import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.DTO.ReportUpdateDTO;
+import com.stadtmeldeapp.Entity.BasicReportEntity;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
 import com.stadtmeldeapp.Entity.ProfilePictureEntity;
+import com.stadtmeldeapp.Entity.ReportDetailsEntity;
 import com.stadtmeldeapp.Entity.ReportEntity;
+import com.stadtmeldeapp.Entity.ReportImageEntity;
+import com.stadtmeldeapp.Entity.ReportVisualsEntity;
 import com.stadtmeldeapp.Entity.ReportingLocationEntity;
 import com.stadtmeldeapp.Entity.StatusEntity;
 import com.stadtmeldeapp.Entity.SubcategoryEntity;
 import com.stadtmeldeapp.Entity.UserEntity;
 import com.stadtmeldeapp.Repository.ProfilePictureRepository;
+import com.stadtmeldeapp.Repository.ReportDetailsRepository;
+import com.stadtmeldeapp.Repository.ReportImageRepository;
+import com.stadtmeldeapp.Repository.BasicReportRepository;
 import com.stadtmeldeapp.Repository.MaincategoryRepository;
 import com.stadtmeldeapp.Repository.ReportRepository;
+import com.stadtmeldeapp.Repository.ReportVisualsRepository;
 import com.stadtmeldeapp.Repository.ReportingLocationRepository;
 import com.stadtmeldeapp.Repository.StatusRepository;
 import com.stadtmeldeapp.Repository.SubcategoryRepository;
@@ -53,8 +61,91 @@ public class ReportService {
     private ProfilePictureRepository imageRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private BasicReportRepository basicReportRepository;
+    @Autowired
+    private ReportImageRepository reportImageRepository;
+    @Autowired
+    private ReportVisualsRepository reportVisualsRepository;
+    @Autowired
+    private ReportDetailsRepository reportDetailsRepository;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MMMM yyyy, HH:mm 'Uhr'");
+
+    // NEW
+    public void NEWcreateReport(ReportDTO reportDto, String username)
+            throws NotFoundException, IOException {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
+        ReportingLocationEntity reportingLocation = reportingLocationRepository
+                .findReportingLocationByName(reportDto.reportingLocationName())
+                .orElseThrow(() -> new NotFoundException("Meldeort nicht gefunden"));
+        MaincategoryEntity maincategory = maincategoryRepository
+                .findByTitleAndReportingLocationEntityId(reportDto.mainCategoryName(), reportingLocation.getId())
+                .orElseThrow(() -> new NotFoundException("Hauptkategorie nicht gefunden"));
+        SubcategoryEntity subcategory = subcategoryRepository
+                .findByTitleAndMaincategoryEntityId(reportDto.subCategoryName(), maincategory.getId())
+                .orElseThrow(() -> new NotFoundException("Unterkategorie nicht gefunden"));
+        List<StatusEntity> status = statusRepository.findByReportingLocationEntityId(reportingLocation.getId());
+
+        BasicReportEntity basicReport = new BasicReportEntity();
+        basicReport.setTitleOrSubcategoryName(
+                subcategory.getTitle().equals("Sonstiges") ? reportDto.title() : subcategory.getTitle());
+        basicReport.setLatitude(reportDto.latitude());
+        basicReport.setLongitude(reportDto.longitude());
+        basicReport.setReportingLocation(reportingLocation);
+        basicReportRepository.save(basicReport);
+
+        ReportImageEntity reportImage = new ReportImageEntity();
+        if (reportDto.additionalPicture() != null) {
+            reportImage.setImage(reportDto.additionalPicture());
+            reportImageRepository.save(reportImage);
+        }
+
+        ReportVisualsEntity reportVisuals = new ReportVisualsEntity();
+        reportVisuals.setReport(basicReport);
+        reportVisuals.setIcon(maincategoryRepository
+                .findByTitleAndReportingLocationEntityId(reportDto.mainCategoryName(), reportingLocation.getId())
+                .isPresent()
+                        ? maincategoryRepository
+                                .findByTitleAndReportingLocationEntityId(reportDto.mainCategoryName(),
+                                        reportingLocation.getId())
+                                .get().getIconEntity()
+                        : null);
+        reportVisuals.setReportImage(reportImage);
+        reportVisualsRepository.save(reportVisuals);
+
+        StatusEntity statusX = null;
+        if (!status.isEmpty()) {
+            statusX = status.get(0);
+        }
+
+        ReportDetailsEntity reportDetails = new ReportDetailsEntity();
+        reportDetails.setReport(basicReport);
+        reportDetails.setDescription(reportDto.description());
+        reportDetails.setUser(user);
+        reportDetails.setStatus(statusX);
+        reportDetailsRepository.save(reportDetails);
+    }
+
+    public List<BasicReportEntity> getReportBasicsByReportingLocationName(String locationName) {
+        return basicReportRepository.findAllByReportingLocationName(locationName);
+    }
+
+    public ReportVisualsEntity getReportImagesById(int reportId) throws NotFoundException {
+        return reportVisualsRepository.findById(reportId).orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
+    }
+
+    public ReportDetailsEntity getReportDetailsById(int reportId) throws NotFoundException {
+        return reportDetailsRepository.findById(reportId).orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
+    }
+
+    public List<ReportDetailsEntity> getBasicReportsByUserId(HttpServletRequest request) throws NotFoundException {
+        int userId = userService.getUserFromRequest(request).getId(); //orElse
+        return reportDetailsRepository.findAllByUserId(userId);
+    }
+
+    // END NEW
 
     public ReportEntity createReport(ReportDTO reportDto, String username)
             throws NotFoundException, IOException {
@@ -95,6 +186,7 @@ public class ReportService {
     public ReportEntity getReportById(int id) {
         return reportRepository.findById(id).orElse(null);
     }
+
     public List<ReportInfoDTO> getReportsByUserId(int userId) {
         return toInfoDTOList(reportRepository.findAllByUserId(userId));
 
@@ -112,6 +204,7 @@ public class ReportService {
     public List<ReportEntity> getReportEntitiesByReportingLocationId(int reportingLocationId) {
         return reportRepository.findAllByReportingLocationId(reportingLocationId);
     }
+
     public List<ReportInfoDTO> getReportsByReportingLocationName(String reportingLocationTitle) {
         return toInfoDTOList(reportRepository.findAllByReportingLocationName(reportingLocationTitle));
     }
@@ -125,7 +218,8 @@ public class ReportService {
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
                         : report.getTitle(),
                 report.getDescription(),
-                report.getSubcategory().getMaincategoryEntity().getIconEntity().getId(), report.getStatus(), dateFormat.format(report.getReportingTimestamp()), report.getAdditionalPicture(),
+                report.getSubcategory().getMaincategoryEntity().getIconEntity().getId(), report.getStatus(),
+                dateFormat.format(report.getReportingTimestamp()), report.getAdditionalPicture(),
                 report.getLongitude(),
                 report.getLatitude(), report.getUser().getUsername(), report.getReportingLocation().getName(),
                 userProfilePicture.isPresent() ? userProfilePicture.get().getImage() : null);

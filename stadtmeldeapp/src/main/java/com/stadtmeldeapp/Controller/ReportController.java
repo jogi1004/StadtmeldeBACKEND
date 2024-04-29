@@ -13,7 +13,10 @@ import com.stadtmeldeapp.DTO.ReportDTO;
 import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.DTO.ReportUpdateDTO;
+import com.stadtmeldeapp.Entity.BasicReportEntity;
+import com.stadtmeldeapp.Entity.ReportDetailsEntity;
 import com.stadtmeldeapp.Entity.ReportEntity;
+import com.stadtmeldeapp.Entity.ReportVisualsEntity;
 import com.stadtmeldeapp.service.EmailSenderService;
 import com.stadtmeldeapp.service.ReportService;
 import com.stadtmeldeapp.service.StaticMapService;
@@ -40,6 +43,43 @@ public class ReportController {
 
     @Autowired
     private StaticMapService staticMapService;
+
+    // NEW
+
+    @PostMapping("/new")
+    public ResponseEntity<ReportEntity> NEWcreateReport(
+            @RequestBody ReportDTO reportDTO) throws NotFoundException, IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        reportService.NEWcreateReport(reportDTO, username);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @GetMapping("/new/location/name/{locationName}")
+    public ResponseEntity<List<BasicReportEntity>> getReportBasicsByLocationName(@PathVariable String locationName) {
+        List<BasicReportEntity> reports = reportService.getReportBasicsByReportingLocationName(locationName);
+        return new ResponseEntity<>(reports, HttpStatus.OK);
+    }
+
+    @GetMapping("/new/mine")
+    public ResponseEntity<List<ReportDetailsEntity>> getMyReportDetails(HttpServletRequest request)
+            throws NotFoundException {
+        List<ReportDetailsEntity> reports = reportService.getBasicReportsByUserId(request);
+        return new ResponseEntity<>(reports, HttpStatus.OK);
+    }
+
+    @GetMapping("/new/details/{reportId}")
+    public ReportDetailsEntity newGetReportDetails(@PathVariable int reportId) throws NotFoundException {
+        return reportService.getReportDetailsById(reportId);
+    }
+
+    @GetMapping("/new/visuals/{reportId}")
+    public ResponseEntity<ReportVisualsEntity> getReportVisuals(@PathVariable int reportId) throws NotFoundException {
+        ReportVisualsEntity reportVisuals = reportService.getReportImagesById(reportId);
+        return new ResponseEntity<>(reportVisuals, HttpStatus.OK);
+    }
+
+    // END NEW
 
     @PostMapping
     public ResponseEntity<ReportEntity> createReport(
@@ -91,7 +131,8 @@ public class ReportController {
     }
 
     @PutMapping("/admin/{reportId}")
-    public ResponseEntity<ReportInfoDTO> updateReportStatus(@PathVariable int reportId, @RequestBody String newStatus) throws Exception {
+    public ResponseEntity<ReportInfoDTO> updateReportStatus(@PathVariable int reportId, @RequestBody String newStatus)
+            throws Exception {
         ReportInfoDTO updatedReport = reportService.updateReportStatus(reportId, newStatus);
         ReportEntity reportEntity = reportService.getReportById(reportId);
         if (reportEntity != null)
