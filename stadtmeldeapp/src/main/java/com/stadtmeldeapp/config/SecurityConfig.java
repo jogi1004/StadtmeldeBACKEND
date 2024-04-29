@@ -19,6 +19,8 @@ import com.stadtmeldeapp.service.UserDetailsServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -78,15 +80,22 @@ public class SecurityConfig {
                         .requestMatchers("/overview").hasAuthority("ADMIN")
                         .requestMatchers("/reports/admin/*").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
-                .formLogin(form -> form
+                        .oauth2Login(withDefaults())
+                /* .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/overview")
+                        .failureUrl("/login?error=true")
+                        .permitAll()) */
+                    .formLogin(withDefaults())
+                /* .formLogin(form -> form
                         .loginPage("/login")
                         .defaultSuccessUrl("/overview")
                         .loginProcessingUrl("/login")
                         .failureUrl("/login?error=true")
-                        .permitAll())
+                        .permitAll()) */
                 .logout(
-                    logout -> logout
-                            .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll())
+                        logout -> logout
+                                .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
