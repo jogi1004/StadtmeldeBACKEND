@@ -95,6 +95,7 @@ public class ReportService {
     public ReportEntity getReportById(int id) {
         return reportRepository.findById(id).orElse(null);
     }
+
     public List<ReportInfoDTO> getReportsByUserId(int userId) {
         return toInfoDTOList(reportRepository.findAllByUserId(userId));
 
@@ -112,6 +113,7 @@ public class ReportService {
     public List<ReportEntity> getReportEntitiesByReportingLocationId(int reportingLocationId) {
         return reportRepository.findAllByReportingLocationId(reportingLocationId);
     }
+
     public List<ReportInfoDTO> getReportsByReportingLocationName(String reportingLocationTitle) {
         return toInfoDTOList(reportRepository.findAllByReportingLocationName(reportingLocationTitle));
     }
@@ -125,7 +127,8 @@ public class ReportService {
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
                         : report.getTitle(),
                 report.getDescription(),
-                report.getSubcategory().getMaincategoryEntity().getIconEntity().getId(), report.getStatus(), dateFormat.format(report.getReportingTimestamp()), report.getAdditionalPicture(),
+                report.getSubcategory().getMaincategoryEntity().getIconEntity().getId(), report.getStatus(),
+                dateFormat.format(report.getReportingTimestamp()), report.getAdditionalPicture(),
                 report.getLongitude(),
                 report.getLatitude(), report.getUser().getUsername(), report.getReportingLocation().getName(),
                 userProfilePicture.isPresent() ? userProfilePicture.get().getImage() : null);
