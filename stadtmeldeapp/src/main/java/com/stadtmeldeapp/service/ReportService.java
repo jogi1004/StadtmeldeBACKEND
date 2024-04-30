@@ -4,6 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.cloud.vision.v1.AnnotateImageRequest;
+import com.google.cloud.vision.v1.AnnotateImageResponse;
+import com.google.cloud.vision.v1.BatchAnnotateImagesResponse;
+import com.google.cloud.vision.v1.Feature;
+import com.google.cloud.vision.v1.Image;
+import com.google.cloud.vision.v1.ImageAnnotatorClient;
+import com.google.protobuf.ByteString;
 import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.ReportDTO;
@@ -57,7 +64,7 @@ public class ReportService {
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MMMM yyyy, HH:mm 'Uhr'");
 
     public ReportEntity createReport(ReportDTO reportDto, String username)
-            throws NotFoundException, IOException {
+            throws NotFoundException, IOException, NotAllowedException {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
         ReportingLocationEntity reportingLocation = reportingLocationRepository
@@ -86,9 +93,28 @@ public class ReportService {
         report.setReportingLocation(reportingLocation);
         report.setUser(user);
         report.setStatus(statusX);
-        if (reportDto.additionalPicture() != null)
+        if (reportDto.additionalPicture() != null) {
+            try (ImageAnnotatorClient vision = ImageAnnotatorClient.create()) {
+                Image img = Image.newBuilder().setContent(ByteString.copyFrom(reportDto.additionalPicture())).build();
+                AnnotateImageRequest request = AnnotateImageRequest.newBuilder()
+                        .addFeatures(Feature.newBuilder().setType(Feature.Type.FACE_DETECTION))
+                        .setImage(img)
+                        .build();
+                BatchAnnotateImagesResponse response = vision.batchAnnotateImages(List.of(request));
+                int faceCount = 0;
+                for (AnnotateImageResponse res : response.getResponsesList()) {
+                    if (res.getFaceAnnotationsList() != null) {
+                        faceCount += res.getFaceAnnotationsList().size();
+                    }
+                }
+                if (faceCount > 0) {
+                    throw new NotAllowedException("Auf dem Bild wurden " + faceCount + " Gesichter gefunden");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             report.setAdditionalPicture(reportDto.additionalPicture());
-
+        }
         return reportRepository.save(report);
     }
 

@@ -43,7 +43,7 @@ public class ReportController {
 
     @PostMapping
     public ResponseEntity<ReportEntity> createReport(
-            @RequestBody ReportDTO reportDTO) throws NotFoundException, IOException {
+            @RequestBody ReportDTO reportDTO) throws NotFoundException, IOException, NotAllowedException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         ReportEntity createdReport = reportService.createReport(reportDTO, username);
@@ -91,7 +91,8 @@ public class ReportController {
     }
 
     @PutMapping("/admin/{reportId}")
-    public ResponseEntity<ReportInfoDTO> updateReportStatus(@PathVariable int reportId, @RequestBody String newStatus) throws Exception {
+    public ResponseEntity<ReportInfoDTO> updateReportStatus(@PathVariable int reportId, @RequestBody String newStatus)
+            throws Exception {
         ReportInfoDTO updatedReport = reportService.updateReportStatus(reportId, newStatus);
         ReportEntity reportEntity = reportService.getReportById(reportId);
         if (reportEntity != null)
