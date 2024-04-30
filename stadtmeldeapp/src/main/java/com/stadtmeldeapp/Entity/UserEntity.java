@@ -62,7 +62,7 @@ public class UserEntity {
         this.email = email;
         this.roles = roles;
         this.profilePictureId = profilePictureId;
-        this.notificationsEnabled = false;
+        this.notificationsEnabled = true;
         this.adminForLocation = adminForLocation;
     }
 }

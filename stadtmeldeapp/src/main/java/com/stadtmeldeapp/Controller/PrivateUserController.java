@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+
 @RestController
 @RequestMapping("/user")
 public class PrivateUserController {
@@ -55,6 +56,12 @@ public class PrivateUserController {
             HttpServletRequest request)
             throws NotFoundException {
         userService.updateProfilePicture(ppDto.profilePicture(), request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/notifications")
+    public ResponseEntity<Void> changeNotifications(@RequestBody boolean notificationsEnabled, HttpServletRequest request) throws NotFoundException {
+        userService.updateNotificationsEnabled(notificationsEnabled, request);
         return ResponseEntity.ok().build();
     }
 }

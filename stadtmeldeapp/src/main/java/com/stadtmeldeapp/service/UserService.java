@@ -108,6 +108,7 @@ public class UserService {
         UserEntity user = getUserFromRequest(request);
         int imageId = imageRepository.save(new ProfilePictureEntity(image)).getId();
         user.setProfilePictureId(imageId);
+        repository.save(user);
     }
 
     public boolean validate(String token, UserDetails userDetails) {
@@ -130,5 +131,12 @@ public class UserService {
             return userEntity;
         }
         return null;
+    }
+
+    @Transactional
+    public void updateNotificationsEnabled(boolean notificationsEnabled, HttpServletRequest request) throws NotFoundException {
+        UserEntity user = getUserFromRequest(request);
+        user.setNotificationsEnabled(notificationsEnabled);
+        repository.save(user);
     }
 }
