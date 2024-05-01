@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 import lombok.NoArgsConstructor;
@@ -46,6 +47,10 @@ public class UserEntity {
     @Column(name = "profile_picture_id", nullable = true)
     private Integer profilePictureId;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "profile_picture_id", referencedColumnName = "id", nullable = true, insertable=false, updatable=false)
+    private ProfilePictureEntity profilePictureEntity;
+
     @Column
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
@@ -55,13 +60,14 @@ public class UserEntity {
     @JoinColumn(name = "isAdminForLocationId", referencedColumnName = "id")
     private ReportingLocationEntity adminForLocation;
 
-    public UserEntity(String username, String password, String email, List<RoleEntity> roles, Integer profilePictureId,
+    public UserEntity(String username, String password, String email, List<RoleEntity> roles, Integer profilePictureId, ProfilePictureEntity profilePictureEntity,
             ReportingLocationEntity adminForLocation) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.roles = roles;
         this.profilePictureId = profilePictureId;
+        this.profilePictureEntity = profilePictureEntity;
         this.notificationsEnabled = true;
         this.adminForLocation = adminForLocation;
     }
