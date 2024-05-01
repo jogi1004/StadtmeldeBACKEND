@@ -10,6 +10,7 @@ public record UserInfoNoProfilePictureDTO(
         String username,
         String email,
         boolean notificationsEnabled,
+        Integer profilePictureId,
         List<RoleEntity> roles,
         ReportingLocationEntity adminForLocation) {
 }

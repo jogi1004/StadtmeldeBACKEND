@@ -1,7 +1,6 @@
 package com.stadtmeldeapp.service;
 
 import java.util.Collections;
-import java.util.Optional;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -53,7 +52,7 @@ public class UserService {
         RoleEntity role = roleService.findRoleByName("USER");
 
         UserEntity user = new UserEntity(request.username(), hashedPassword, request.email(),
-                Collections.singletonList(role), null, null);
+                Collections.singletonList(role), null, null, null);
 
         return repository.save(user);
     }
@@ -63,19 +62,17 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
         UserInfoNoProfilePictureDTO userInfoDTO = new UserInfoNoProfilePictureDTO(user.getId(), username,
                 user.getEmail(),
-                user.isNotificationsEnabled(), user.getRoles(), user.getAdminForLocation());
+                user.isNotificationsEnabled(), user.getProfilePictureId(), user.getRoles(), user.getAdminForLocation());
         return userInfoDTO;
     }
 
     public UserInfoDTO getUserInfoByUsernameWithProfilePicture(String username) throws NotFoundException {
         UserEntity user = repository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
+
         byte[] profilePic = null;
-        if (user.getProfilePictureId() != null) {
-            Optional<ProfilePictureEntity> image = imageRepository.findById(user.getProfilePictureId());
-            if (image.isPresent()){
-                profilePic = image.get().getImage();
-            }  
+        if (user.getProfilePictureEntity() != null) {
+                profilePic = user.getProfilePictureEntity().getImage();
         }
 
         UserInfoDTO userInfoDTO = new UserInfoDTO(user.getId(), username, user.getEmail(), profilePic,
@@ -106,8 +103,11 @@ public class UserService {
     @Transactional
     public void updateProfilePicture(byte[] image, HttpServletRequest request) throws NotFoundException {
         UserEntity user = getUserFromRequest(request);
-        int imageId = imageRepository.save(new ProfilePictureEntity(image)).getId();
+        imageRepository.delete(user.getProfilePictureEntity());
+        ProfilePictureEntity profilePictureEntity = new ProfilePictureEntity(image);
+        int imageId = imageRepository.save(profilePictureEntity).getId();
         user.setProfilePictureId(imageId);
+        user.setProfilePictureEntity(profilePictureEntity);
         repository.save(user);
     }
 
