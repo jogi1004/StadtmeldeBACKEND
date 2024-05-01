@@ -40,7 +40,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.awt.Graphics;
 import java.awt.RenderingHints;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -142,8 +141,6 @@ public class ReportService {
                             int width = (int) (face.getFdBoundingPoly().getVertices(2).getX() - x);
                             int height = (int) (face.getFdBoundingPoly().getVertices(2).getY() - y);
                             BufferedImage faceRegion = bufferedImage.getSubimage(x, y, width, height);
-
-                            BufferedImage blurredFace = blurImage(faceRegion);
                             BufferedImage blurredFace = pixelateImage(faceRegion, width/5);
                             graphics.drawImage(blurredFace, x, y, null);
                         }
