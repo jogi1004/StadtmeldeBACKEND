@@ -13,6 +13,11 @@
 
     <div layout:fragment="content">
         <section class="my-5">
+            <div th:if="${param.errorSave}" class="alert alert-danger">
+                Kategorie konnte nicht gespeichert werden
+            </div>
+            <div th:if="${param.errorDelete}" class="alert alert-danger">
+                Kategorie konnte nicht gelöscht werden</div>
             <div class="container px-4 px-lg-5">
                 <h2 class="text-center mt-5">Meldungs-Kategorien</h2>
                 <div class="end">
