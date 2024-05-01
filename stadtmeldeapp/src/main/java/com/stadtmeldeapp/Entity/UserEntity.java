@@ -47,7 +47,7 @@ public class UserEntity {
     @Column(name = "profile_picture_id", nullable = true)
     private Integer profilePictureId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "profile_picture_id", referencedColumnName = "id", nullable = true, insertable=false, updatable=false)
     private ProfilePictureEntity profilePictureEntity;
 

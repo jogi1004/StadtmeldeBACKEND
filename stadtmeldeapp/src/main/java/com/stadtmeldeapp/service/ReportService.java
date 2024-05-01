@@ -103,16 +103,6 @@ public class ReportService {
         }
 
         ReportEntity report = new ReportEntity();
-        if (reportDto.additionalPicture() != null) {
-            ReportPictureEntity reportPictureEntity = new ReportPictureEntity(reportDto.additionalPicture());
-            reportPictureRepository.save(reportPictureEntity);
-            report.setReportPictureEntity(reportPictureEntity);
-            report.setReportPictureId(reportPictureEntity.getId());
-        } else {
-            report.setReportPictureEntity(null);
-            report.setReportPictureId(null);
-        }
-
         report.setSubcategory(subcategory);
         if (reportDto.title() != null)
             report.setTitle(reportDto.title());
@@ -145,7 +135,7 @@ public class ReportService {
                             graphics.drawImage(blurredFace, x, y, null);
                         }
                     }
-                }
+                } 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ImageIO.write(bufferedImage, "jpg", baos);
                 
@@ -154,9 +144,12 @@ public class ReportService {
                 report.setReportPictureEntity(reportPictureEntity);
                 report.setReportPictureId(reportPictureEntity.getId());
                 
-            } catch (IOException e) {
+            }  catch (IOException e) {
                 e.printStackTrace();
             }
+        } else {
+            report.setReportPictureEntity(null);
+            report.setReportPictureId(null);
         }
 
         return reportRepository.save(report);
@@ -230,6 +223,9 @@ public class ReportService {
 
             report.setReportPictureId(reportPictureEntity.getId());
             report.setReportPictureEntity(reportPictureEntity);
+        } else {
+            report.setReportPictureId(null);
+            report.setReportPictureEntity(null);
         }
         report.setTitle(reportDto.title());
         report.setDescription(reportDto.description());

@@ -104,10 +104,17 @@ public class UserService {
     public void updateProfilePicture(byte[] image, HttpServletRequest request) throws NotFoundException {
         UserEntity user = getUserFromRequest(request);
         imageRepository.delete(user.getProfilePictureEntity());
-        ProfilePictureEntity profilePictureEntity = new ProfilePictureEntity(image);
-        int imageId = imageRepository.save(profilePictureEntity).getId();
-        user.setProfilePictureId(imageId);
-        user.setProfilePictureEntity(profilePictureEntity);
+        
+        if(image != null) {
+            ProfilePictureEntity profilePictureEntity = new ProfilePictureEntity(image);
+            imageRepository.save(profilePictureEntity);
+            user.setProfilePictureId(profilePictureEntity.getId());
+            user.setProfilePictureEntity(profilePictureEntity);
+        } else {
+            user.setProfilePictureId(null);
+            user.setProfilePictureEntity(null);
+        }
+        
         repository.save(user);
     }
 
