@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.cloud.vision.v1.AnnotateImageRequest;
 import com.google.cloud.vision.v1.AnnotateImageResponse;
 import com.google.cloud.vision.v1.BatchAnnotateImagesResponse;
+import com.google.cloud.vision.v1.FaceAnnotation;
 import com.google.cloud.vision.v1.Feature;
 import com.google.cloud.vision.v1.Image;
 import com.google.cloud.vision.v1.ImageAnnotatorClient;
@@ -34,11 +35,18 @@ import com.stadtmeldeapp.Repository.UserRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import javax.imageio.ImageIO;
 
 @Service
 @Transactional
@@ -101,20 +109,29 @@ public class ReportService {
                         .setImage(img)
                         .build();
                 BatchAnnotateImagesResponse response = vision.batchAnnotateImages(List.of(request));
-                int faceCount = 0;
+                BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(reportDto.additionalPicture()));
+                Graphics graphics = bufferedImage.getGraphics();
                 for (AnnotateImageResponse res : response.getResponsesList()) {
                     if (res.getFaceAnnotationsList() != null) {
-                        faceCount += res.getFaceAnnotationsList().size();
+                        for (FaceAnnotation face : res.getFaceAnnotationsList()) {
+                            int x = (int) face.getFdBoundingPoly().getVertices(0).getX();
+                            int y = (int) face.getFdBoundingPoly().getVertices(0).getY();
+                            int width = (int) (face.getFdBoundingPoly().getVertices(2).getX() - x);
+                            int height = (int) (face.getFdBoundingPoly().getVertices(2).getY() - y);
+                            BufferedImage faceRegion = bufferedImage.getSubimage(x, y, width, height);
+                            BufferedImage blurredFace = pixelateImage(faceRegion, width/5);
+                            graphics.drawImage(blurredFace, x, y, null);
+                        }
                     }
                 }
-                if (faceCount > 0) {
-                    throw new NotAllowedException("Auf dem Bild wurden " + faceCount + " Gesichter gefunden");
-                }
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(bufferedImage, "jpg", baos);
+                report.setAdditionalPicture(baos.toByteArray());
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            report.setAdditionalPicture(reportDto.additionalPicture());
         }
+
         return reportRepository.save(report);
     }
 
@@ -245,5 +262,45 @@ public class ReportService {
                 report.iconId(), report.status(), report.timestamp(), report.image(),
                 report.longitude(),
                 report.latitude());
+    }
+    
+    public BufferedImage pixelateImage(BufferedImage image, int pixelSize) {
+        BufferedImage pixelatedImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+    
+        for (int y = 0; y < image.getHeight(); y += pixelSize) {
+            for (int x = 0; x < image.getWidth(); x += pixelSize) {
+                int averageColor = getAverageColor(image, x, y, pixelSize);
+                for (int yd = y; (yd < y + pixelSize) && (yd < pixelatedImage.getHeight()); yd++) {
+                    for (int xd = x; (xd < x + pixelSize) && (xd < pixelatedImage.getWidth()); xd++) {
+                        pixelatedImage.setRGB(xd, yd, averageColor);
+                    }
+                }
+            }
+        }
+    
+        return pixelatedImage;
+    }
+    
+    public int getAverageColor(BufferedImage image, int x, int y, int pixelSize) {
+        long sumRed = 0;
+        long sumGreen = 0;
+        long sumBlue = 0;
+        long count = 0;
+    
+        for (int yd = y; (yd < y + pixelSize) && (yd < image.getHeight()); yd++) {
+            for (int xd = x; (xd < x + pixelSize) && (xd < image.getWidth()); xd++) {
+                Color color = new Color(image.getRGB(xd, yd));
+                sumRed += color.getRed();
+                sumGreen += color.getGreen();
+                sumBlue += color.getBlue();
+                count++;
+            }
+        }
+    
+        int averageRed = (int) (sumRed / count);
+        int averageGreen = (int) (sumGreen / count);
+        int averageBlue = (int) (sumBlue / count);
+    
+        return new Color(averageRed, averageGreen, averageBlue).getRGB();
     }
 }
