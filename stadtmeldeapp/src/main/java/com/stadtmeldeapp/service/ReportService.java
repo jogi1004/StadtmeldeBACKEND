@@ -39,6 +39,8 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.awt.Graphics;
 import java.awt.RenderingHints;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -140,14 +142,21 @@ public class ReportService {
                             int width = (int) (face.getFdBoundingPoly().getVertices(2).getX() - x);
                             int height = (int) (face.getFdBoundingPoly().getVertices(2).getY() - y);
                             BufferedImage faceRegion = bufferedImage.getSubimage(x, y, width, height);
+
                             BufferedImage blurredFace = blurImage(faceRegion);
+                            BufferedImage blurredFace = pixelateImage(faceRegion, width/5);
                             graphics.drawImage(blurredFace, x, y, null);
                         }
                     }
                 }
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ImageIO.write(bufferedImage, "jpg", baos);
-                report.setAdditionalPicture(reportDto.additionalPicture());
+                
+                ReportPictureEntity reportPictureEntity = new ReportPictureEntity(baos.toByteArray());
+                reportPictureRepository.save(reportPictureEntity);
+                report.setReportPictureEntity(reportPictureEntity);
+                report.setReportPictureId(reportPictureEntity.getId());
+                
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -311,5 +320,44 @@ public class ReportService {
         BufferedImageOp op = new ConvolveOp(new Kernel(3, 3, blurKernel), ConvolveOp.EDGE_NO_OP, hints);
         return op.filter(image, null);
     }
-
+    
+    public BufferedImage pixelateImage(BufferedImage image, int pixelSize) {
+        BufferedImage pixelatedImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+    
+        for (int y = 0; y < image.getHeight(); y += pixelSize) {
+            for (int x = 0; x < image.getWidth(); x += pixelSize) {
+                int averageColor = getAverageColor(image, x, y, pixelSize);
+                for (int yd = y; (yd < y + pixelSize) && (yd < pixelatedImage.getHeight()); yd++) {
+                    for (int xd = x; (xd < x + pixelSize) && (xd < pixelatedImage.getWidth()); xd++) {
+                        pixelatedImage.setRGB(xd, yd, averageColor);
+                    }
+                }
+            }
+        }
+    
+        return pixelatedImage;
+    }
+    
+    public int getAverageColor(BufferedImage image, int x, int y, int pixelSize) {
+        long sumRed = 0;
+        long sumGreen = 0;
+        long sumBlue = 0;
+        long count = 0;
+    
+        for (int yd = y; (yd < y + pixelSize) && (yd < image.getHeight()); yd++) {
+            for (int xd = x; (xd < x + pixelSize) && (xd < image.getWidth()); xd++) {
+                Color color = new Color(image.getRGB(xd, yd));
+                sumRed += color.getRed();
+                sumGreen += color.getGreen();
+                sumBlue += color.getBlue();
+                count++;
+            }
+        }
+    
+        int averageRed = (int) (sumRed / count);
+        int averageGreen = (int) (sumGreen / count);
+        int averageBlue = (int) (sumBlue / count);
+    
+        return new Color(averageRed, averageGreen, averageBlue).getRGB();
+    }
 }
