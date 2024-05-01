@@ -10,18 +10,18 @@ public class ReportPictureDTO {
     private String titleOrsubcategoryName;
     private String icon;
     private Timestamp timestamp;
-    private String image;
+    private Integer reportPictureId;
     private double longitude;
     private double latitude;
     private StatusEntity status;
 
-    public ReportPictureDTO(int id, String titleOrsubcategoryName, String icon, Timestamp timestamp, String image,
+    public ReportPictureDTO(int id, String titleOrsubcategoryName, String icon, Timestamp timestamp, Integer reportPictureId,
             double longitude, double latitude, StatusEntity status) {
         this.id = id;
         this.titleOrsubcategoryName = titleOrsubcategoryName;
         this.icon = icon;
         this.timestamp = timestamp;
-        this.image = image;
+        this.reportPictureId = reportPictureId;
         this.longitude = longitude;
         this.latitude = latitude;
         this.status = status;
@@ -67,12 +67,12 @@ public class ReportPictureDTO {
         this.timestamp = timestamp;
     }
 
-    public String getImage() {
-        return image;
+    public Integer getReportPictureId() {
+        return reportPictureId;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setReportPictureId(Integer reportPictureId) {
+        this.reportPictureId = reportPictureId;
     }
 
     public double getLongitude() {

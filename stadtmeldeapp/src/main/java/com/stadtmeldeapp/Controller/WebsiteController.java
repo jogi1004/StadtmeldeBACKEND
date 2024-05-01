@@ -28,8 +28,6 @@ import jakarta.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.Base64;
-
 @Controller
 public class WebsiteController {
 
@@ -173,7 +171,7 @@ public class WebsiteController {
       List<ReportPictureDTO> reportListRejected = new ArrayList<ReportPictureDTO>();
       for (ReportEntity report : reports) {
         String iconBase64 = "X";
-        String imageBase64 = "X";
+        Integer reportPictureId = null;
         /*
          * if (report.getIcon() != null) {
          * byte[] iconBytes = report.getIcon();
@@ -183,9 +181,8 @@ public class WebsiteController {
 
         // ICON ist Noch nicht in der ReportEntity Klasse, ODER wo kommt das ICON her???
 
-        if (report.getAdditionalPicture() != null) {
-          byte[] imageBytes = report.getAdditionalPicture();
-          imageBase64 = Base64.getEncoder().encodeToString(imageBytes);
+        if (report.getReportPictureId() != null) {
+          reportPictureId = report.getReportPictureId();
         }
         String titleOrSubCategory;
         if (report.getTitle() == null || report.getTitle().equals("")) {
@@ -196,19 +193,19 @@ public class WebsiteController {
 
         if (report.getStatus().getName().equals("Neu")) {
           reportListNew.add(new ReportPictureDTO(report.getId(), titleOrSubCategory, iconBase64,
-              report.getReportingTimestamp(), imageBase64, report.getLongitude(), report.getLatitude(),
+              report.getReportingTimestamp(), reportPictureId, report.getLongitude(), report.getLatitude(),
               report.getStatus()));
         } else if (report.getStatus().getName().equals("In Bearbeitung")) {
           reportListInProgress.add(new ReportPictureDTO(report.getId(), titleOrSubCategory, iconBase64,
-              report.getReportingTimestamp(), imageBase64, report.getLongitude(), report.getLatitude(),
+              report.getReportingTimestamp(), reportPictureId, report.getLongitude(), report.getLatitude(),
               report.getStatus()));
         } else if (report.getStatus().getName().equals("Abgeschlossen")) {
           reportListDone.add(new ReportPictureDTO(report.getId(), titleOrSubCategory, iconBase64,
-              report.getReportingTimestamp(), imageBase64, report.getLongitude(), report.getLatitude(),
+              report.getReportingTimestamp(), reportPictureId, report.getLongitude(), report.getLatitude(),
               report.getStatus()));
         } else if (report.getStatus().getName().equals("Abgelehnt")) {
           reportListRejected.add(new ReportPictureDTO(report.getId(), titleOrSubCategory, iconBase64,
-              report.getReportingTimestamp(), imageBase64, report.getLongitude(), report.getLatitude(),
+              report.getReportingTimestamp(), reportPictureId, report.getLongitude(), report.getLatitude(),
               report.getStatus()));
         }
 
