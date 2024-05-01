@@ -4,13 +4,16 @@ import java.sql.Timestamp;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -47,6 +50,13 @@ public class ReportEntity {
     @CreationTimestamp
     private Timestamp reportingTimestamp;
 
+    @Column(name = "report_picture_id", nullable = true)
+    private Integer reportPictureId;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "report_picture_id", referencedColumnName = "id", nullable = true, insertable=false, updatable=false)
+    private ReportPictureEntity reportPictureEntity;
+
     @ManyToOne
     @JoinColumn(name = "reporting_location_id", referencedColumnName = "id", nullable = false)
     private ReportingLocationEntity reportingLocation;
@@ -54,8 +64,5 @@ public class ReportEntity {
     @ManyToOne
     @JoinColumn(name = "status_id", referencedColumnName = "id", nullable = false)
     private StatusEntity status;
-
-    @Column(name = "additional_picture", nullable = true)
-    private byte[] additionalPicture;
 }
 
