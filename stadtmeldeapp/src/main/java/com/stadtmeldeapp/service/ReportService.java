@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.cloud.vision.v1.AnnotateImageRequest;
 import com.google.cloud.vision.v1.AnnotateImageResponse;
 import com.google.cloud.vision.v1.BatchAnnotateImagesResponse;
+import com.google.cloud.vision.v1.FaceAnnotation;
 import com.google.cloud.vision.v1.Feature;
 import com.google.cloud.vision.v1.Image;
 import com.google.cloud.vision.v1.ImageAnnotatorClient;
@@ -34,11 +35,24 @@ import com.stadtmeldeapp.Repository.UserRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.awt.Graphics;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import javax.imageio.ImageIO;
+
+import java.awt.image.BufferedImageOp;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 
 @Service
 @Transactional
@@ -101,20 +115,29 @@ public class ReportService {
                         .setImage(img)
                         .build();
                 BatchAnnotateImagesResponse response = vision.batchAnnotateImages(List.of(request));
-                int faceCount = 0;
+                BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(reportDto.additionalPicture()));
+                Graphics graphics = bufferedImage.getGraphics();
                 for (AnnotateImageResponse res : response.getResponsesList()) {
                     if (res.getFaceAnnotationsList() != null) {
-                        faceCount += res.getFaceAnnotationsList().size();
+                        for (FaceAnnotation face : res.getFaceAnnotationsList()) {
+                            int x = (int) face.getFdBoundingPoly().getVertices(0).getX();
+                            int y = (int) face.getFdBoundingPoly().getVertices(0).getY();
+                            int width = (int) (face.getFdBoundingPoly().getVertices(2).getX() - x);
+                            int height = (int) (face.getFdBoundingPoly().getVertices(2).getY() - y);
+                            BufferedImage faceRegion = bufferedImage.getSubimage(x, y, width, height);
+                            BufferedImage blurredFace = blurImage(faceRegion);
+                            graphics.drawImage(blurredFace, x, y, null);
+                        }
                     }
                 }
-                if (faceCount > 0) {
-                    throw new NotAllowedException("Auf dem Bild wurden " + faceCount + " Gesichter gefunden");
-                }
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(bufferedImage, "jpg", baos);
+                report.setAdditionalPicture(reportDto.additionalPicture());
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            report.setAdditionalPicture(reportDto.additionalPicture());
         }
+
         return reportRepository.save(report);
     }
 
@@ -246,4 +269,22 @@ public class ReportService {
                 report.longitude(),
                 report.latitude());
     }
+
+    public BufferedImage blurImage(BufferedImage image) {
+        float ninth = 1.0f / 9.0f;
+        float[] blurKernel = {
+                ninth, ninth, ninth,
+                ninth, ninth, ninth,
+                ninth, ninth, ninth
+        };
+
+        Map<RenderingHints.Key, Object> map = new HashMap<>();
+        map.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        map.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        map.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        RenderingHints hints = new RenderingHints(map);
+        BufferedImageOp op = new ConvolveOp(new Kernel(3, 3, blurKernel), ConvolveOp.EDGE_NO_OP, hints);
+        return op.filter(image, null);
+    }
+
 }
