@@ -21,11 +21,13 @@ import com.stadtmeldeapp.DTO.ReportUpdateDTO;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
 import com.stadtmeldeapp.Entity.ProfilePictureEntity;
 import com.stadtmeldeapp.Entity.ReportEntity;
+import com.stadtmeldeapp.Entity.ReportPictureEntity;
 import com.stadtmeldeapp.Entity.ReportingLocationEntity;
 import com.stadtmeldeapp.Entity.StatusEntity;
 import com.stadtmeldeapp.Entity.SubcategoryEntity;
 import com.stadtmeldeapp.Entity.UserEntity;
 import com.stadtmeldeapp.Repository.ProfilePictureRepository;
+import com.stadtmeldeapp.Repository.ReportPictureRepository;
 import com.stadtmeldeapp.Repository.MaincategoryRepository;
 import com.stadtmeldeapp.Repository.ReportRepository;
 import com.stadtmeldeapp.Repository.ReportingLocationRepository;
@@ -74,6 +76,8 @@ public class ReportService {
     private ProfilePictureRepository imageRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ReportPictureRepository reportPictureRepository;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MMMM yyyy, HH:mm 'Uhr'");
 
@@ -98,6 +102,16 @@ public class ReportService {
         }
 
         ReportEntity report = new ReportEntity();
+        if (reportDto.additionalPicture() != null) {
+            ReportPictureEntity reportPictureEntity = new ReportPictureEntity(reportDto.additionalPicture());
+            reportPictureRepository.save(reportPictureEntity);
+            report.setReportPictureEntity(reportPictureEntity);
+            report.setReportPictureId(reportPictureEntity.getId());
+        } else {
+            report.setReportPictureEntity(null);
+            report.setReportPictureId(null);
+        }
+
         report.setSubcategory(subcategory);
         if (reportDto.title() != null)
             report.setTitle(reportDto.title());
@@ -107,6 +121,7 @@ public class ReportService {
         report.setReportingLocation(reportingLocation);
         report.setUser(user);
         report.setStatus(statusX);
+
         if (reportDto.additionalPicture() != null) {
             try (ImageAnnotatorClient vision = ImageAnnotatorClient.create()) {
                 Image img = Image.newBuilder().setContent(ByteString.copyFrom(reportDto.additionalPicture())).build();
@@ -177,7 +192,8 @@ public class ReportService {
                         : report.getTitle(),
                 report.getDescription(),
                 report.getSubcategory().getMaincategoryEntity().getIconEntity().getId(), report.getStatus(),
-                dateFormat.format(report.getReportingTimestamp()), report.getAdditionalPicture(),
+                dateFormat.format(report.getReportingTimestamp()), report.getReportPictureId(),
+                report.getReportPictureEntity().getPicture(),
                 report.getLongitude(),
                 report.getLatitude(), report.getUser().getUsername(), report.getReportingLocation().getName(),
                 userProfilePicture.isPresent() ? userProfilePicture.get().getImage() : null);
@@ -199,9 +215,18 @@ public class ReportService {
         if (reportDto.title() != null && !report.getSubcategory().getTitle().equals("Sonstiges")) {
             throw new NotAllowedException("Meldungen außerhalb der Kategorie 'Sonstiges' haben keinen Titel");
         }
+        if (reportDto.additionalPicture() != null) {
+            if (report.getReportPictureId() != null) {
+                reportPictureRepository.delete(report.getReportPictureEntity());
+            }
+            ReportPictureEntity reportPictureEntity = new ReportPictureEntity(reportDto.additionalPicture());
+            reportPictureRepository.save(reportPictureEntity);
+
+            report.setReportPictureId(reportPictureEntity.getId());
+            report.setReportPictureEntity(reportPictureEntity);
+        }
         report.setTitle(reportDto.title());
         report.setDescription(reportDto.description());
-        report.setAdditionalPicture(reportDto.additionalPicture());
         return toReportInfoDTO(reportRepository.save(report));
     }
 
@@ -244,7 +269,7 @@ public class ReportService {
                                     : r.getTitle(),
                             (r.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1
                                     : r.getSubcategory().getMaincategoryEntity().getIconEntity().getId()),
-                            r.getStatus(), dateFormat.format(r.getReportingTimestamp()), r.getAdditionalPicture(),
+                            r.getStatus(), dateFormat.format(r.getReportingTimestamp()), r.getReportPictureId(),
                             r.getLongitude(),
                             r.getLatitude()));
         }
@@ -257,7 +282,7 @@ public class ReportService {
                         : report.getTitle(),
                 (report.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1
                         : report.getSubcategory().getMaincategoryEntity().getIconEntity().getId()),
-                report.getStatus(), dateFormat.format(report.getReportingTimestamp()), report.getAdditionalPicture(),
+                report.getStatus(), dateFormat.format(report.getReportingTimestamp()), report.getReportPictureId(),
                 report.getLongitude(),
                 report.getLatitude());
     }
@@ -265,7 +290,7 @@ public class ReportService {
     public ReportInfoDTO toReportInfoDTO(ReportDetailInfoDTO report) {
         return new ReportInfoDTO(
                 report.titleOrsubcategoryName(),
-                report.iconId(), report.status(), report.timestamp(), report.image(),
+                report.iconId(), report.status(), report.timestamp(), report.reportPictureId(),
                 report.longitude(),
                 report.latitude());
     }
