@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
+import com.stadtmeldeapp.DTO.MainCategoryDTO;
 import com.stadtmeldeapp.DTO.MainCategoryWithSubCategoriesDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.DTO.ReportPictureDTO;
@@ -18,7 +19,6 @@ import com.stadtmeldeapp.service.CategoryService;
 import com.stadtmeldeapp.service.ReportService;
 import com.stadtmeldeapp.service.StatusService;
 import com.stadtmeldeapp.service.UserService;
-import com.stadtmeldeapp.Entity.MaincategoryEntity;
 import com.stadtmeldeapp.Entity.ReportEntity;
 import com.stadtmeldeapp.Entity.StatusEntity;
 import com.stadtmeldeapp.Entity.SubcategoryEntity;
@@ -64,11 +64,11 @@ public class WebsiteController {
     }
     model.addAttribute("cityInfo", true);
     logger.info("GET CATEGORYS");
-    List<MaincategoryEntity> mainCategory = categoryService.getMaincategoriesByLocationName("Zweibrücken");
+    List<MainCategoryDTO> mainCategory = categoryService.getMaincategoriesByLocationName("Zweibrücken");
     List<SubcategoryEntity> subCategory = new ArrayList<SubcategoryEntity>();
     ArrayList<SubcategoryEntity> subCategoryList = new ArrayList<SubcategoryEntity>();
-    for (MaincategoryEntity maincategoryEntity : mainCategory) {
-      int mainCategoryId = (int) maincategoryEntity.getId();
+    for (MainCategoryDTO maincategoryDTO : mainCategory) {
+      int mainCategoryId = (int) maincategoryDTO.id();
       subCategory = categoryService.getSubCategoriesByMainCategoryId(mainCategoryId);
       for (SubcategoryEntity subcategoryEntity : subCategory) {
         subCategoryList.add(subcategoryEntity);

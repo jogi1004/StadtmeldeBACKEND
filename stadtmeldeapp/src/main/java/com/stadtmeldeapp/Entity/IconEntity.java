@@ -20,9 +20,10 @@ public class IconEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false, unique = true)
-    private String name;
-
     @Column(nullable = false)
     private byte[] icon;
+
+    public IconEntity(byte[] icon) {
+        this.icon = icon;
+    }
 }
