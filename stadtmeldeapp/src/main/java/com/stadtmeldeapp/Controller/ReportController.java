@@ -15,7 +15,9 @@ import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.DTO.ReportUpdateDTO;
 import com.stadtmeldeapp.Entity.ReportEntity;
+import com.stadtmeldeapp.Entity.ReportPictureEntity;
 import com.stadtmeldeapp.service.EmailSenderService;
+import com.stadtmeldeapp.service.ReportPictureService;
 import com.stadtmeldeapp.service.ReportService;
 import com.stadtmeldeapp.service.StaticMapService;
 
@@ -27,7 +29,6 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
-import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/reports")
@@ -41,6 +42,9 @@ public class ReportController {
 
     @Autowired
     private StaticMapService staticMapService;
+
+    @Autowired
+    private ReportPictureService reportPictureService;
 
     @PostMapping
     public ResponseEntity<NewReportCreatedDTO> createReport(
@@ -118,4 +122,11 @@ public class ReportController {
         reportService.deleteReport(reportId, request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("/reportPicture/{reportPictureId}")
+    public ResponseEntity<ReportPictureEntity> getReportPicture(@PathVariable int reportPictureId, HttpServletRequest request) throws NotFoundException {
+        ReportPictureEntity reportPictureEntity = reportPictureService.getReportPictureById(reportPictureId);
+        return new ResponseEntity<>(reportPictureEntity, HttpStatus.OK);
+    }
+    
 }
