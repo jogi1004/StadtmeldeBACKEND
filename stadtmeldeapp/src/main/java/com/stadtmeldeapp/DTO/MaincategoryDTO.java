@@ -1,4 +1,4 @@
 package com.stadtmeldeapp.DTO;
 
-public record MaincategoryDTO (String title, int reportingLocationId){
+public record MainCategoryDTO(int id, String title, int reportingLocationId, Integer iconId) {
 }
