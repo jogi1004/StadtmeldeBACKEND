@@ -17,7 +17,7 @@ public class ReportPictureService {
     private ReportPictureRepository reportPictureRepository;
 
     public ReportPictureEntity getReportPictureById(int id) throws NotFoundException {
-        ReportPictureEntity reportPictureEntity = reportPictureRepository.findById(id).orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
+        ReportPictureEntity reportPictureEntity = reportPictureRepository.findById(id).orElseThrow(() -> new NotFoundException("Bild nicht gefunden"));
         return reportPictureEntity;
     }
 }
