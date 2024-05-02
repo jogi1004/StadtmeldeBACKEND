@@ -52,7 +52,6 @@ public class CategoryController {
         maincategoryEntity.setReportingLocationEntity(reportingLocationEntity);
         maincategoryEntity.setIconEntity(null);
         maincategoryEntity.setIconId(null);
-        System.out.println(maincategoryEntity);
         MaincategoryEntity savedMainCategory = categoryService.saveMainCategory(maincategoryEntity, request);
         return new ResponseEntity<>(savedMainCategory, HttpStatus.CREATED);
     }
