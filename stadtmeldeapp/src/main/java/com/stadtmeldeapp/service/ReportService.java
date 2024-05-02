@@ -275,7 +275,7 @@ public class ReportService {
             retReports
                     .add(new ReportInfoDTO(
                             (r.getTitle() == null || r.getTitle().isBlank()) ? r.getSubcategory().getTitle()
-                                    : r.getTitle(),
+                                    : r.getTitle(), r.getDescription(),
                             (r.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1
                                     : r.getSubcategory().getMaincategoryEntity().getIconEntity().getId()),
                             r.getStatus(), dateFormat.format(r.getReportingTimestamp()), r.getReportPictureId(),
@@ -288,7 +288,7 @@ public class ReportService {
     public ReportInfoDTO toReportInfoDTO(ReportEntity report) {
         return new ReportInfoDTO(
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
-                        : report.getTitle(),
+                        : report.getTitle(), report.getDescription(),
                 (report.getSubcategory().getMaincategoryEntity().getIconEntity() == null ? -1
                         : report.getSubcategory().getMaincategoryEntity().getIconEntity().getId()),
                 report.getStatus(), dateFormat.format(report.getReportingTimestamp()), report.getReportPictureId(),
@@ -298,7 +298,7 @@ public class ReportService {
 
     public ReportInfoDTO toReportInfoDTO(ReportDetailInfoDTO report) {
         return new ReportInfoDTO(
-                report.titleOrsubcategoryName(),
+                report.titleOrsubcategoryName(), report.description(),
                 report.iconId(), report.status(), report.timestamp(), report.reportPictureId(),
                 report.longitude(),
                 report.latitude());
