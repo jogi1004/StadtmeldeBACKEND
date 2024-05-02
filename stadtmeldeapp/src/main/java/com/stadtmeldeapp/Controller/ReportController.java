@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
+import com.stadtmeldeapp.DTO.NewReportCreatedDTO;
 import com.stadtmeldeapp.DTO.ReportDTO;
 import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
@@ -42,11 +43,11 @@ public class ReportController {
     private StaticMapService staticMapService;
 
     @PostMapping
-    public ResponseEntity<ReportEntity> createReport(
+    public ResponseEntity<NewReportCreatedDTO> createReport(
             @RequestBody ReportDTO reportDTO) throws NotFoundException, IOException, NotAllowedException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        ReportEntity createdReport = reportService.createReport(reportDTO, username);
+        NewReportCreatedDTO createdReport = reportService.createReport(reportDTO, username);
         return new ResponseEntity<>(createdReport, HttpStatus.CREATED);
     }
 

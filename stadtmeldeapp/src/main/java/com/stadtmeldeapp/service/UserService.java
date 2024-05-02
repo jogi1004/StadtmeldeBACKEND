@@ -106,11 +106,19 @@ public class UserService {
         imageRepository.delete(user.getProfilePictureEntity());
         
         if(image != null) {
+            if(user.getProfilePictureId() != null) {
+                imageRepository.delete(user.getProfilePictureEntity());
+            }
             ProfilePictureEntity profilePictureEntity = new ProfilePictureEntity(image);
             imageRepository.save(profilePictureEntity);
+            
             user.setProfilePictureId(profilePictureEntity.getId());
             user.setProfilePictureEntity(profilePictureEntity);
         } else {
+            if(user.getProfilePictureId() != null) {
+                imageRepository.delete(user.getProfilePictureEntity());
+            }
+            
             user.setProfilePictureId(null);
             user.setProfilePictureEntity(null);
         }

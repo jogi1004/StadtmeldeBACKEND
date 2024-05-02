@@ -14,6 +14,7 @@ import com.google.cloud.vision.v1.ImageAnnotatorClient;
 import com.google.protobuf.ByteString;
 import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
+import com.stadtmeldeapp.DTO.NewReportCreatedDTO;
 import com.stadtmeldeapp.DTO.ReportDTO;
 import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
@@ -82,7 +83,7 @@ public class ReportService {
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MMMM yyyy, HH:mm 'Uhr'");
 
-    public ReportEntity createReport(ReportDTO reportDto, String username)
+    public NewReportCreatedDTO createReport(ReportDTO reportDto, String username)
             throws NotFoundException, IOException, NotAllowedException {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
@@ -141,18 +142,21 @@ public class ReportService {
                 
                 ReportPictureEntity reportPictureEntity = new ReportPictureEntity(baos.toByteArray());
                 reportPictureRepository.save(reportPictureEntity);
-                report.setReportPictureEntity(reportPictureEntity);
                 report.setReportPictureId(reportPictureEntity.getId());
+                report.setReportPictureEntity(reportPictureEntity);
                 
             }  catch (IOException e) {
                 e.printStackTrace();
-            }
+            } 
         } else {
-            report.setReportPictureEntity(null);
             report.setReportPictureId(null);
+            report.setReportPictureEntity(null);
         }
-
-        return reportRepository.save(report);
+        ReportEntity reportEntity =  reportRepository.save(report);
+        NewReportCreatedDTO reportCreatedDTO = new NewReportCreatedDTO(reportEntity.getId(), reportEntity.getSubcategory(), reportEntity.getUser().getId(), reportEntity.getTitle(),
+                            reportEntity.getDescription(), reportEntity.getLongitude(), reportEntity.getLatitude(), reportEntity.getReportingTimestamp(), reportEntity.getReportPictureId(),
+                            reportEntity.getReportingLocation(), reportEntity.getStatus());
+        return reportCreatedDTO;
     }
 
     public ReportEntity getReportById(int id) {
@@ -224,6 +228,9 @@ public class ReportService {
             report.setReportPictureId(reportPictureEntity.getId());
             report.setReportPictureEntity(reportPictureEntity);
         } else {
+            if (report.getReportPictureId() != null) {
+                reportPictureRepository.delete(report.getReportPictureEntity());
+            }
             report.setReportPictureId(null);
             report.setReportPictureEntity(null);
         }
