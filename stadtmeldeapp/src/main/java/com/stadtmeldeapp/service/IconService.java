@@ -3,10 +3,14 @@ package com.stadtmeldeapp.service;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.Entity.IconEntity;
 import com.stadtmeldeapp.Repository.IconRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
 public class IconService {
     
     @Autowired

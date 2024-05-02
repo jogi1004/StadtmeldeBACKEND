@@ -97,7 +97,7 @@
 		<dependency>
 			<groupId>com.google.cloud</groupId>
 			<artifactId>spring-cloud-gcp-starter-secretmanager</artifactId>
-			<version>3.0.0</version>
+			<version>3.8.1</version> <!-- NICHT ÄNDERN!!! -->
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
@@ -119,7 +119,12 @@
 			<artifactId>httpclient5</artifactId>
 			<version>5.3.1</version>
 		</dependency>
-
+		<!-- https://mvnrepository.com/artifact/com.google.cloud/spring-cloud-gcp-starter-vision -->
+		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>spring-cloud-gcp-starter-vision</artifactId>
+			<version>5.1.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -130,5 +135,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

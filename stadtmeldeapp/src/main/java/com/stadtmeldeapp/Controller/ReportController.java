@@ -9,12 +9,15 @@ import org.springframework.web.bind.annotation.*;
 
 import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
+import com.stadtmeldeapp.DTO.NewReportCreatedDTO;
 import com.stadtmeldeapp.DTO.ReportDTO;
 import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.DTO.ReportUpdateDTO;
 import com.stadtmeldeapp.Entity.ReportEntity;
+import com.stadtmeldeapp.Entity.ReportPictureEntity;
 import com.stadtmeldeapp.service.EmailSenderService;
+import com.stadtmeldeapp.service.ReportPictureService;
 import com.stadtmeldeapp.service.ReportService;
 import com.stadtmeldeapp.service.StaticMapService;
 
@@ -26,7 +29,6 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
-import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/reports")
@@ -41,12 +43,15 @@ public class ReportController {
     @Autowired
     private StaticMapService staticMapService;
 
+    @Autowired
+    private ReportPictureService reportPictureService;
+
     @PostMapping
-    public ResponseEntity<ReportEntity> createReport(
-            @RequestBody ReportDTO reportDTO) throws NotFoundException, IOException {
+    public ResponseEntity<NewReportCreatedDTO> createReport(
+            @RequestBody ReportDTO reportDTO) throws NotFoundException, IOException, NotAllowedException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        ReportEntity createdReport = reportService.createReport(reportDTO, username);
+        NewReportCreatedDTO createdReport = reportService.createReport(reportDTO, username);
         return new ResponseEntity<>(createdReport, HttpStatus.CREATED);
     }
 
@@ -91,7 +96,8 @@ public class ReportController {
     }
 
     @PutMapping("/admin/{reportId}")
-    public ResponseEntity<ReportInfoDTO> updateReportStatus(@PathVariable int reportId, @RequestBody String newStatus) throws Exception {
+    public ResponseEntity<ReportInfoDTO> updateReportStatus(@PathVariable int reportId, @RequestBody String newStatus)
+            throws Exception {
         ReportInfoDTO updatedReport = reportService.updateReportStatus(reportId, newStatus);
         ReportEntity reportEntity = reportService.getReportById(reportId);
         if (reportEntity != null)
@@ -116,4 +122,11 @@ public class ReportController {
         reportService.deleteReport(reportId, request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("/reportPicture/{reportPictureId}")
+    public ResponseEntity<ReportPictureEntity> getReportPicture(@PathVariable int reportPictureId) throws NotFoundException {
+        ReportPictureEntity reportPictureEntity = reportPictureService.getReportPictureById(reportPictureId);
+        return new ResponseEntity<>(reportPictureEntity, HttpStatus.OK);
+    }
+    
 }

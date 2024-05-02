@@ -1,7 +1,5 @@
 package com.stadtmeldeapp.Controller;
 
-import java.io.IOException;
-
 /* import org.slf4j.Logger;
 import org.slf4j.LoggerFactory; */
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,16 +7,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.ProfilePictureDTO;
 import com.stadtmeldeapp.DTO.UserInfoDTO;
+import com.stadtmeldeapp.DTO.UserInfoNoProfilePictureDTO;
+import com.stadtmeldeapp.Entity.ProfilePictureEntity;
 import com.stadtmeldeapp.Entity.UserEntity;
-import com.stadtmeldeapp.service.UserDetailsServiceImpl;
+import com.stadtmeldeapp.service.ProfilePictureService;
 import com.stadtmeldeapp.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,44 +29,52 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/user")
 public class PrivateUserController {
 
-    //Logger logger = LoggerFactory.getLogger(getClass());
+    // Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private UserService userService;
     @Autowired
-    private UserDetailsServiceImpl userDetailsServiceImpl;
+    private ProfilePictureService profilePictureService;
 
     @GetMapping("/info")
-    public ResponseEntity<UserInfoDTO> getUserInfo(HttpServletRequest request) throws NotFoundException {
-
-        //logger.info("INFO");
+    public ResponseEntity<UserInfoNoProfilePictureDTO> getUserInfo(HttpServletRequest request)
+            throws NotFoundException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        
-        UserInfoDTO userInfoDTO = userService.getUserInfoByUsername(username);
 
-        //logger.info("Return user info for " + headerUsername);
+        UserInfoNoProfilePictureDTO userInfoDTO = userService.getUserInfoByUsername(username);
+        return ResponseEntity.ok(userInfoDTO);
+    }
+
+    @GetMapping("/infoprofilepic")
+    public ResponseEntity<UserInfoDTO> getUserInfoWithProfilePicture(HttpServletRequest request)
+            throws NotFoundException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        UserInfoDTO userInfoDTO = userService.getUserInfoByUsernameWithProfilePicture(username);
         return ResponseEntity.ok(userInfoDTO);
     }
 
     @PutMapping("/addProfilePicture")
-    public ResponseEntity<UserEntity> addProfilePicture(@RequestBody ProfilePictureDTO file, HttpServletRequest request) throws NotFoundException, IOException {
+    public ResponseEntity<UserEntity> addProfilePicture(@RequestBody ProfilePictureDTO ppDto,
+            HttpServletRequest request)
+            throws NotFoundException {
+        userService.updateProfilePicture(ppDto.profilePicture(), request);
+        return ResponseEntity.ok().build();
+    }
 
-        //logger.info("PROFILEPICTURE");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        UserEntity userEntity = userService.getUserEntityByUsername(username);
-            //logger.info("User " + headerUsername + " not found.");
-            // Wenn Nutzer im Header nicht exisitiert
+    @GetMapping("/profilePicture/{profilePictureId}")
+    public ResponseEntity<ProfilePictureEntity> getProfilePicture(@PathVariable int profilePictureId)
+            throws NotFoundException {
+        ProfilePictureEntity profilePictureEntity = profilePictureService.getProfilePictureById(profilePictureId);
+        return new ResponseEntity<>(profilePictureEntity, HttpStatus.OK);
+    }
 
-        UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
-        if (!userService.validate(request.getHeader("Authorization"), userDetails) || file == null) {
-            //logger.info(headerUsername + " does not match JWT");
-            // Wenn JWT in Kombination mit Nutzer nicht gültig ist
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-            userEntity.setProfilePicture(file.getProfilePicture());
-            userService.updateUser(userEntity);
-            return ResponseEntity.ok().build();
+    @PutMapping("/notifications")
+    public ResponseEntity<Void> changeNotifications(@RequestBody boolean notificationsEnabled,
+            HttpServletRequest request) throws NotFoundException {
+        userService.updateNotificationsEnabled(notificationsEnabled, request);
+        return ResponseEntity.ok().build();
     }
 }
