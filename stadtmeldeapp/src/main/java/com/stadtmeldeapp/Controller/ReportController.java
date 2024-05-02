@@ -124,7 +124,7 @@ public class ReportController {
     }
 
     @GetMapping("/reportPicture/{reportPictureId}")
-    public ResponseEntity<ReportPictureEntity> getReportPicture(@PathVariable int reportPictureId, HttpServletRequest request) throws NotFoundException {
+    public ResponseEntity<ReportPictureEntity> getReportPicture(@PathVariable int reportPictureId) throws NotFoundException {
         ReportPictureEntity reportPictureEntity = reportPictureService.getReportPictureById(reportPictureId);
         return new ResponseEntity<>(reportPictureEntity, HttpStatus.OK);
     }
