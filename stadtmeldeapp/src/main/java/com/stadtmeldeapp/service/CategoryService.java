@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
-import com.stadtmeldeapp.DTO.MainCategoryDTO;
+import com.stadtmeldeapp.DTO.MainCategoryDTOw;
 import com.stadtmeldeapp.DTO.MainCategoryWithSubCategoriesDTO;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
 import com.stadtmeldeapp.Entity.ReportingLocationEntity;
@@ -74,11 +74,11 @@ public class CategoryService {
         return subCategoryRepository.findByMaincategoryEntity_Id(mainCategoryId);
     }
 
-    public List<MainCategoryDTO> getMaincategoriesByLocationName(String reportingLocationName) {
+    public List<MainCategoryDTOw> getMaincategoriesByLocationName(String reportingLocationName) {
         List<MaincategoryEntity> maincategoryEntities = mainCategoryRepository.findByReportingLocationEntity_Name(reportingLocationName);
-        List<MainCategoryDTO> mainCategoryDTOs = new ArrayList<MainCategoryDTO>();
+        List<MainCategoryDTOw> mainCategoryDTOs = new ArrayList<MainCategoryDTOw>();
         for(MaincategoryEntity mainCategory : maincategoryEntities) {
-            MainCategoryDTO mainCategoryDTO = new MainCategoryDTO(mainCategory.getId(), mainCategory.getTitle(), mainCategory.getReportingLocationEntity().getId(), mainCategory.getIconId());
+            MainCategoryDTOw mainCategoryDTO = new MainCategoryDTOw(mainCategory.getId(), mainCategory.getTitle(), mainCategory.getReportingLocationEntity().getId(), mainCategory.getIconId());
             mainCategoryDTOs.add(mainCategoryDTO);
         }
         return mainCategoryDTOs;
