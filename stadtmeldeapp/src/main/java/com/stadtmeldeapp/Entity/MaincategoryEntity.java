@@ -1,7 +1,9 @@
 package com.stadtmeldeapp.Entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,7 +28,10 @@ public class MaincategoryEntity {
     @JoinColumn(name = "reporting_location_id", nullable = false)
     private ReportingLocationEntity reportingLocationEntity;
 
-    @ManyToOne
-    @JoinColumn(name = "icon_id", nullable = true)
+    @Column(name = "icon_id", nullable = true)
+    private Integer iconId;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "icon_id", referencedColumnName = "id", nullable = true, insertable=false, updatable=false)
     private IconEntity iconEntity;
 }

@@ -20,8 +20,8 @@ public class IconController {
     private IconService iconService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<byte[]> getIconById(@PathVariable int id) throws NotFoundException {
+    public ResponseEntity<IconEntity> getIconById(@PathVariable int id) throws NotFoundException {
         IconEntity icon = iconService.findIconById(id);
-        return new ResponseEntity<>(icon.getIcon(), HttpStatus.OK);
+        return new ResponseEntity<>(icon, HttpStatus.OK);
     }
 }
