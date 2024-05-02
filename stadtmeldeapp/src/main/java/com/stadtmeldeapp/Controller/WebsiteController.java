@@ -11,7 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
-import com.stadtmeldeapp.DTO.MainCategoryDTOw;
+import com.stadtmeldeapp.DTO.MainCategoryDTO;
 import com.stadtmeldeapp.DTO.MainCategoryWithSubCategoriesDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.DTO.ReportPictureDTO;
@@ -64,10 +64,10 @@ public class WebsiteController {
     }
     model.addAttribute("cityInfo", true);
     logger.info("GET CATEGORYS");
-    List<MainCategoryDTOw> mainCategory = categoryService.getMaincategoriesByLocationName("Zweibrücken");
+    List<MainCategoryDTO> mainCategory = categoryService.getMaincategoriesByLocationName("Zweibrücken");
     List<SubcategoryEntity> subCategory = new ArrayList<SubcategoryEntity>();
     ArrayList<SubcategoryEntity> subCategoryList = new ArrayList<SubcategoryEntity>();
-    for (MainCategoryDTOw maincategoryDTO : mainCategory) {
+    for (MainCategoryDTO maincategoryDTO : mainCategory) {
       int mainCategoryId = (int) maincategoryDTO.id();
       subCategory = categoryService.getSubCategoriesByMainCategoryId(mainCategoryId);
       for (SubcategoryEntity subcategoryEntity : subCategory) {

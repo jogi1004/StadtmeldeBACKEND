@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
-import com.stadtmeldeapp.DTO.MainCategoryDTOw;
+import com.stadtmeldeapp.DTO.MainCategoryDTO;
 import com.stadtmeldeapp.DTO.NewMainCategoryDTO;
 import com.stadtmeldeapp.DTO.SubcategoryDTO;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
@@ -108,9 +108,9 @@ public class CategoryController {
     }
 
     @GetMapping("/main/location/{locationName}")
-    public ResponseEntity<List<MainCategoryDTOw>> getCategoriesByLocationName(
+    public ResponseEntity<List<MainCategoryDTO>> getCategoriesByLocationName(
             @PathVariable("locationName") String locationName) {
-        List<MainCategoryDTOw> categories = categoryService.getMaincategoriesByLocationName(locationName);
+        List<MainCategoryDTO> categories = categoryService.getMaincategoriesByLocationName(locationName);
         if (categories.size() == 0) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
