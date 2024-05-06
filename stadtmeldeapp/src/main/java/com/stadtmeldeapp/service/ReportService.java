@@ -14,7 +14,6 @@ import com.google.cloud.vision.v1.ImageAnnotatorClient;
 import com.google.protobuf.ByteString;
 import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
-import com.stadtmeldeapp.DTO.NewReportCreatedDTO;
 import com.stadtmeldeapp.DTO.ReportDTO;
 import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
@@ -83,7 +82,7 @@ public class ReportService {
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MMMM yyyy, HH:mm 'Uhr'");
 
-    public NewReportCreatedDTO createReport(ReportDTO reportDto, String username)
+    public void createReport(ReportDTO reportDto, String username)
             throws NotFoundException, IOException, NotAllowedException {
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NotFoundException("Nutzer nicht gefunden"));
@@ -148,15 +147,8 @@ public class ReportService {
             }  catch (IOException e) {
                 e.printStackTrace();
             } 
-        } else {
-            report.setReportPictureId(null);
-            report.setReportPictureEntity(null);
         }
-        ReportEntity reportEntity =  reportRepository.save(report);
-        NewReportCreatedDTO reportCreatedDTO = new NewReportCreatedDTO(reportEntity.getId(), reportEntity.getSubcategory(), reportEntity.getUser().getId(), reportEntity.getTitle(),
-                            reportEntity.getDescription(), reportEntity.getLongitude(), reportEntity.getLatitude(), reportEntity.getReportingTimestamp(), reportEntity.getReportPictureId(),
-                            reportEntity.getReportingLocation(), reportEntity.getStatus());
-        return reportCreatedDTO;
+        reportRepository.save(report);
     }
 
     public ReportEntity getReportById(int id) {
@@ -190,6 +182,7 @@ public class ReportService {
                 .orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
         Optional<ProfilePictureEntity> userProfilePicture = imageRepository
                 .findById(report.getUser().getProfilePictureId());
+
         return new ReportDetailInfoDTO(
                 (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
                         : report.getTitle(),

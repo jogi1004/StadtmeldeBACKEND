@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
-import com.stadtmeldeapp.DTO.NewReportCreatedDTO;
 import com.stadtmeldeapp.DTO.ReportDTO;
 import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
@@ -46,12 +45,12 @@ public class ReportController {
     private ReportPictureService reportPictureService;
 
     @PostMapping
-    public ResponseEntity<NewReportCreatedDTO> createReport(
+    public ResponseEntity<Void> createReport(
             @RequestBody ReportDTO reportDTO) throws NotFoundException, IOException, NotAllowedException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        NewReportCreatedDTO createdReport = reportService.createReport(reportDTO, username);
-        return new ResponseEntity<>(createdReport, HttpStatus.CREATED);
+        reportService.createReport(reportDTO, username);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/user/{userId}")
