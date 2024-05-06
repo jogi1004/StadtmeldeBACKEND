@@ -1,5 +1,5 @@
 package com.stadtmeldeapp.DTO;
 
-public record ProfilePictureDTO(
+public record ProfilePictureDTO(int id,
         byte[] profilePicture) {
 }
