@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
+import com.stadtmeldeapp.DTO.NotificationsEnabledDTO;
 import com.stadtmeldeapp.DTO.ProfilePictureDTO;
 import com.stadtmeldeapp.DTO.UserInfoDTO;
 import com.stadtmeldeapp.DTO.UserInfoNoProfilePictureDTO;
@@ -72,9 +73,9 @@ public class PrivateUserController {
     }
 
     @PutMapping("/notifications")
-    public ResponseEntity<Void> changeNotifications(@RequestBody boolean notificationsEnabled,
+    public ResponseEntity<Void> changeNotifications(@RequestBody NotificationsEnabledDTO notificationsEnabled,
             HttpServletRequest request) throws NotFoundException {
-        userService.updateNotificationsEnabled(notificationsEnabled, request);
+        userService.updateNotificationsEnabled(notificationsEnabled.notification(), request);
         return ResponseEntity.ok().build();
     }
 }
