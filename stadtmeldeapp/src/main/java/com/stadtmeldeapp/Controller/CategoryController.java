@@ -100,9 +100,9 @@ public class CategoryController {
     }
 
     @GetMapping("/sub/main/{mainCategoryId}")
-    public ResponseEntity<List<SubcategoryEntity>> getSubCategoriesByMainCategoryId(
+    public ResponseEntity<List<SubcategoryDTO>> getSubCategoriesByMainCategoryId(
             @PathVariable("mainCategoryId") int mainCategoryId) {
-        List<SubcategoryEntity> subCategories = categoryService.getSubCategoriesByMainCategoryId(mainCategoryId);
+        List<SubcategoryDTO> subCategories = categoryService.getSubCategoriesByMainCategoryId(mainCategoryId);
         return new ResponseEntity<>(subCategories, HttpStatus.OK);
     }
 
