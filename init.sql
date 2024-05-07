@@ -48,6 +48,11 @@ CREATE TABLE user_roles (
     PRIMARY KEY (user_id, role_id)
 );
 
+CREATE TABLE reportPictures (
+    id SERIAL PRIMARY KEY,
+    picture BYTEA
+);
+
 -- Create Messages table
 CREATE TABLE reports (
     id SERIAL PRIMARY KEY,

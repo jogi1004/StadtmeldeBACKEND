@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
-import com.stadtmeldeapp.DTO.MaincategoryDTO;
+import com.stadtmeldeapp.DTO.MainCategoryDTO;
+import com.stadtmeldeapp.DTO.NewMainCategoryDTO;
 import com.stadtmeldeapp.DTO.SubcategoryDTO;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
 import com.stadtmeldeapp.Entity.ReportingLocationEntity;
@@ -43,12 +44,14 @@ public class CategoryController {
 
     @PostMapping("/main")
     public ResponseEntity<MaincategoryEntity> createOrUpdateMainCategory(
-            @RequestBody @NonNull MaincategoryDTO mainCategoryDTO, HttpServletRequest request) throws NotFoundException, NotAllowedException {
+            @RequestBody @NonNull NewMainCategoryDTO mainCategoryDTO, HttpServletRequest request) throws NotFoundException, NotAllowedException {
         ReportingLocationEntity reportingLocationEntity = reportingLocationService
                 .getReportingLocationById(mainCategoryDTO.reportingLocationId());
         MaincategoryEntity maincategoryEntity = new MaincategoryEntity();
         maincategoryEntity.setTitle(mainCategoryDTO.title());
         maincategoryEntity.setReportingLocationEntity(reportingLocationEntity);
+        maincategoryEntity.setIconEntity(null);
+        maincategoryEntity.setIconId(null);
         MaincategoryEntity savedMainCategory = categoryService.saveMainCategory(maincategoryEntity, request);
         return new ResponseEntity<>(savedMainCategory, HttpStatus.CREATED);
     }
@@ -97,16 +100,16 @@ public class CategoryController {
     }
 
     @GetMapping("/sub/main/{mainCategoryId}")
-    public ResponseEntity<List<SubcategoryEntity>> getSubCategoriesByMainCategoryId(
+    public ResponseEntity<List<SubcategoryDTO>> getSubCategoriesByMainCategoryId(
             @PathVariable("mainCategoryId") int mainCategoryId) {
-        List<SubcategoryEntity> subCategories = categoryService.getSubCategoriesByMainCategoryId(mainCategoryId);
+        List<SubcategoryDTO> subCategories = categoryService.getSubCategoriesByMainCategoryId(mainCategoryId);
         return new ResponseEntity<>(subCategories, HttpStatus.OK);
     }
 
     @GetMapping("/main/location/{locationName}")
-    public ResponseEntity<List<MaincategoryEntity>> getCategoriesByLocationName(
+    public ResponseEntity<List<MainCategoryDTO>> getCategoriesByLocationName(
             @PathVariable("locationName") String locationName) {
-        List<MaincategoryEntity> categories = categoryService.getMaincategoriesByLocationName(locationName);
+        List<MainCategoryDTO> categories = categoryService.getMaincategoriesByLocationName(locationName);
         if (categories.size() == 0) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

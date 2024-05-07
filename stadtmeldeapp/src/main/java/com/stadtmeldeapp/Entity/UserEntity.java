@@ -13,16 +13,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 import lombok.NoArgsConstructor;
 import jakarta.persistence.JoinColumn;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Entity
 @Table(name = "users")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserEntity {
 
     @Id
@@ -39,10 +42,14 @@ public class UserEntity {
     private String email;
 
     @Column(nullable = true)
-    private byte[] profilePicture;
-
-    @Column(nullable = true)
     private boolean notificationsEnabled;
+
+    @Column(name = "profile_picture_id", nullable = true)
+    private Integer profilePictureId;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "profile_picture_id", referencedColumnName = "id", nullable = true, insertable=false, updatable=false)
+    private ProfilePictureEntity profilePictureEntity;
 
     @Column
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -53,14 +60,15 @@ public class UserEntity {
     @JoinColumn(name = "isAdminForLocationId", referencedColumnName = "id")
     private ReportingLocationEntity adminForLocation;
 
-    public UserEntity(String username, String password, String email, List<RoleEntity> roles,
+    public UserEntity(String username, String password, String email, List<RoleEntity> roles, Integer profilePictureId, ProfilePictureEntity profilePictureEntity,
             ReportingLocationEntity adminForLocation) {
         this.username = username;
         this.password = password;
         this.email = email;
-        this.profilePicture = null;
-        this.notificationsEnabled = false;
         this.roles = roles;
+        this.profilePictureId = profilePictureId;
+        this.profilePictureEntity = profilePictureEntity;
+        this.notificationsEnabled = true;
         this.adminForLocation = adminForLocation;
     }
 }

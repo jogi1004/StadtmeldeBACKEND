@@ -7,23 +7,23 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import lombok.NoArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "icons")
+@Table(name = "profilepictures")
 @Data
 @NoArgsConstructor
-public class IconEntity {
+public class ProfilePictureEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(nullable = false)
-    private byte[] icon;
+    private byte[] image;
 
-    public IconEntity(byte[] icon) {
-        this.icon = icon;
+    public ProfilePictureEntity(byte[] image) {
+        this.image = image;
     }
 }
