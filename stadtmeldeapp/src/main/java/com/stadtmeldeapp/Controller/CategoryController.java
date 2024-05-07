@@ -29,13 +29,6 @@ public class CategoryController {
     @Autowired
     private ReportingLocationService reportingLocationService;
 
-    @Deprecated
-    @GetMapping("/main") // kommt weg
-    public ResponseEntity<List<MaincategoryEntity>> getAllMainCategories() {
-        List<MaincategoryEntity> mainCategories = categoryService.getAllMainCategories();
-        return new ResponseEntity<>(mainCategories, HttpStatus.OK);
-    }
-
     @GetMapping("/main/{id}")
     public ResponseEntity<MaincategoryEntity> getMainCategoryById(@PathVariable("id") int id) throws NotFoundException {
         MaincategoryEntity mainCategory = categoryService.getMainCategoryById(id);
