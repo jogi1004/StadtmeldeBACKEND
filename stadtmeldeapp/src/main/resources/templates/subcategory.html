@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <title>Kategorien</title>
+</head>
+
+<body>
+
+    <div layout:fragment="content">
+        <section class="my-5">
+            <div class="container px-4 px-lg-5">
+                <h2 class="text-center mt-5 mb-4" th:text="${MainCategory.getTitle}"></h2>
+                <div class="row gx-4 gx-lg-5 mx-0 mt-3 pt-3 borderSchemeContainer" style="height: 400px;">
+                    <div class="col-md-12 px-3 scrollbar" style="height: 95%">
+                        <div th:if="${SubCategories} == null">
+                            <p>Es wurden noch keine Unterkategorien angelegt!</p>
+                        </div>
+                        <div class="borderScheme mb-3" th:each="SubCategory, state : ${SubCategories}">
+                            <div th:text="${state.index + 1}" class="borderSchemeRightBottom p-0 center"
+                                style="height: 100%; width: 30px;">
+                            </div>
+                            <p th:text="${SubCategory.getTitle}" class="center">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+</body>
+
+</html>
