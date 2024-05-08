@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.ReportDTO;
-import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.DTO.ReportUpdateDTO;
 import com.stadtmeldeapp.Entity.ReportEntity;
@@ -75,12 +74,6 @@ public class ReportController {
     public ResponseEntity<List<ReportInfoDTO>> getReportsByLocationName(@PathVariable String locationName) {
         List<ReportInfoDTO> reports = reportService.getReportsByReportingLocationName(locationName);
         return new ResponseEntity<>(reports, HttpStatus.OK);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<ReportDetailInfoDTO> getReportDetails(@PathVariable int id) throws NotFoundException {
-        ReportDetailInfoDTO report = reportService.getReportDetails(id);
-        return new ResponseEntity<>(report, HttpStatus.OK);
     }
 
     @PutMapping("/{reportId}")

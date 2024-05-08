@@ -12,6 +12,14 @@
     border-radius: var(--border-radius);
     background-color: white;
 }
+.borderSchemeRed {
+    --border-width: 1px;
+    --border-color: rgba(201, 0, 0, 0.788);
+    --border-radius: 0.375rem;
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: white;
+}
 
 .borderSchemeContainer {
     --border-width: 1px;
@@ -97,6 +105,53 @@
     align-items: end;
 }
 
+.endTop {
+    display: flex;
+    width: 100%;
+    justify-content: end;
+    align-items: flex-start;
+}
+
+.endBottom {
+    display: flex;
+    width: 100%;
+    justify-content: end;
+    align-items: flex-end;
+}
+
+.categoryContainer {
+    display: flex;
+    height: 68px;
+    flex-direction: row;
+    align-items: center;
+}
+
+.categoryHeader {
+    width: 10%;
+    height: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.categoryBody {
+    width: 80%;
+    height: 100%;
+}
+
+.categoryFooter {
+    width: 10%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.hwAuto {
+    height: auto;
+    width: auto;
+}
+
 footer {
     position: fixed;
     bottom: 0;
@@ -115,5 +170,16 @@ footer {
 
 .icon-button img {
     width: 24px;
+    height: auto;
+}
+
+.icon-button-edit {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.icon-button-edit img {
+    width: 18px;
     height: auto;
 }

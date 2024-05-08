@@ -8,25 +8,26 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.MainCategoryDTO;
 import com.stadtmeldeapp.DTO.MainCategoryWithSubCategoriesDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.DTO.ReportPictureDTO;
-import com.stadtmeldeapp.DTO.SubcategoryDTO;
 import com.stadtmeldeapp.service.CategoryService;
 import com.stadtmeldeapp.service.ReportService;
 import com.stadtmeldeapp.service.StatusService;
 import com.stadtmeldeapp.service.UserService;
+import com.stadtmeldeapp.Entity.MaincategoryEntity;
 import com.stadtmeldeapp.Entity.ReportEntity;
 import com.stadtmeldeapp.Entity.StatusEntity;
+import com.stadtmeldeapp.Entity.SubcategoryEntity;
 import com.stadtmeldeapp.Entity.UserEntity;
 
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class WebsiteController {
@@ -55,32 +56,49 @@ public class WebsiteController {
     return "landingPage";
   }
 
-  @GetMapping("/cityInfo")
-  public String cityInfo(RedirectAttributes redirectAttributes, HttpSession session, Model model)
+  @GetMapping("/category")
+  public String cityInfo(HttpSession session, Model model)
       throws NotFoundException {
     UserEntity userEntity = userService.getUserByAuthentication();
     if (userEntity != null) {
       model.addAttribute("User", userEntity);
     }
-    model.addAttribute("cityInfo", true);
+    model.addAttribute("category", true);
     logger.info("GET CATEGORYS");
-    List<MainCategoryDTO> mainCategory = categoryService.getMaincategoriesByLocationName("Zweibrücken");
-    List<SubcategoryDTO> subCategory = new ArrayList<>();
-    ArrayList<SubcategoryDTO> subCategoryList = new ArrayList<>();
-    for (MainCategoryDTO maincategoryDTO : mainCategory) {
-      int mainCategoryId = (int) maincategoryDTO.id();
-      subCategory = categoryService.getSubCategoriesByMainCategoryId(mainCategoryId);
-      for (SubcategoryDTO subcategoryEntity : subCategory) {
-        subCategoryList.add(subcategoryEntity);
-      }
-    }
-    if (mainCategory != null) {
+    List<MainCategoryDTO> mainCategory = categoryService.getMaincategoriesByLocationName("Bexbach");
+    if (mainCategory.size() > 0) {
       model.addAttribute("MainCategories", mainCategory);
-      model.addAttribute("SubCategories", subCategoryList);
-      return "cityInfo";
+      return "category";
     }
-    logger.info("Main Category not found.");
-    return "cityInfo";
+    logger.info("Main Categories not found.");
+    model.addAttribute("MainCategories", null);
+    return "category";
+  }
+
+  @GetMapping("/subcategory")
+  public String getSubcategory(@RequestParam("maincategoryId") int maincategoryId, HttpSession session, Model model)
+      throws NotFoundException {
+    UserEntity userEntity = userService.getUserByAuthentication();
+    if (userEntity != null) {
+      model.addAttribute("User", userEntity);
+    }
+    model.addAttribute("category", true);
+    logger.info("GET CATEGORYS");
+    MaincategoryEntity mainCategory = categoryService.getMainCategoryById(maincategoryId);
+    List<SubcategoryEntity> subcategories = categoryService.getSubCategoryEntitiesByMainCategoryId(maincategoryId);
+    if (mainCategory != null) {
+      model.addAttribute("MainCategory", mainCategory);
+      if (subcategories.size() > 0) {
+        model.addAttribute("SubCategories", subcategories);
+        return "subcategory";
+      }
+      model.addAttribute("SubCategories", null);
+      return "subcategory";
+    }
+    logger.info("Main Categories not found.");
+    model.addAttribute("MainCategory", null);
+    model.addAttribute("SubCategories", null);
+    return "subcategory";
   }
 
   @GetMapping("/services")

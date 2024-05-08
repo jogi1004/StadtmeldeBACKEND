@@ -15,7 +15,6 @@ import com.google.protobuf.ByteString;
 import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.ReportDTO;
-import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.DTO.ReportUpdateDTO;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
@@ -73,8 +72,6 @@ public class ReportService {
     private StatusRepository statusRepository;
     @Autowired
     private MaincategoryRepository maincategoryRepository;
-    @Autowired
-    private ProfilePictureRepository imageRepository;
     @Autowired
     private UserService userService;
     @Autowired
@@ -147,8 +144,10 @@ public class ReportService {
             }  catch (IOException e) {
                 e.printStackTrace();
             } 
+        } else {
+            report.setReportPictureId(null);
         }
-        reportRepository.save(report);
+        ReportEntity reportEntity =  reportRepository.save(report);
     }
 
     public ReportEntity getReportById(int id) {
@@ -175,24 +174,6 @@ public class ReportService {
 
     public List<ReportInfoDTO> getReportsByReportingLocationName(String reportingLocationTitle) {
         return toInfoDTOList(reportRepository.findAllByReportingLocationName(reportingLocationTitle));
-    }
-
-    public ReportDetailInfoDTO getReportDetails(int id) throws NotFoundException {
-        ReportEntity report = reportRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Meldung nicht gefunden"));
-        Optional<ProfilePictureEntity> userProfilePicture = imageRepository
-                .findById(report.getUser().getProfilePictureId());
-
-        return new ReportDetailInfoDTO(
-                (report.getTitle() == null || report.getTitle().isBlank()) ? report.getSubcategory().getTitle()
-                        : report.getTitle(),
-                report.getDescription(),
-                report.getSubcategory().getMaincategoryEntity().getIconEntity().getId(), report.getStatus(),
-                dateFormat.format(report.getReportingTimestamp()), report.getReportPictureId(),
-                report.getReportPictureEntity().getPicture(),
-                report.getLongitude(),
-                report.getLatitude(), report.getUser().getUsername(), report.getReportingLocation().getName(),
-                userProfilePicture.isPresent() ? userProfilePicture.get().getImage() : null);
     }
 
     public List<ReportInfoDTO> getLatestReportsByReportingLocationId(int id) {
@@ -287,14 +268,6 @@ public class ReportService {
                 report.getStatus(), dateFormat.format(report.getReportingTimestamp()), report.getReportPictureId(),
                 report.getLongitude(),
                 report.getLatitude());
-    }
-
-    public ReportInfoDTO toReportInfoDTO(ReportDetailInfoDTO report) {
-        return new ReportInfoDTO(
-                report.titleOrsubcategoryName(), report.description(),
-                report.iconId(), report.status(), report.timestamp(), report.reportPictureId(),
-                report.longitude(),
-                report.latitude());
     }
 
     public BufferedImage blurImage(BufferedImage image) {

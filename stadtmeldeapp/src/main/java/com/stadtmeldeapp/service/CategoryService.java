@@ -80,6 +80,10 @@ public class CategoryService {
         return ret;
     }
 
+    public List<SubcategoryEntity> getSubCategoryEntitiesByMainCategoryId(int mainCategoryId) {
+        return subCategoryRepository.findByMaincategoryEntity_Id(mainCategoryId);
+    }
+
     public List<MainCategoryDTO> getMaincategoriesByLocationName(String reportingLocationName) {
         List<MaincategoryEntity> maincategoryEntities = mainCategoryRepository.findByReportingLocationEntity_Name(reportingLocationName);
         List<MainCategoryDTO> mainCategoryDTOs = new ArrayList<MainCategoryDTO>();
