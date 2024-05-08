@@ -33,7 +33,7 @@
                     <li class="nav-item" th:if= "${User == null}"><a th:class="${contact}? 'nav-link active' : 'nav-link'" th:href= "@{/contact}">Kontakt</a></li>
                     <li class="nav-item" th:if= "${User == null}"><a th:class="${services}? 'nav-link active' : 'nav-link'" th:href= "@{/services}">Dienstleistungen</a></li>
                     <li class="nav-item" th:if= "${User != null}"><a th:if= "${User.getRoles().get(0).getName() eq 'ADMIN'}" th:class="${overview}? 'nav-link active' : 'nav-link'" th:href= "@{/overview}">Übersicht</a></li>
-                    <li class="nav-item" th:if= "${User != null}"><a th:if= "${User.getRoles().get(0).getName() eq 'ADMIN'}" th:class="${cityInfo}? 'nav-link active' : 'nav-link'" th:href= "@{/cityInfo}">Stadtinformationen</a></li>
+                    <li class="nav-item" th:if= "${User != null}"><a th:if= "${User.getRoles().get(0).getName() eq 'ADMIN'}" th:class="${category}? 'nav-link active' : 'nav-link'" th:href= "@{/category}">Meldungs-Kategorien</a></li>
                     <li class="nav-item" th:if= "${User != null}"><a th:if= "${User.getRoles().get(0).getName() eq 'ADMIN'}" th:class="${reports}? 'nav-link active' : 'nav-link'" th:href= "@{/reports}">Getätigte Meldungen</a></li>
                     <li class="nav-item" th:if= "${User != null}"><a th:if= "${User.getRoles().get(0).getName() eq 'ADMIN'}" th:class="${status}? 'nav-link active' : 'nav-link'" th:href= "@{/status}">Status</a></li>
                 </ul>

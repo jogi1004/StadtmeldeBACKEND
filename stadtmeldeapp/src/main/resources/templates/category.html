@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <title>Kategorien</title>
+</head>
+
+<body>
+
+    <div layout:fragment="content">
+        <section class="my-5">
+            <div class="container px-4 px-lg-5">
+                <div th:if="${param.successSave}" class="alert alert-success">
+                    Neue Kategorie wurde erfolgreich gespeichert</div>
+                <div th:if="${param.errorSave}" class="alert alert-danger">
+                    Kategorie konnte nicht gespeichert werden
+                </div>
+                <div th:if="${param.errorDelete}" class="alert alert-danger">
+                    Kategorie konnte nicht gelöscht werden</div>
+                <h2 class="text-center mt-5">Meldungs-Kategorien</h2>
+                <div class="end">
+                    <button id="addCategoryButton" class="icon-button" onclick="addDIV()"><img src="images/plusIcon.png"
+                            alt="Icon"></button>
+                </div>
+            </div>
+
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 mx-0 mt-3 pt-3 borderSchemeContainer" style="height: 70vh;">
+                    <div id="categoryContainer" class="col-md-12 px-3 scrollbar" style="height: 95%">
+                        <div th:if="${MainCategories} == null">
+                            <p>Es wurden derzeit noch keine Kategorien angelegt!</p>
+                        </div>
+                        <div th:id="'category_' + ${state.index + 1}" class="borderScheme hover mb-3"
+                            th:each="category, state : ${MainCategories}">
+                            <div th:id="'innerCategoryContainer_' + ${state.index +1}" class="categoryContainer">
+                                <div th:id="'category_header_' + ${state.index + 1}" class="categoryHeader"
+                                    th:onclick="'javascript:loadSubcategoryPage(' + ${category.id}+ ')'">
+                                    <div th:id="'index_category_' + ${state.index + 1}" th:text="${state.index + 1}"
+                                        class="borderSchemeRightBottom p-0 center" style="height: 30px; width: 30px;">
+                                    </div>
+                                </div>
+                                <div th:id="'category_body_' + ${state.index + 1}" class="center categoryBody"
+                                    th:onclick="'javascript:loadSubcategoryPage(' + ${category.id}+ ')'">
+                                    <p class="m-0 center" th:id="'category_paragraph_' + ${state.index + 1}"
+                                        th:text="${category.title}" style="width: 100%;">
+                                    </p>
+                                </div>
+                                <div th:id="'category_footer_' + ${state.index + 1}" class="categoryFooter p-1">
+                                    <button th:id="'editCategoryButton_' + ${state.index + 1}"
+                                        class="icon-button-edit endTop hwAuto" onclick="convertParagraphToInput(this)">
+                                        <img src="images/editIcon.png" alt="Icon">
+                                    </button>
+                                    <button th:id="'deleteCategoryButton_' + ${state.index + 1}"
+                                        class="icon-button-edit endBottom hwAuto" onclick="deleteCategory(this)">
+                                        <img src="images/deleteIcon.png" alt="Icon">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog"
+                aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Löschen bestätigen</h5>
+                            <button type="button" class="close" aria-label="Close" onclick="closeModal()">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Bist du sicher das du die Kategorie löschen willst?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal()">Abbrechen</button>
+                            <button type="button" class="btn btn-danger"
+                                onclick="confirmDeleteCategory()">Löschen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script type="text/javascript" th:src="@{/js/category.js}"></script>
+        </section>
+    </div>
+
+</body>
+
+</html>
