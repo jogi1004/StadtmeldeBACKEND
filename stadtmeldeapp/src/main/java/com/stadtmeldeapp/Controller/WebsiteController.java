@@ -14,6 +14,7 @@ import com.stadtmeldeapp.DTO.MainCategoryDTO;
 import com.stadtmeldeapp.DTO.MainCategoryWithSubCategoriesDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.DTO.ReportPictureDTO;
+import com.stadtmeldeapp.DTO.SubcategoryDTO;
 import com.stadtmeldeapp.service.CategoryService;
 import com.stadtmeldeapp.service.ReportService;
 import com.stadtmeldeapp.service.StatusService;
@@ -21,7 +22,6 @@ import com.stadtmeldeapp.service.UserService;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
 import com.stadtmeldeapp.Entity.ReportEntity;
 import com.stadtmeldeapp.Entity.StatusEntity;
-import com.stadtmeldeapp.Entity.SubcategoryEntity;
 import com.stadtmeldeapp.Entity.UserEntity;
 
 import jakarta.servlet.http.HttpSession;

@@ -21,14 +21,14 @@ public class MaincategoryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String title;
 
     @OneToOne
     @JoinColumn(name = "reporting_location_id", nullable = false)
     private ReportingLocationEntity reportingLocationEntity;
 
-    @Column(name = "icon_id", nullable = true)
+    @Column(name = "icon_id", nullable = true, unique = false)
     private Integer iconId;
 
     @ManyToOne(fetch = FetchType.LAZY)

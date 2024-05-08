@@ -3,10 +3,13 @@ package com.stadtmeldeapp.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
+import com.stadtmeldeapp.DTO.ProfilePictureDTO;
 import com.stadtmeldeapp.Entity.ProfilePictureEntity;
 import com.stadtmeldeapp.Repository.ProfilePictureRepository;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -16,8 +19,8 @@ public class ProfilePictureService {
     @Autowired
     private ProfilePictureRepository profilePictureRepository;
 
-    public ProfilePictureEntity getProfilePictureById(int id) throws NotFoundException {
+    public ProfilePictureDTO getProfilePictureById(int id, HttpServletRequest request) throws NotFoundException, NotAllowedException {
         ProfilePictureEntity profilePictureEntity = profilePictureRepository.findById(id).orElseThrow(() -> new NotFoundException("Bild nicht gefunden"));
-        return profilePictureEntity;
+        return new ProfilePictureDTO(id, profilePictureEntity.getImage());
     }
 }

@@ -9,6 +9,7 @@ import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
 import com.stadtmeldeapp.DTO.MainCategoryDTO;
 import com.stadtmeldeapp.DTO.MainCategoryWithSubCategoriesDTO;
+import com.stadtmeldeapp.DTO.SubcategoryDTO;
 import com.stadtmeldeapp.Entity.MaincategoryEntity;
 import com.stadtmeldeapp.Entity.ReportingLocationEntity;
 import com.stadtmeldeapp.Entity.SubcategoryEntity;
@@ -70,8 +71,13 @@ public class CategoryService {
         subCategoryRepository.deleteById(id);
     }
 
-    public List<SubcategoryEntity> getSubCategoriesByMainCategoryId(int mainCategoryId) {
-        return subCategoryRepository.findByMaincategoryEntity_Id(mainCategoryId);
+    public List<SubcategoryDTO> getSubCategoriesByMainCategoryId(int mainCategoryId) {
+        List<SubcategoryEntity> subcats = subCategoryRepository.findByMaincategoryEntity_Id(mainCategoryId);
+        List<SubcategoryDTO> ret = new ArrayList<>();
+        for (SubcategoryEntity sub : subcats) {
+            ret.add(new SubcategoryDTO(sub.getTitle(), mainCategoryId));
+        }
+        return ret;
     }
 
     public List<MainCategoryDTO> getMaincategoriesByLocationName(String reportingLocationName) {
@@ -91,7 +97,7 @@ public class CategoryService {
         
         for (MaincategoryEntity maincategoryEntity : mainCategory) {
             int mainCategoryId = maincategoryEntity.getId();
-            List<SubcategoryEntity> subcategoryEntities = getSubCategoriesByMainCategoryId(mainCategoryId);
+            List<SubcategoryEntity> subcategoryEntities = subCategoryRepository.findByMaincategoryEntity_Id(mainCategoryId);
             mainCategoryWithSubCategoriesDTOs.add(new MainCategoryWithSubCategoriesDTO(maincategoryEntity, subcategoryEntities));
         }
         return mainCategoryWithSubCategoriesDTOs;

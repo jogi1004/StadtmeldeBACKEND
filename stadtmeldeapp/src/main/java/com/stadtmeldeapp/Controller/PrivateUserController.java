@@ -12,11 +12,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
+import com.stadtmeldeapp.DTO.NotificationsEnabledDTO;
 import com.stadtmeldeapp.DTO.ProfilePictureDTO;
 import com.stadtmeldeapp.DTO.UserInfoDTO;
 import com.stadtmeldeapp.DTO.UserInfoNoProfilePictureDTO;
-import com.stadtmeldeapp.Entity.ProfilePictureEntity;
 import com.stadtmeldeapp.Entity.UserEntity;
 import com.stadtmeldeapp.service.ProfilePictureService;
 import com.stadtmeldeapp.service.UserService;
@@ -65,16 +66,16 @@ public class PrivateUserController {
     }
 
     @GetMapping("/profilePicture/{profilePictureId}")
-    public ResponseEntity<ProfilePictureEntity> getProfilePicture(@PathVariable int profilePictureId)
-            throws NotFoundException {
-        ProfilePictureEntity profilePictureEntity = profilePictureService.getProfilePictureById(profilePictureId);
+    public ResponseEntity<ProfilePictureDTO> getProfilePicture(@PathVariable int profilePictureId, HttpServletRequest request)
+            throws NotFoundException, NotAllowedException {
+        ProfilePictureDTO profilePictureEntity = profilePictureService.getProfilePictureById(profilePictureId, request);
         return new ResponseEntity<>(profilePictureEntity, HttpStatus.OK);
     }
 
     @PutMapping("/notifications")
-    public ResponseEntity<Void> changeNotifications(@RequestBody boolean notificationsEnabled,
+    public ResponseEntity<Void> changeNotifications(@RequestBody NotificationsEnabledDTO notificationsEnabled,
             HttpServletRequest request) throws NotFoundException {
-        userService.updateNotificationsEnabled(notificationsEnabled, request);
+        userService.updateNotificationsEnabled(notificationsEnabled.notification(), request);
         return ResponseEntity.ok().build();
     }
 }

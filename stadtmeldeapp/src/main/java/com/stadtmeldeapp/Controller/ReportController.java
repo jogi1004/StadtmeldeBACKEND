@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.stadtmeldeapp.CustomExceptions.NotAllowedException;
 import com.stadtmeldeapp.CustomExceptions.NotFoundException;
-import com.stadtmeldeapp.DTO.NewReportCreatedDTO;
 import com.stadtmeldeapp.DTO.ReportDTO;
-import com.stadtmeldeapp.DTO.ReportDetailInfoDTO;
 import com.stadtmeldeapp.DTO.ReportInfoDTO;
 import com.stadtmeldeapp.DTO.ReportUpdateDTO;
 import com.stadtmeldeapp.Entity.ReportEntity;
@@ -28,7 +26,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
-
 
 @RestController
 @RequestMapping("/reports")
@@ -47,12 +44,12 @@ public class ReportController {
     private ReportPictureService reportPictureService;
 
     @PostMapping
-    public ResponseEntity<NewReportCreatedDTO> createReport(
+    public ResponseEntity<Void> createReport(
             @RequestBody ReportDTO reportDTO) throws NotFoundException, IOException, NotAllowedException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        NewReportCreatedDTO createdReport = reportService.createReport(reportDTO, username);
-        return new ResponseEntity<>(createdReport, HttpStatus.CREATED);
+        reportService.createReport(reportDTO, username);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/user/{userId}")
@@ -79,12 +76,6 @@ public class ReportController {
         return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ReportDetailInfoDTO> getReportDetails(@PathVariable int id) throws NotFoundException {
-        ReportDetailInfoDTO report = reportService.getReportDetails(id);
-        return new ResponseEntity<>(report, HttpStatus.OK);
-    }
-
     @PutMapping("/{reportId}")
     public ResponseEntity<ReportInfoDTO> updateReport(@PathVariable int reportId,
             @RequestBody ReportUpdateDTO reportDto,
@@ -96,24 +87,30 @@ public class ReportController {
     }
 
     @PutMapping("/admin/{reportId}")
-    public ResponseEntity<ReportInfoDTO> updateReportStatus(@PathVariable int reportId, @RequestBody String newStatus)
+    public ResponseEntity<?> updateReportStatus(@PathVariable int reportId, @RequestBody String newStatus)
             throws Exception {
-        ReportInfoDTO updatedReport = reportService.updateReportStatus(reportId, newStatus);
+
         ReportEntity reportEntity = reportService.getReportById(reportId);
-        if (reportEntity != null)
-            try {
-                emailSenderService.sendStatusChangeEmail(reportEntity.getUser().getEmail(),
-                        reportEntity.getUser().getUsername(),
-                        (reportEntity.getTitle() == null || reportEntity.getTitle().isBlank())
-                                ? reportEntity.getSubcategory().getTitle()
-                                : reportEntity.getTitle(),
-                        reportEntity.getStatus().getName(),
-                        new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).format(reportEntity.getReportingTimestamp()),
-                        staticMapService.getMapImage(reportEntity.getLatitude(), reportEntity.getLongitude()));
-            } catch (MessagingException | IOException e) {
-                e.printStackTrace();
-            }
-        return new ResponseEntity<>(updatedReport, HttpStatus.OK);
+        if (!reportEntity.getStatus().getName().equals(newStatus)) {
+
+            ReportInfoDTO updatedReport = reportService.updateReportStatus(reportId, newStatus);
+            if (reportEntity != null)
+                try {
+                    emailSenderService.sendStatusChangeEmail(reportEntity.getUser().getEmail(),
+                            reportEntity.getUser().getUsername(),
+                            (reportEntity.getTitle() == null || reportEntity.getTitle().isBlank())
+                                    ? reportEntity.getSubcategory().getTitle()
+                                    : reportEntity.getTitle(),
+                            reportEntity.getStatus().getName(),
+                            new SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY)
+                                    .format(reportEntity.getReportingTimestamp()),
+                            staticMapService.getMapImage(reportEntity.getLatitude(), reportEntity.getLongitude()));
+                } catch (MessagingException | IOException e) {
+                    e.printStackTrace();
+                }
+            return new ResponseEntity<>(updatedReport, HttpStatus.OK);
+        }
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{reportId}")
@@ -124,9 +121,10 @@ public class ReportController {
     }
 
     @GetMapping("/reportPicture/{reportPictureId}")
-    public ResponseEntity<ReportPictureEntity> getReportPicture(@PathVariable int reportPictureId) throws NotFoundException {
+    public ResponseEntity<ReportPictureEntity> getReportPicture(@PathVariable int reportPictureId)
+            throws NotFoundException {
         ReportPictureEntity reportPictureEntity = reportPictureService.getReportPictureById(reportPictureId);
         return new ResponseEntity<>(reportPictureEntity, HttpStatus.OK);
     }
-    
+
 }
